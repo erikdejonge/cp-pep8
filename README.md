@@ -7,10 +7,22 @@ reformats coffeescript in a consistant way, usage
 
 python cp.py -f yourfile.coffee
 
-Also ads debugging info to printstatements
+Also ads debugging info to printstatements (linenumber and sourcefile)
+
+<pre>
+print "hello world"
+</pre>
+
+becomes
+
+<pre>
+print "yourfile.cf:1", "helloworld"
+</pre>
 
 You can use this print method
-<code>
+
+<pre>
+
 print = (msg, others...) ->
     if msg.replace? #@if switch when while
         msg = msg.replace(".cf", ".cf") #@method call
@@ -85,4 +97,4 @@ print = (msg, others...) ->
             console?.log? msg, others
         return 1 #@return
 
-</code>
+</pre>
