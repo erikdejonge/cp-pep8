@@ -251,11 +251,12 @@ def main():
                 if prev_line:
                     if not in_test(["when", "if", "->", "=>", "else"], prev_line):
                         add_enter = True
+                    else:
+                        debuginfo += " denied by " + in_test_result(["when", "if", "->", "=>", "else"], prev_line)
             elif method_call(line):
+                debuginfo = ""
                 if assignment(line):
-                    debuginfo = "assigned "
-                else:
-                    debuginfo = "method call"
+                    debuginfo += "assigned "
 
                 if line.find(" ") is not 0:
                     debuginfo += "method call global scope"
@@ -267,7 +268,9 @@ def main():
                         if ws(line) < ws(prev_line):
                             debuginfo += "method call higher scope"
                             add_enter = True
-                    elif not func_test([scoped_method_call, method_call, class_method], prev_line.strip()):
+                        else:
+                            debuginfo += "nested method call"
+                    elif not func_test([func_def, scoped_method_call, method_call, class_method], prev_line.strip()):
                         debuginfo += "method call"
                         if data_assignment(line, prev_line):
                             debuginfo += "method call data assignment"
@@ -278,7 +281,7 @@ def main():
                                 debuginfo += "method call"
                                 add_enter = True
                         if in_test(["$watch", "if", "else"], prev_line.strip()):
-                            debuginfo += "method call after if else or watch"
+                            debuginfo += "method call after 1f 3lse or w@tch"
                             add_enter = False
                             add_double_enter = False
                     else:
