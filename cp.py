@@ -3,6 +3,8 @@
 import os
 from argparse import ArgumentParser
 
+ADDCOMMENT_WITH_FOUND_TYPE = True
+
 def anon_func(line):
     return "->" in line or "=>" in line
 
@@ -135,8 +137,6 @@ def main():
                 add_double_enter = True
                 first_method_factory = True
                 debuginfo = ".factory"
-            elif "print" in line:
-                pass
             elif "_.map" in line:
                 debuginfo = ".map"
                 add_enter = True
@@ -203,8 +203,6 @@ def main():
                             add_double_enter = False
                     else:
                         add_enter = False
-            elif "throw" in line:
-                debuginfo = "throw"
             elif in_test(["class"], line):
                 first_method_class = True
                 debuginfo = "class"
@@ -277,6 +275,9 @@ def main():
                         debuginfo = "large pull back in if statement"
                         in_if = False
                         add_enter = True
+            if "throw" in line:
+                print "WARNING THROW", line
+                line = line.replace("(", " ").replace(")", " ").replace("throw", "warning")
 
             if resolve_func:
                 if anon_func(line):
@@ -289,6 +290,8 @@ def main():
                 if line.strip() is ")":
                     debuginfo = "resolve func stopped"
                     resolve_func = False
+            elif "print" in line:
+                debuginfo = "debug statement"
 
             if ".cf" in fname:
                 if add_double_enter:
@@ -314,12 +317,14 @@ def main():
                         if not len(prev_line.strip()) is 0:
                             line = "\n" + line
 
-            #debuginfo = None
+            if not ADDCOMMENT_WITH_FOUND_TYPE:
+                debuginfo = None
+
             if debuginfo:
                 ef = line.find("\n")
                 if ef > 0 and ef is not 0:
                     line = line.rstrip("\n")
-                line = line + " #@" + debuginfo
+                line = line + " #@ " + debuginfo
                 if ef > 0 and ef is not 0:
                     line += "\n"
                 debuginfo = None
