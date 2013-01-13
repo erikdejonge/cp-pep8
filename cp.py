@@ -278,8 +278,11 @@ def main():
                             if assignment(prev_line):
                                 debuginfo += "method call after assignment"
                             else:
-                                debuginfo += "method call"
-                                add_enter = True
+                                if "print" in prev_line:
+                                    debuginfo += " after pr1nt"
+                                else:
+                                    debuginfo += " not after assignment"
+                                    add_enter = True
                         if in_test(["$watch", "if", "else"], prev_line.strip()):
                             debuginfo += "method call after 1f 3lse or w@tch"
                             add_enter = False
@@ -333,15 +336,24 @@ def main():
                 add_enter = True
             elif "return" in line:
                 debuginfo = "return"
-                if prev_line and next_line:
-                    if (prev_line.strip() == "") or ("else" in prev_line) or ("else" in next_line) and not in_test(["setInterval", "setTimeout"], prev_line):
-                        pass
-                    if is_test([")"], prev_line.strip()) or in_test(["_.filter", "_.map"], prev_line):
+                if prev_line:
+                    debuginfo += " | "
+                    if next_line:
+                        if (prev_line.strip() == "") or ("else" in prev_line) or ("else" in next_line) and not in_test(["setInterval", "setTimeout"], prev_line):
+                            debuginfo += " after empty line time func or 3lse"
+                    elif is_test([")"], prev_line.strip()) or in_test(["_.filter", "_.map"], prev_line):
+                        debuginfo += " after close or underscore func"
+                        add_enter = True
+                    elif "return" in prev_line:
+                        debuginfo += " after return"
                         add_enter = True
                     else:
                         if next_line and not in_test(["setInterval", "setTimeout"], prev_line):
                             if "class" not in next_line or len(next_line) > 0:
-                                pass
+                                debuginfo += " after js time func"
+                        elif scoped > 0:
+                                debuginfo += " after scope diff "+str(scoped)
+                                add_enter = True
             elif cnt > 1:
                 if line.strip() != "":
                     if scoped >= 2:
