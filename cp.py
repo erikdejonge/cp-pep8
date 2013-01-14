@@ -137,7 +137,7 @@ def main():
         fname = fname.replace("/:", ":")
 
     variables = ["print", "cvar.set", "throw", "cvar.commit_set", "clientcookies.del", "memory.get_promise", "cvar.mem_get", "cvar.get", "cvar.del", "urls.command", "urls.http_error", "clientcookies.set_no_warning", "clientcookies.set", "urls.make_route", "set_document_location", "urls.change_route", "clientcookies.get", "memory.set_no_warning", "memory.set", "memory.get", "memory.del"]
-    ignore_variables = ['91m', '92m', '94m', '95m', '41m', '97m']
+    color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
 
     mylines = []
     fname = fname.replace("coffee", "cf")
@@ -433,10 +433,12 @@ def main():
 
             line = line + "\n"
 
+        restore_color = None
         if orgfname.strip().endswith(".py"):
-            for ignore_var in ignore_variables:
-                if ignore_var in line:
-                    process_line = False
+            for color in color_vals_to_keep:
+                if color in line:
+                    restore_color = color
+                    line = line.replace(color, "93m")
 
         if process_line:
             for replace_variable in variables:
@@ -508,6 +510,10 @@ def main():
 
                             #print line.strip()
 
+        if restore_color:
+            line = line.replace('93m', restore_color)
+            restore_color = None
+
         buffer_string += line
         num += 1
         cnt += 1
@@ -518,7 +524,7 @@ def main():
     num = 1
     buffer_string = ""
     for line in open(args.myfile, "r"):
-        line = line.replace("@@@@", str(num))
+        line = line.replace("@@@@", str(num+1))
         num += 1
         buffer_string += line
 
