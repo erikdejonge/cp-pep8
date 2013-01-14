@@ -3,7 +3,7 @@
 import os
 from argparse import ArgumentParser
 
-ADDCOMMENT_WITH_FOUND_TYPE = True
+ADDCOMMENT_WITH_FOUND_TYPE = False
 
 def func_test(funcs, line):
     for func in funcs:
