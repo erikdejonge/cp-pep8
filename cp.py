@@ -3,7 +3,7 @@
 import os
 from argparse import ArgumentParser
 
-ADDCOMMENT_WITH_FOUND_TYPE = False
+ADDCOMMENT_WITH_FOUND_TYPE = True
 
 def func_test(funcs, line):
     for func in funcs:
@@ -30,7 +30,7 @@ def func_def(line):
 
 def method_call(line):
     line = str(line)
-    return (("(" in line and ")" in line)) or ("$(this)." in line and line.find("(") > 1 and line.find(")") > 1)
+    return (line.find("(") is 1 and line.find(")") is 1) or ("$(this)." in line and line.find("(") is 1 and line.find(")") is 1)
 
 
 def class_method(line):
@@ -96,6 +96,11 @@ def in_test(items, line):
     return False
 
 
+def in_test_kw(items, line):
+    items = [x + " " for x in items]
+    return in_test(items, line)
+
+
 def in_test_result(items, line):
     for item in items:
         if item in line:
@@ -107,6 +112,13 @@ def is_test(items, line):
     for item in items:
         if item is line.strip():
             return True
+    return False
+
+
+def is_member_var(line):
+    line = str(line)
+    if ":" in line and line.count(":") is 1 and not anon_func(line):
+        return True
     return False
 
 
@@ -211,7 +223,12 @@ def main():
                     first_method_factory = False
                     add_enter = True
                 else:
-                    add_double_enter = True
+                    debuginfo = "method"
+                    if is_member_var(prev_line):
+                        debuginfo += " after member var"
+                        add_enter = True
+                    else:
+                        add_double_enter = True
             elif ".then" in line:
                 debuginfo = "resolve method body"
                 resolve_func = True
@@ -219,6 +236,8 @@ def main():
                     if not in_test(["if", "else", "->", "=>"], prev_line):
                         add_enter = True
             elif func_def(line) and not resolve_func:
+                if first_method_factory:
+                    first_method_factory = False
                 debuginfo = "function def"
                 if line.find(" ") is not 0:
                     add_double_enter = True
@@ -246,13 +265,16 @@ def main():
                         add_double_enter = True
                 else:
                     debuginfo = "resolveresult"
-            elif  ("if" in line and line.strip().find("if") is 0) or in_test(["switch", "when", "while"], line):
-                debuginfo = in_test_result(["switch", "when", "while", "if"], line) + " statement"
+            elif  ("if" in line and line.strip().find("if") is 0) or in_test_kw(["switch", "for", "when", "while"], line):
+                debuginfo = in_test_result(["switch", "when", "while", "if", "for"], line) + " statement"
                 if prev_line:
                     if not in_test(["when", "if", "->", "=>", "else", "switch"], prev_line):
                         add_enter = True
                     else:
-                        debuginfo += " denied by " + str(in_test(["when", "if", "->", "=>", "else", "switch"], prev_line))
+                        debuginfo += " prevented by " + str(in_test_result(["when", "if", "->", "=>", "else", "switch"], prev_line))
+            elif ".directive" in line:
+                add_enter = True
+                debuginfo = ".directive"
             elif method_call(line):
                 debuginfo = ""
                 if assignment(line):
@@ -276,10 +298,12 @@ def main():
                             debuginfo += "method call data assignment"
                         else:
                             if assignment(prev_line):
+                                add_enter = True
                                 debuginfo += "method call after assignment"
                             else:
-                                if in_test(["print", "when"], prev_line):
-                                    debuginfo += " after "+str(in_test_result(["print", "when"], prev_line)).replace("print", "pr1nt")
+                                test_items = ["print", "when", "_.keys"]
+                                if in_test(test_items, prev_line):
+                                    debuginfo += " after " + str(in_test_result(test_items, prev_line)).replace("print", "pr1nt")
                                 else:
                                     debuginfo += " not after assignment"
                                     add_enter = True
@@ -293,6 +317,9 @@ def main():
 
             elif assignment(line):
                 debuginfo = "assignment"
+                if scoped > 0:
+                    add_enter = True
+                    debuginfo += " new scope"
             elif in_test(["class"], line):
                 first_method_class = True
                 debuginfo = "class"
@@ -326,9 +353,6 @@ def main():
                         if not resolve_func:
                             add_enter = True
                             debuginfo = ".each"
-            elif ".directive" in line:
-                add_enter = True
-                debuginfo = ".directive"
             elif line.lstrip().startswith("f_") and (line.endswith("->") or line.endswith("=>")):
                 add_double_enter = True
             elif "setInterval" in line or "setTimeout" in line:
@@ -352,8 +376,8 @@ def main():
                             if "class" not in next_line or len(next_line) > 0:
                                 debuginfo += " after js time func"
                         elif scoped > 0:
-                                debuginfo += " after scope diff "+str(scoped)
-                                add_enter = True
+                            debuginfo += " after scope diff " + str(scoped)
+                            add_enter = True
             elif cnt > 1:
                 if line.strip() != "":
                     if scoped >= 2:
@@ -384,6 +408,8 @@ def main():
                     resolve_func = False
             elif "print" in line:
                 debuginfo = "debug statement"
+            elif is_member_var(line):
+                debuginfo = "member initialization"
 
             if ".cf" in fname:
                 #print debuginfo, add_enter, add_double_enter
@@ -524,7 +550,7 @@ def main():
     num = 1
     buffer_string = ""
     for line in open(args.myfile, "r"):
-        line = line.replace("@@@@", str(num+1))
+        line = line.replace("@@@@", str(num + 1))
         num += 1
         buffer_string += line
 
