@@ -249,10 +249,10 @@ def main():
             elif  ("if" in line and line.strip().find("if") is 0) or in_test(["switch", "when", "while"], line):
                 debuginfo = in_test_result(["switch", "when", "while", "if"], line) + " statement"
                 if prev_line:
-                    if not in_test(["when", "if", "->", "=>", "else"], prev_line):
+                    if not in_test(["when", "if", "->", "=>", "else", "switch"], prev_line):
                         add_enter = True
                     else:
-                        debuginfo += " denied by " + in_test_result(["when", "if", "->", "=>", "else"], prev_line)
+                        debuginfo += " denied by " + str(in_test(["when", "if", "->", "=>", "else", "switch"], prev_line))
             elif method_call(line):
                 debuginfo = ""
                 if assignment(line):
@@ -278,8 +278,8 @@ def main():
                             if assignment(prev_line):
                                 debuginfo += "method call after assignment"
                             else:
-                                if "print" in prev_line:
-                                    debuginfo += " after pr1nt"
+                                if in_test(["print", "when"], prev_line):
+                                    debuginfo += " after "+str(in_test_result(["print", "when"], prev_line)).replace("print", "pr1nt")
                                 else:
                                     debuginfo += " not after assignment"
                                     add_enter = True
@@ -423,7 +423,7 @@ def main():
                 debuginfo = None
 
             line = line.replace(" != ", " is not ")
-            if "=>" not in line and "!=" not in line:
+            if "=>" not in line and "!=" not in line and "?" not in line:
                 line = line.replace("=>", "@>").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
 
             for i in range(0, 10):
