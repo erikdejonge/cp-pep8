@@ -474,11 +474,19 @@ def main():
                     check_split2.extend(i.split("("))
 
                 check_split = [x.strip() for x in check_split2]
-
+                found_color = False
                 if replace_variable in check_split and len(line.strip()) > 0:
                     if replace_variable + " = " not in line:
                         if fname.endswith(".py"):
-                            line = line.replace('"\\033[93m" + log_date_time_string(),', "")
+                            if "93m" in line:
+                                found_color = True
+                                line = line.replace('"\\033[93m" + log_date_time_string(),', "")
+                                line = line.replace('"\\033[93m"', "")
+                                line = line.replace('93m', "")
+                                line = line.replace('log_date_time_string(),', "")
+                                line = line.replace(", '\\033[m'", "")
+                            else:
+                                line = line.replace('log_date_time_string(),', "")
 
                         if fname in line:
                             line2 = line.replace(fname, "")
@@ -519,7 +527,10 @@ def main():
                             line = line + "?"
 
                         if orgfname.endswith(".py"):
-                            line = line.replace("print(", "print \"\\033[93m\" + log_date_time_string(), ")
+                            if found_color:
+                                line = line.replace("print(", "print \"\\033[93m\" + log_date_time_string(), ")
+                            else:
+                                line = line.replace("print(", "print log_date_time_string(), ")
                             #line = line.replace("print(", "print ")
                             line = line[:len(line) - 1]
                         else:
@@ -527,12 +538,16 @@ def main():
                                 line = line.replace("print(", "print ")
                                 line = line[:len(line) - 1]
 
+                        if found_color:
+                            line += ", '\\033[m'"
+
                         line += "\n"
                         line = line.replace('",', '", ')
                         line = line.replace('",  ', '", ')
 
                         if replace_variable == "throw":
                             line = line.replace(",", " +")
+
 
                             #print line.strip()
 
