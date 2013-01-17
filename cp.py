@@ -173,6 +173,7 @@ def main():
     debuginfo = ""
     in_if = False
     first_method_factory = first_method_class = False
+    when_statement = False
 
     for line in mylines:
         process_line = True
@@ -196,8 +197,6 @@ def main():
             line = ltemp
 
             line = line.replace("\n", "")
-            if "=>" not in line:
-                line = line.replace("==", " is ")
             add_enter = add_double_enter = False
 
             if "if " in line and not in_if:
@@ -269,7 +268,10 @@ def main():
                 debuginfo = in_test_result(["switch", "when", "while", "if", "for"], line) + " statement"
                 if prev_line:
                     if not in_test(["when", "if", "->", "=>", "else", "switch"], prev_line):
-                        add_enter = True
+                        if in_test(["return"], prev_line) and in_test(["when"], line):
+                            debuginfo += " prevented when statement"
+                        else:
+                            add_enter = True
                     else:
                         debuginfo += " prevented by " + str(in_test_result(["when", "if", "->", "=>", "else", "switch"], prev_line))
             elif ".directive" in line:
@@ -359,7 +361,7 @@ def main():
                 debuginfo = "setInterval timeout"
                 add_enter = True
             elif "return" in line:
-                debuginfo = "return"
+                debuginfo = "retrn"
                 if prev_line:
                     debuginfo += " | "
                     if next_line:
@@ -369,7 +371,7 @@ def main():
                         debuginfo += " after close or underscore func"
                         add_enter = True
                     elif "return" in prev_line:
-                        debuginfo += " after return"
+                        debuginfo += " after rturn"
                         add_enter = True
                     else:
                         if next_line and not in_test(["setInterval", "setTimeout"], prev_line):
@@ -448,8 +450,8 @@ def main():
                     line += "\n"
                 debuginfo = None
 
-            line = line.replace(" != ", " is not ")
-            if "=>" not in line and "!=" not in line and "?" not in line:
+            #line = line.replace(" != ", " is not ")
+            if "=>" not in line and "!=" not in line and not " == " in line and "?" not in line:
                 line = line.replace("=>", "@>").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
 
             for i in range(0, 10):
