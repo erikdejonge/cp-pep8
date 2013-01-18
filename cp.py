@@ -18,9 +18,12 @@ def anon_func(line):
     return "->" in line or "=>" in line
 
 
+def parenthesis(line):
+    return ("(" in line) and (")" in line)
+
 def anon_func_param(line):
     line = str(line)
-    return "(" in line and ")" in line and anon_func(line)
+    return parenthesis(line) and anon_func(line)
 
 
 def func_def(line):
@@ -68,6 +71,15 @@ def data_assignment(line, prev_line):
     else:
         return False
 
+def comment(line):
+    if not line:
+        return False
+
+    line = line.strip()
+    if line.startswith("#"):
+        return True
+    else:
+        return False
 
 def ws(line):
     cnt = 0
@@ -95,6 +107,12 @@ def in_test(items, line):
             return True
     return False
 
+def start_in_test(items, line):
+    line = line.strip()
+    for item in items:
+        if line.startswith(item):
+            return True
+    return False
 
 def in_test_kw(items, line):
     items = [x + " " for x in items]
@@ -121,6 +139,11 @@ def is_member_var(line):
         return True
     return False
 
+def global_object_method_call(line):
+    if line.find(" ")!=0:
+        if "." in line and parenthesis(line):
+            return True
+    return False
 
 def main():
     """
@@ -206,6 +229,9 @@ def main():
                 add_double_enter = True
                 first_method_factory = True
                 debuginfo = ".factory"
+            elif global_object_method_call(line):
+                debuginfo = "global method call"
+                add_double_enter = True
             elif "_.map" in line:
                 debuginfo = ".map"
                 add_enter = True
@@ -222,12 +248,16 @@ def main():
                     first_method_factory = False
                     add_enter = True
                 else:
-                    debuginfo = "method"
+                    debuginfo = "method " + str(scoped)
                     if is_member_var(prev_line):
                         debuginfo += " after member var"
                         add_enter = True
                     else:
-                        add_double_enter = True
+                        if scoped < 0:
+                            add_enter = True
+                            debuginfo += " in a nested scope"
+                        else:
+                            add_double_enter = True
             elif ".then" in line:
                 debuginfo = "resolve method body"
                 resolve_func = True
@@ -322,7 +352,7 @@ def main():
                 if scoped > 0:
                     add_enter = True
                     debuginfo += " new scope"
-            elif in_test(["class"], line):
+            elif start_in_test(["class"], line):
                 first_method_class = True
                 debuginfo = "class"
                 add_double_enter = True
@@ -380,6 +410,19 @@ def main():
                         elif scoped > 0:
                             debuginfo += " after scope diff " + str(scoped)
                             add_enter = True
+            elif "print" in line:
+                debuginfo = "debug statement"
+            elif is_member_var(line):
+                debuginfo = "member initialization"
+                if scoped > 0:
+                    add_double_enter = True
+                    debuginfo += " new scope"
+
+            if comment(line):
+                debuginfo = "comment -> " + debuginfo
+                add_enter = False
+                add_double_enter = False
+
             elif cnt > 1:
                 if line.strip() != "":
                     if scoped >= 2:
@@ -408,10 +451,6 @@ def main():
                 if line.strip() is ")":
                     debuginfo = "resolve func stopped"
                     resolve_func = False
-            elif "print" in line:
-                debuginfo = "debug statement"
-            elif is_member_var(line):
-                debuginfo = "member initialization"
 
             if ".cf" in fname:
                 #print debuginfo, add_enter, add_double_enter
