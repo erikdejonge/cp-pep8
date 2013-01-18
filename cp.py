@@ -419,7 +419,10 @@ def main():
                     debuginfo += " new scope"
 
             if comment(line):
-                debuginfo = "comment -> " + debuginfo
+                if debuginfo:
+                    debuginfo = "comment -> " + debuginfo
+                else:
+                    debuginfo = "comment"
                 add_enter = False
                 add_double_enter = False
 
