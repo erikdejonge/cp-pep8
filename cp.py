@@ -75,7 +75,7 @@ def comment(line):
     if not line:
         return False
 
-    line = line.strip()
+    line = line.strip().replace("#@", "")
     if line.startswith("#"):
         return True
     else:
@@ -493,7 +493,7 @@ def main():
                 debuginfo = None
 
             #line = line.replace(" != ", " is not ")
-            if "=>" not in line and "!=" not in line and not " == " in line and "?" not in line:
+            if not in_test(["=>", "!=", " == ", "?", "ng-", "input", "type="], line):
                 line = line.replace("=>", "@>").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
 
             for i in range(0, 10):
