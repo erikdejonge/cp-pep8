@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 
 ADDCOMMENT_WITH_FOUND_TYPE = False
 
+
 def func_test(funcs, line):
     for func in funcs:
         res = func(line)
@@ -20,6 +21,7 @@ def anon_func(line):
 
 def parenthesis(line):
     return ("(" in line) and (")" in line)
+
 
 def anon_func_param(line):
     line = str(line)
@@ -65,11 +67,11 @@ def data_assignment(line, prev_line):
     if "." in line:
         lvalue = line.split(".")[0].strip()
     if "." in prev_line:
-        rvalue = "|"
         rvalue = prev_line.split(".")[0].strip()
         return lvalue in rvalue
     else:
         return False
+
 
 def comment(line):
     if not line:
@@ -80,6 +82,7 @@ def comment(line):
         return True
     else:
         return False
+
 
 def ws(line):
     cnt = 0
@@ -107,12 +110,14 @@ def in_test(items, line):
             return True
     return False
 
+
 def start_in_test(items, line):
     line = line.strip()
     for item in items:
         if line.startswith(item):
             return True
     return False
+
 
 def in_test_kw(items, line):
     items = [x + " " for x in items]
@@ -135,15 +140,17 @@ def is_test(items, line):
 
 def is_member_var(line):
     line = str(line)
-    if ":" in line and line.count(":") is 1 and not anon_func(line):
+    if ":" in line and line.count(":") is 1 and not anon_func(line) and not in_test(["warning"], line):
         return True
     return False
 
+
 def global_object_method_call(line):
-    if line.find(" ")!=0:
+    if line.find(" ") != 0:
         if "." in line and parenthesis(line):
             return True
     return False
+
 
 def main():
     """
@@ -196,7 +203,6 @@ def main():
     debuginfo = ""
     in_if = False
     first_method_factory = first_method_class = False
-    when_statement = False
 
     for line in mylines:
         process_line = True
@@ -232,6 +238,8 @@ def main():
             elif global_object_method_call(line):
                 debuginfo = "global method call"
                 add_double_enter = True
+            elif "warning" in line:
+                debuginfo = "error state (wrning)"
             elif "_.map" in line:
                 debuginfo = ".map"
                 add_enter = True
@@ -294,7 +302,7 @@ def main():
                         add_double_enter = True
                 else:
                     debuginfo = "resolveresult"
-            elif  ("if" in line and line.strip().find("if") is 0) or in_test_kw(["switch", "for", "when", "while"], line):
+            elif ("if" in line and line.strip().find("if") is 0) or in_test_kw(["switch", "for", "when", "while"], line):
                 debuginfo = in_test_result(["switch", "when", "while", "if", "for"], line) + " statement"
                 if prev_line:
                     if not in_test(["when", "if", "->", "=>", "else", "switch"], prev_line):
@@ -430,6 +438,7 @@ def main():
                 if line.strip() != "":
                     if scoped >= 2:
                         debuginfo = "double scope change"
+                        add_enter = True
                         if next_line:
                             if "else" not in line:
                                 add_enter = True
@@ -501,7 +510,7 @@ def main():
                 line = line.replace("  is  ", " is ")
                 line = line.replace("  is not  ", " is ")
 
-            line = line + "\n"
+            line += "\n"
 
         restore_color = None
         if orgfname.strip().endswith(".py"):
@@ -568,14 +577,14 @@ def main():
                                 for i in range(0, line.count("(") - line.count(")")):
                                     line += ")"
                         if question:
-                            line = line + "?"
+                            line += "?"
 
                         if orgfname.endswith(".py"):
                             if found_color:
                                 line = line.replace("print(", "print \"\\033[93m\" + log_date_time_string(), ")
                             else:
                                 line = line.replace("print(", "print log_date_time_string(), ")
-                            #line = line.replace("print(", "print ")
+                                #line = line.replace("print(", "print ")
                             if line.strip().startswith("print"):
                                 line = line.replace("print(", "print ")
                                 line = line[:len(line) - 1]
@@ -595,12 +604,8 @@ def main():
                         if replace_variable == "throw":
                             line = line.replace(",", " +")
 
-
-                            #print line.strip()
-
         if restore_color:
             line = line.replace('93m', restore_color)
-            restore_color = None
 
         buffer_string += line
         num += 1
@@ -617,6 +622,7 @@ def main():
         buffer_string += line
 
     open(args.myfile, "w").write("\n\n" + buffer_string.lstrip())
+
 
 if __name__ == "__main__":
     main()
