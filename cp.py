@@ -140,7 +140,7 @@ def is_test(items, line):
 
 def is_member_var(line):
     line = str(line)
-    if ":" in line and line.count(":") is 1 and not anon_func(line) and not in_test(["warning"], line):
+    if (":" in line and not ".cf" in line) and line.count(":") is 1 and not anon_func(line) and not in_test(["warning"], line):
         return True
     return False
 
@@ -238,8 +238,6 @@ def main():
             elif global_object_method_call(line):
                 debuginfo = "global method call"
                 add_double_enter = True
-            elif "warning" in line:
-                debuginfo = "error state (wrning)"
             elif "_.map" in line:
                 debuginfo = ".map"
                 add_enter = True
@@ -256,7 +254,7 @@ def main():
                     first_method_factory = False
                     add_enter = True
                 else:
-                    debuginfo = "method " + str(scoped)
+                    debuginfo = "method"
                     if is_member_var(prev_line):
                         debuginfo += " after member var"
                         add_enter = True
@@ -266,6 +264,8 @@ def main():
                             debuginfo += " in a nested scope"
                         else:
                             add_double_enter = True
+            elif "warning" in line:
+                debuginfo = "error state (wrning)"
             elif ".then" in line:
                 debuginfo = "resolve method body"
                 resolve_func = True
@@ -437,11 +437,12 @@ def main():
             elif cnt > 1:
                 if line.strip() != "":
                     if scoped >= 2:
-                        debuginfo = "double scope change"
-                        add_enter = True
-                        if next_line:
-                            if "else" not in line:
-                                add_enter = True
+                        if not class_method(line):
+                            debuginfo = "double scope change"
+                            add_enter = True
+                            if next_line:
+                                if "else" not in line:
+                                    add_enter = True
             elif in_if:
                 if cnt > 1:
                     if "else" not in line and scoped >= 1:
