@@ -175,8 +175,8 @@ def main():
 
     if "__init__" in fname:
         fname = "/".join(str(args.myfile).split("/")[-2:])
-        fname = fname.replace("__init__.py", "")
-        fname = fname.replace("/:", ":")
+        #fname = fname.replace("__init__.py", "")
+        #fname = fname.replace("/:", ":")
 
     variables = ["print", "cvar.set", "throw", "cvar.commit_set", "clientcookies.del", "warning", "Exception", "memory.get_promise", "cvar.mem_get", "cvar.get", "cvar.del", "urls.command", "urls.http_error", "clientcookies.set_no_warning", "clientcookies.set", "urls.make_route", "set_document_location", "urls.change_route", "clientcookies.get", "memory.set_no_warning", "memory.set", "memory.get", "memory.del"]
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
