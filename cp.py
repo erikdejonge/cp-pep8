@@ -77,7 +77,7 @@ def comment(line):
     if not line:
         return False
 
-    line = line.strip().replace("#@", "")
+    line = line.strip().replace("# ##@", "")
     if line.startswith("#"):
         return True
     else:
@@ -217,7 +217,7 @@ def main():
 
             scoped = scope_diff(line, prev_line)
 
-            ls = line.split("#@")
+            ls = line.split("# ##@ ")
 
             ltemp = ls[0].rstrip()
             if ADDCOMMENT_WITH_FOUND_TYPE:
@@ -497,7 +497,7 @@ def main():
                 ef = line.find("\n")
                 if ef > 0 and ef is not 0:
                     line = line.rstrip("\n")
-                line = line + " #@ " + debuginfo
+                line = line + " # ##@ " + debuginfo
                 if ef > 0 and ef is not 0:
                     line += "\n"
                 debuginfo = None
