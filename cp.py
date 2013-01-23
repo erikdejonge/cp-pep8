@@ -14,6 +14,10 @@ def func_test(funcs, line):
     return False
 
 
+def on_scope(line):
+    return line.strip().find("$scope.") == 0
+
+
 def anon_func(line):
     line = str(line)
     return "->" in line or "=>" in line
@@ -145,10 +149,20 @@ def is_member_var(line):
     return False
 
 
+def global_line(line):
+    return line.find(" ") != 0
+
+
 def global_object_method_call(line):
-    if line.find(" ") != 0:
+    if global_line(line):
         if "." in line and parenthesis(line):
             return True
+    return False
+
+
+def class_method_call(line):
+    if line.strip().find("@") == 0:
+        return True
     return False
 
 
@@ -199,7 +213,7 @@ def main():
         myfile.close()
         mylines = open(args.myfile, "r")
 
-    resolve_func = False
+    resolve_func = 0
     debuginfo = ""
     in_if = False
     first_method_factory = first_method_class = False
@@ -207,7 +221,7 @@ def main():
     for line in mylines:
         process_line = True
         if ".cf" in fname:
-            prev_line = None
+            prev_line = ""
             next_line = None
 
             if cnt > 1:
@@ -240,7 +254,6 @@ def main():
                 add_double_enter = True
             elif "_.map" in line:
                 debuginfo = ".map"
-                add_enter = True
             elif class_method(line):
                 if first_method_class:
                     debuginfo = "classmethod " + str(first_method_class)
@@ -268,20 +281,30 @@ def main():
                 debuginfo = "error state (wrning)"
             elif ".then" in line:
                 debuginfo = "resolve method body"
-                resolve_func = True
+                resolve_func += 1
                 if prev_line:
                     if not in_test(["if", "else", "->", "=>"], prev_line):
                         add_enter = True
             elif func_def(line) and not resolve_func:
-                if first_method_factory:
-                    first_method_factory = False
                 debuginfo = "function def"
                 if line.find(" ") is not 0:
                     add_double_enter = True
                 else:
                     if not func_def(prev_line):
-                        debuginfo = "function def nested first"
-                        add_enter = True
+                        debuginfo = "function def nested"
+                        if first_method_factory:
+                            add_enter = True
+                        if on_scope(line):
+                            debuginfo += " on scope"
+                            add_enter = True
+                if first_method_factory:
+                    first_method_factory = False
+            elif class_method_call(line):
+                debuginfo = "class method call"
+                if scoped > 1:
+                    add_enter = True
+                    debuginfo += " scoped"
+
             elif scoped_method_call(line):
                 if prev_line:
                     if not func_test([method_call, class_method], prev_line.strip()) and not in_test([".then", "if", "->", "=>", "else"], prev_line):
@@ -302,7 +325,9 @@ def main():
                         add_double_enter = True
                 else:
                     debuginfo = "resolveresult"
-            elif ("if" in line and line.strip().find("if") is 0) or in_test_kw(["switch", "for", "when", "while"], line):
+            elif "if" in line and line.strip().find("if") is 0:
+                debuginfo = "if statement"
+            elif in_test_kw(["switch", "for", "when", "while"], line):
                 debuginfo = in_test_result(["switch", "when", "while", "if", "for"], line) + " statement"
                 if prev_line:
                     if not in_test(["when", "if", "->", "=>", "else", "switch"], prev_line):
@@ -316,7 +341,7 @@ def main():
                 add_enter = True
                 debuginfo = ".directive"
             elif method_call(line):
-                debuginfo = ""
+                debuginfo = "methodcall "
                 if assignment(line):
                     debuginfo += "assigned "
 
@@ -357,9 +382,16 @@ def main():
 
             elif assignment(line):
                 debuginfo = "assignment"
-                if scoped > 0:
-                    add_enter = True
-                    debuginfo += " new scope"
+                if global_line(line):
+                    debuginfo += " on global"
+                    if not global_line(prev_line):
+                        add_double_enter = True
+
+                if on_scope(line):
+                    debuginfo += " on scope"
+                    if scoped > 1:
+                        add_enter = True
+                        debuginfo += " new scope"
             elif start_in_test(["class"], line):
                 first_method_class = True
                 debuginfo = "class"
@@ -385,7 +417,6 @@ def main():
                 debuginfo = "angular module"
                 add_double_enter = True
             elif "_.filter" in line:
-                add_enter = True
                 debuginfo = ".filter"
             elif "_." in line or "$." in line:
                 if prev_line:
@@ -397,7 +428,6 @@ def main():
                 add_double_enter = True
             elif "setInterval" in line or "setTimeout" in line:
                 debuginfo = "setInterval timeout"
-                add_enter = True
             elif "return" in line:
                 debuginfo = "retrn"
                 if prev_line:
@@ -415,7 +445,7 @@ def main():
                         if next_line and not in_test(["setInterval", "setTimeout"], prev_line):
                             if "class" not in next_line or len(next_line) > 0:
                                 debuginfo += " after js time func"
-                        elif scoped > 0:
+                        elif scoped > 1:
                             debuginfo += " after scope diff " + str(scoped)
                             add_enter = True
             elif "print" in line:
@@ -436,19 +466,19 @@ def main():
 
             elif cnt > 1:
                 if line.strip() != "":
-                    if scoped >= 2:
+                    if scoped >= 4:
                         if not class_method(line):
-                            debuginfo = "double scope change"
+                            debuginfo = "quadrupel scope change"
                             add_enter = True
                             if next_line:
                                 if "else" not in line:
                                     add_enter = True
-            elif in_if:
-                if cnt > 1:
-                    if "else" not in line and scoped >= 1:
-                        debuginfo = "double scope change in if statement"
-                        in_if = False
-                        add_enter = True
+                                    #elif in_if:
+                                    #    if cnt > 1:
+                #        if "else" not in line and scoped >= 1:
+            #            debuginfo = "double scope change in if statement"
+            #            in_if = False
+            #            add_enter = True
             if "throw" in line:
                 print "WARNING THROW", line
                 line = line.replace("(", " ").replace(")", " ").replace("throw", "warning")
@@ -463,7 +493,7 @@ def main():
 
                 if line.strip() is ")":
                     debuginfo = "resolve func stopped"
-                    resolve_func = False
+                    resolve_func -= 1
 
             if ".cf" in fname:
                 #print debuginfo, add_enter, add_double_enter
