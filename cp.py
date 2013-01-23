@@ -63,6 +63,10 @@ def assignment(line):
     return False
 
 
+def indentation(line):
+    return line.count("    ")
+
+
 def data_assignment(line, prev_line):
     lvalue = "-"
     if '["' in line and '"]' in line:
@@ -276,7 +280,11 @@ def main():
                             add_enter = True
                             debuginfo += " in a nested scope"
                         else:
-                            add_double_enter = True
+                            if indentation(line) == 1:
+                                debuginfo += " indented 1"
+                                add_enter = True
+                            else:
+                                add_enter = True
             elif "warning" in line:
                 debuginfo = "error state (wrning)"
             elif ".then" in line:
