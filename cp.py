@@ -5,7 +5,6 @@ from argparse import ArgumentParser
 
 ADDCOMMENT_WITH_FOUND_TYPE = False
 
-
 def func_test(funcs, line):
     for func in funcs:
         res = func(line)
@@ -299,6 +298,7 @@ def main():
                     add_double_enter = True
                 else:
                     if not func_def(prev_line):
+                        add_enter = True
                         debuginfo = "function def nested"
                         if first_method_factory:
                             add_enter = True
@@ -387,7 +387,6 @@ def main():
                     else:
                         debuginfo += "method call nested "
                         add_enter = False
-
             elif assignment(line):
                 debuginfo = "assignment"
                 if global_line(line):
@@ -426,7 +425,7 @@ def main():
                 add_double_enter = True
             elif "_.filter" in line:
                 debuginfo = ".filter"
-            elif "_." in line or "$." in line:
+            elif "$." in line:
                 if prev_line:
                     if not ("_." in prev_line or "$." in prev_line or "if" in prev_line):
                         if not resolve_func:
@@ -445,17 +444,17 @@ def main():
                             debuginfo += " after empty line time func or 3lse"
                     elif is_test([")"], prev_line.strip()) or in_test(["_.filter", "_.map"], prev_line):
                         debuginfo += " after close or underscore func"
-                        add_enter = True
+                        #add_enter = True
                     elif "return" in prev_line:
                         debuginfo += " after rturn"
-                        add_enter = True
+                        #add_enter = True
                     else:
                         if next_line and not in_test(["setInterval", "setTimeout"], prev_line):
                             if "class" not in next_line or len(next_line) > 0:
                                 debuginfo += " after js time func"
                         elif scoped > 1:
                             debuginfo += " after scope diff " + str(scoped)
-                            add_enter = True
+                            #add_enter = True
             elif "print" in line:
                 debuginfo = "debug statement"
             elif is_member_var(line):
@@ -483,8 +482,8 @@ def main():
                                     add_enter = True
                                     #elif in_if:
                                     #    if cnt > 1:
-                #        if "else" not in line and scoped >= 1:
-            #            debuginfo = "double scope change in if statement"
+                                    #        if "else" not in line and scoped >= 1:
+                #            debuginfo = "double scope change in if statement"
             #            in_if = False
             #            add_enter = True
             if "throw" in line:
