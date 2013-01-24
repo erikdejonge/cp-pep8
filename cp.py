@@ -3,7 +3,8 @@
 import os
 from argparse import ArgumentParser
 
-ADDCOMMENT_WITH_FOUND_TYPE = True
+ADDCOMMENT_WITH_FOUND_TYPE = False
+
 
 def func_test(funcs, line):
     for func in funcs:
@@ -27,11 +28,23 @@ def parenthesis(line):
 
 
 def anon_func_param(line):
+    if functional(line):
+        return False
+
     line = str(line)
     return parenthesis(line) and anon_func(line)
 
 
+def functional(line):
+    if "_.filter" in line:
+        return True
+    if "_.map" in line:
+        return True
+
+
 def func_def(line):
+    if functional(line):
+        return False
     line = str(line)
     return ("->" in line or "=>" in line) and "=" in line
 
@@ -47,6 +60,9 @@ def class_method(line):
 
 
 def scoped_method_call(line):
+    if functional(line):
+        return False
+
     line = str(line)
     return ("=" in line and ("->" in line or "=>" in line)) or ("$scope." in line and "()" in line and line.find("     ") is not 0)
 
@@ -169,6 +185,12 @@ def class_method_call(line):
     return False
 
 
+def function_call(line):
+    if parenthesis(line) and not "." in line:
+        return True
+    return False
+
+
 def main():
     """
         main function
@@ -281,7 +303,11 @@ def main():
                         else:
                             if indentation(line) == 1:
                                 debuginfo += " indented 1"
-                                add_enter = True
+                                if scoped>=1:
+                                    debuginfo += " scoped >=1"
+                                    add_double_enter = True
+                                else:
+                                    add_enter = True
                             else:
                                 add_enter = True
             elif "warning" in line:
@@ -312,7 +338,6 @@ def main():
                 if scoped > 1:
                     add_enter = True
                     debuginfo += " scoped"
-
             elif scoped_method_call(line):
                 if prev_line:
                     if not func_test([method_call, class_method], prev_line.strip()) and not in_test([".then", "if", "->", "=>", "else"], prev_line):
@@ -399,6 +424,10 @@ def main():
                     if scoped > 1:
                         add_enter = True
                         debuginfo += " new scope"
+            elif function_call(line):
+                debuginfo = "function call"
+                if not function_call(prev_line):
+                    add_enter = True
             elif start_in_test(["class"], line):
                 first_method_class = True
                 debuginfo = "class"
@@ -484,9 +513,9 @@ def main():
                                     #elif in_if:
                                     #    if cnt > 1:
                                     #        if "else" not in line and scoped >= 1:
-                #            debuginfo = "double scope change in if statement"
-            #            in_if = False
-            #            add_enter = True
+                                    #            debuginfo = "double scope change in if statement"
+                                    #            in_if = False
+                #            add_enter = True
             if "throw" in line:
                 print "WARNING THROW", line
                 line = line.replace("(", " ").replace(")", " ").replace("throw", "warning")
