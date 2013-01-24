@@ -3,7 +3,7 @@
 import os
 from argparse import ArgumentParser
 
-ADDCOMMENT_WITH_FOUND_TYPE = False
+ADDCOMMENT_WITH_FOUND_TYPE = True
 
 def func_test(funcs, line):
     for func in funcs:
@@ -475,8 +475,9 @@ def main():
                 if line.strip() != "":
                     if scoped >= 4:
                         if not class_method(line):
-                            debuginfo = "quadrupel scope change"
-                            add_enter = True
+                            if not add_double_enter:
+                                debuginfo = "quadrupel scope change"
+                                add_enter = True
                             if next_line:
                                 if "else" not in line:
                                     add_enter = True
@@ -540,7 +541,7 @@ def main():
                 debuginfo = None
 
             #line = line.replace(" != ", " is not ")
-            if not in_test(["=>", "!=", " == ", "?", "ng-", "input", "type=", "/=", "\="], line):
+            if not in_test(["=>", "!=", "==", "?", "ng-", "input", "type=", "/=", "\="], line):
                 line = line.replace("=>", "@>").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
 
             for i in range(0, 10):
