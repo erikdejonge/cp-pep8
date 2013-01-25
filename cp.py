@@ -502,10 +502,10 @@ def main():
 
             elif cnt > 1:
                 if line.strip() != "":
-                    if scoped >= 4:
+                    if scoped >= 3:
                         if not class_method(line):
                             if not add_double_enter:
-                                debuginfo = "quadrupel scope change"
+                                debuginfo = "triple scope change"
                                 add_enter = True
                             if next_line:
                                 if "else" not in line:
