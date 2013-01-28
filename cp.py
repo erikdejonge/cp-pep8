@@ -244,6 +244,7 @@ def main():
     first_method_factory = first_method_class = False
 
     for line in mylines:
+        line = line.replace("fingerprint", "fingerpr1nt")
         process_line = True
         if ".cf" in fname:
             prev_line = ""
@@ -676,6 +677,7 @@ def main():
         if restore_color:
             line = line.replace('93m', restore_color)
 
+        line = line.replace("fingerpr1nt", "fingerprint")
         buffer_string += line
         num += 1
         cnt += 1
