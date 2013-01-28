@@ -274,11 +274,13 @@ def main():
                 add_double_enter = True
                 first_method_factory = True
                 debuginfo = ".factory"
+            elif "_." in line:
+                debuginfo = "underscore"
+                if scoped > 0:
+                    add_enter = True
             elif global_object_method_call(line):
                 debuginfo = "global method call"
                 add_double_enter = True
-            elif "_.map" in line:
-                debuginfo = ".map"
             elif class_method(line):
                 if first_method_class:
                     debuginfo = "classmethod " + str(first_method_class)
@@ -303,14 +305,14 @@ def main():
                         else:
                             if indentation(line) == 1:
                                 debuginfo += " indented 1"
-                                if scoped>=1:
+                                if scoped >= 1:
                                     debuginfo += " scoped >=1"
                                     add_double_enter = True
                                 else:
                                     add_enter = True
                             else:
                                 add_enter = True
-            elif "warning" in line:
+            elif line.strip().find("warning") == 0:
                 debuginfo = "error state (wrning)"
             elif ".then" in line:
                 debuginfo = "resolve method body"
@@ -427,7 +429,8 @@ def main():
             elif function_call(line):
                 debuginfo = "function call"
                 if not function_call(prev_line):
-                    add_enter = True
+                    if "return" in prev_line:
+                        add_enter = True
             elif start_in_test(["class"], line):
                 first_method_class = True
                 debuginfo = "class"
@@ -452,8 +455,6 @@ def main():
             elif "angular.module" in line:
                 debuginfo = "angular module"
                 add_double_enter = True
-            elif "_.filter" in line:
-                debuginfo = ".filter"
             elif "$." in line:
                 if prev_line:
                     if not ("_." in prev_line or "$." in prev_line or "if" in prev_line):
@@ -515,7 +516,7 @@ def main():
                                     #        if "else" not in line and scoped >= 1:
                                     #            debuginfo = "double scope change in if statement"
                                     #            in_if = False
-                #            add_enter = True
+                                    #            add_enter = True
             if "throw" in line:
                 print "WARNING THROW", line
                 line = line.replace("(", " ").replace(")", " ").replace("throw", "warning")
