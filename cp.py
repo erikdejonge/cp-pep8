@@ -40,7 +40,7 @@ def functional(line):
         return True
     if "_.map" in line:
         return True
-
+    return False
 
 def func_def(line):
     if functional(line):
@@ -58,13 +58,17 @@ def class_method(line):
     line = str(line)
     return ("->" in line or "=>" in line) and ":" in line
 
+def scope_declaration(line):
+    if line.strip().find("$scope") == 0:
+        return True
+    return False
 
 def scoped_method_call(line):
     if functional(line):
         return False
 
     line = str(line)
-    return ("=" in line and ("->" in line or "=>" in line)) or ("$scope." in line and "()" in line and line.find("     ") is not 0)
+    return ("=" in line and ("->" in line or "=>" in line)) or (scope_declaration(line) and "()" in line and line.find("     ") is not 0)
 
 
 def some_func(line):
@@ -73,8 +77,9 @@ def some_func(line):
 
 def assignment(line):
     line = line.strip()
-    if line.count("=") is 1 and not some_func(line):
-        return True
+    if line.count("=") is 1:
+        if not some_func(line):
+            return True
     return False
 
 
@@ -523,6 +528,9 @@ def main():
                     debuginfo = "comment"
                 add_enter = False
                 add_double_enter = False
+
+            if add_double_enter:
+                add_enter = False
 
             elif cnt > 1:
                 if line.strip() != "":
