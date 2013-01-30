@@ -78,6 +78,16 @@ def assignment(line):
     return False
 
 
+def keyword(line):
+    if in_test(["switch", "for", "when", "if", "else", "while"], line):
+        return True
+    elif some_func(line):
+        return True
+    elif anon_func(line):
+        return True
+    return False
+
+
 def indentation(line):
     return line.count("    ")
 
@@ -327,8 +337,10 @@ def main():
                     add_double_enter = True
                 else:
                     if not func_def(prev_line):
-                        add_enter = True
                         debuginfo = "function def nested"
+                        if not class_method(prev_line) and not keyword(prev_line):
+                            debuginfo += " after method"
+                            add_enter = True
                         if first_method_factory:
                             add_enter = True
                         if on_scope(line):
@@ -363,11 +375,15 @@ def main():
                     debuginfo = "resolveresult"
             elif "if" in line and line.strip().find("if") is 0:
                 debuginfo = "if statement"
-            elif in_test_kw(["switch", "for", "when", "while"], line):
+                if not func_def(prev_line) and not class_method(prev_line) and not keyword(prev_line):
+                    add_enter = True
+            elif in_test_kw(["when"], line):
+                debuginfo = in_test_result(["when"], line) + " statement"
+            elif in_test_kw(["switch", "for", "while"], line):
                 debuginfo = in_test_result(["switch", "when", "while", "if", "for"], line) + " statement"
                 if prev_line:
                     if not in_test(["when", "if", "->", "=>", "else", "switch"], prev_line):
-                        if in_test(["return"], prev_line) and in_test(["when"], line):
+                        if in_test(["return"], prev_line) and in_test(["when"], line) and scoped>1:
                             debuginfo += " prevented when statement"
                         else:
                             add_enter = True
@@ -424,9 +440,10 @@ def main():
 
                 if on_scope(line):
                     debuginfo += " on scope"
-                    if scoped > 1:
-                        add_enter = True
-                        debuginfo += " new scope"
+
+                if scoped >= 1:
+                    add_enter = True
+                    debuginfo += " new scope"
             elif function_call(line):
                 debuginfo = "function call"
                 if not function_call(prev_line):
@@ -444,6 +461,10 @@ def main():
                 if prev_line:
                     if not ")" is prev_line.strip():
                         add_enter = True
+            elif "$watch" in line:
+                debuginfo = "watch def"
+                if not keyword(prev_line):
+                    add_enter = True
             elif "#noinspection" in line:
                 debuginfo = "no-inspection"
                 add_enter = True
@@ -484,15 +505,16 @@ def main():
                             if "class" not in next_line or len(next_line) > 0:
                                 debuginfo += " after js time func"
                         elif scoped > 1:
-                            debuginfo += " after scope diff " + str(scoped)
+                            debuginfo += " after scope d!ff " + str(scoped)
                             #add_enter = True
             elif "print" in line:
                 debuginfo = "debug statement"
             elif is_member_var(line):
                 debuginfo = "member initialization"
                 if scoped > 0:
-                    add_double_enter = True
-                    debuginfo += " new scope"
+                    if not is_member_var(prev_line):
+                        add_double_enter = True
+                        debuginfo += " new scope"
 
             if comment(line):
                 if debuginfo:
@@ -566,7 +588,7 @@ def main():
                 ef = line.find("\n")
                 if ef > 0 and ef is not 0:
                     line = line.rstrip("\n")
-                line = line + " # ##@ " + debuginfo
+                line = line + " # ##@ " + debuginfo.replace("i", "1").replace("return", "retrn")
                 if ef > 0 and ef is not 0:
                     line += "\n"
                 debuginfo = None
