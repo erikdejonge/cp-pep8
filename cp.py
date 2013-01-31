@@ -42,6 +42,7 @@ def functional(line):
         return True
     return False
 
+
 def func_def(line):
     if functional(line):
         return False
@@ -58,10 +59,12 @@ def class_method(line):
     line = str(line)
     return ("->" in line or "=>" in line) and ":" in line
 
+
 def scope_declaration(line):
     if line.strip().find("$scope") == 0:
         return True
     return False
+
 
 def scoped_method_call(line):
     if functional(line):
@@ -388,7 +391,7 @@ def main():
                 debuginfo = in_test_result(["switch", "when", "while", "if", "for"], line) + " statement"
                 if prev_line:
                     if not in_test(["when", "if", "->", "=>", "else", "switch"], prev_line):
-                        if in_test(["return"], prev_line) and in_test(["when"], line) and scoped>1:
+                        if in_test(["return"], prev_line) and in_test(["when"], line) and scoped > 1:
                             debuginfo += " prevented when statement"
                         else:
                             add_enter = True
@@ -454,6 +457,8 @@ def main():
                 if not function_call(prev_line):
                     if "return" in prev_line:
                         add_enter = True
+                if prev_line.strip() == ")":
+                    add_enter = True
             elif start_in_test(["class"], line):
                 first_method_class = True
                 debuginfo = "class"
