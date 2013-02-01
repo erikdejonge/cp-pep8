@@ -80,7 +80,7 @@ def some_func(line):
 
 def assignment(line):
     line = line.strip()
-    if line.count("=") is 1:
+    if line.count("=") is 1 and not is_member_var(line):
         if not some_func(line):
             return True
     return False
@@ -607,7 +607,7 @@ def main():
                 debuginfo = None
 
             #line = line.replace(" != ", " is not ")
-            if not in_test(["=>", "!=", "==", "?", "ng-", "input", "type=", "/=", "\="], line):
+            if not in_test(["=>", "!=", "==", "?", "ng-", "input", "type=", "/=", "\=", "template:"], line):
                 line = line.replace("=>", "@>").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
 
             for i in range(0, 10):
