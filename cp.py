@@ -607,7 +607,7 @@ def main():
                 debuginfo = None
 
             #line = line.replace(" != ", " is not ")
-            if not in_test(["=>", "!=", "==", "?", "ng-", "input", "type=", "/=", "\=", "template:"], line):
+            if not in_test(["=>", "!=", "==", "?", "ng-", "input", "type=", "/=", "\=", ":"], line):
                 line = line.replace("=>", "@>").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
 
             for i in range(0, 10):
