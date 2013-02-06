@@ -235,8 +235,12 @@ def main():
         #fname = fname.replace("__init__.py", "")
         #fname = fname.replace("/:", ":")
 
-    variables = ["print", "cvar.set", "throw", "cvar.commit_set", "clientcookies.del", "warning", "Exception", "utils.exist_truth", "memory.get_promise", "cvar.mem_get", "cvar.get", "cvar.del", "urls.command", "urls.http_error", "clientcookies.set_no_warning", "clientcookies.set", "urls.make_route", "set_document_location", "urls.change_route", "clientcookies.get", "memory.set_no_warning", "memory.set", "memory.get", "memory.del", "memory.bool_test"]
+    #variables = ["print", "cvar.set", "throw", "cvar.commit_set", "clientcookies.del", "warning", "Exception", "utils.exist_truth", "memory.del", "memory.set", "memory.get_promise", "cvar.mem_get", "cvar.get", "cvar.del", "urls.command", "urls.http_error", "clientcookies.set_no_warning", "clientcookies.set", "urls.make_route", "set_document_location", "urls.change_route", "clientcookies.get", "memory.get"]
+    #undo_variables = ["cvar.set", "throw", "cvar.commit_set", "clientcookies.del", "warning", "Exception", "utils.exist_truth", "memory.del", "memory.set", "memory.get_promise", "cvar.mem_get", "cvar.get", "cvar.del", "urls.command", "urls.http_error", "clientcookies.set_no_warning", "clientcookies.set", "urls.make_route", "set_document_location", "urls.change_route", "clientcookies.get", "memory.get"]
+    variables = ["print", "warning"]
+    undo_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
+
 
     mylines = []
     fname = fname.replace("coffee", "cf")
@@ -608,9 +612,10 @@ def main():
 
             #line = line.replace(" != ", " is not ")
             if not in_test(["=>", "!=", "==", "?", "ng-", "input", "type=", "/=", "\=", ":"], line):
-                line = line.replace("=>", "@>").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
+                line = line.replace("=>", "@>").replace("( ", "(").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
 
             for i in range(0, 10):
+                line = line.replace("( ", "(")
                 line = line.replace("  =", " =")
                 line = line.replace("  is  ", " is ")
                 line = line.replace("  is not  ", " is ")
@@ -668,7 +673,10 @@ def main():
                                 location = fname + ":" + "@@@@"
                                 location_id += 1
 
-                                line = line.replace(replace_variable, replace_variable + "(\"" + str(location) + "\",")
+                                if replace_variable not in undo_variables:
+                                    line = line.replace(replace_variable, replace_variable + "(\"" + str(location) + "\",")
+                                else:
+                                    line = line.replace(replace_variable, replace_variable + "(").replace("( \"", "(\"")
                         for i in range(0, 20):
                             line = line.rstrip(",")
                             line = line.rstrip()
