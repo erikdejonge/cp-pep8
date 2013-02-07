@@ -238,7 +238,7 @@ def main():
     #variables = ["print", "cvar.set", "throw", "cvar.commit_set", "clientcookies.del", "warning", "Exception", "utils.exist_truth", "memory.del", "memory.set", "memory.get_promise", "cvar.mem_get", "cvar.get", "cvar.del", "urls.command", "urls.http_error", "clientcookies.set_no_warning", "clientcookies.set", "urls.make_route", "set_document_location", "urls.change_route", "clientcookies.get", "memory.get"]
     #undo_variables = ["cvar.set", "throw", "cvar.commit_set", "clientcookies.del", "warning", "Exception", "utils.exist_truth", "memory.del", "memory.set", "memory.get_promise", "cvar.mem_get", "cvar.get", "cvar.del", "urls.command", "urls.http_error", "clientcookies.set_no_warning", "clientcookies.set", "urls.make_route", "set_document_location", "urls.change_route", "clientcookies.get", "memory.get"]
     variables = ["print", "warning"]
-    undo_variables = []
+    undo_variables = [""]
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
 
 
