@@ -20,6 +20,8 @@ def on_scope(line):
 
 def anon_func(line):
     line = str(line)
+    if in_test(["warning", "print"], line):
+        return False
     return "->" in line or "=>" in line
 
 
@@ -47,6 +49,10 @@ def func_def(line):
     if functional(line):
         return False
     line = str(line)
+
+    if in_test(["warning", "print"], line):
+        return False
+
     return ("->" in line or "=>" in line) and "=" in line
 
 
@@ -57,6 +63,10 @@ def method_call(line):
 
 def class_method(line):
     line = str(line)
+
+    if in_test(["warning", "print"], line):
+        return False
+
     return ("->" in line or "=>" in line) and ":" in line
 
 
@@ -68,6 +78,10 @@ def scope_declaration(line):
 
 def scoped_method_call(line):
     if functional(line):
+        return False
+
+
+    if in_test(["warning", "print"], line):
         return False
 
     line = str(line)
@@ -87,7 +101,7 @@ def assignment(line):
 
 
 def keyword(line):
-    if in_test(["switch", "for", "when", "if", "else", "while"], line):
+    if in_test(["switch", "for", "when", "if", "else", "while", "try", "catch"], line):
         return True
     elif some_func(line):
         return True
@@ -299,7 +313,7 @@ def main():
                 debuginfo = ".factory"
             elif "_." in line:
                 debuginfo = "underscore"
-                if scoped > 0:
+                if scoped == 0:
                     add_enter = True
             elif global_object_method_call(line):
                 debuginfo = "global method call"
@@ -352,7 +366,6 @@ def main():
                         debuginfo = "function def nested"
                         if not class_method(prev_line) and not keyword(prev_line):
                             debuginfo += " after method"
-                            add_enter = True
                         if first_method_factory:
                             add_enter = True
                         if on_scope(line):
@@ -478,7 +491,8 @@ def main():
             elif "$watch" in line:
                 debuginfo = "watch def"
                 if not keyword(prev_line):
-                    add_enter = True
+                    if scoped == 0:
+                        add_enter = True
             elif "#noinspection" in line:
                 debuginfo = "no-inspection"
                 add_enter = True
@@ -487,7 +501,6 @@ def main():
                 add_enter = True
             elif "try" in line:
                 debuginfo = "try"
-                add_enter = True
             elif "angular.module" in line:
                 debuginfo = "angular module"
                 add_double_enter = True
