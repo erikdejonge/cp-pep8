@@ -366,7 +366,9 @@ def main():
                         debuginfo = "function def nested"
                         if not class_method(prev_line) and not keyword(prev_line):
                             debuginfo += " after method"
+                            add_enter = True
                         if first_method_factory:
+                            debuginfo += "first method factory"
                             add_enter = True
                         if on_scope(line):
                             debuginfo += " on scope"
