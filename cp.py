@@ -311,7 +311,7 @@ def main():
                 add_double_enter = True
                 first_method_factory = True
                 debuginfo = ".factory"
-         
+
             elif global_object_method_call(line):
                 debuginfo = "global method call"
                 add_double_enter = True
