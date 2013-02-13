@@ -348,6 +348,12 @@ def main():
                                 add_enter = True
             elif line.strip().find("warning") == 0:
                 debuginfo = "error state (wrning)"
+            elif ".$on" in line:
+                debuginfo = "0n event"
+                add_enter = True
+            elif ".bind" in line:
+                debuginfo = "b1nd event"
+                add_enter = True
             elif ".then" in line:
                 debuginfo = "resolve method body"
                 resolve_func += 1
