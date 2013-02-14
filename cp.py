@@ -195,7 +195,7 @@ def is_test(items, line):
 
 def is_member_var(line):
     line = str(line)
-    if (":" in line and not ".cf" in line) and line.count(":") is 1 and not anon_func(line) and not in_test(["warning"], line):
+    if (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not in_test(["warning"], line):
         return True
     return False
 
@@ -258,8 +258,10 @@ def main():
 
     mylines = []
     fname = fname.replace("coffee", "cf")
+    import cStringIO
 
     data = myfile.read()
+
     for i in range(0, 10):
         data = data.replace("\n\n", "\n")
     data = data.replace(")->", ") ->")
@@ -272,7 +274,8 @@ def main():
 
     if ".cf" not in fname:
         myfile.close()
-        mylines = open(args.myfile, "r")
+    #    mylines = open(args.myfile, "r")
+        mylines = cStringIO.StringIO(data)
 
     resolve_func = 0
     debuginfo = ""
@@ -744,11 +747,12 @@ def main():
         cnt += 1
 
     myfile.close()
-    open(args.myfile, "w").write("\n" + buffer_string.lstrip())
+    sio_file2 = cStringIO.StringIO("\n" + buffer_string.lstrip())
+    #open(args.myfile, "w").write()
 
     num = 1
     buffer_string = ""
-    for line in open(args.myfile, "r"):
+    for line in sio_file2:
         line = line.replace("@@@@", str(num + 1))
         num += 1
         buffer_string += line
@@ -757,4 +761,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    from lockfile import FileLock
+    lock = FileLock("cplockfile")
+    with lock:
+        main()
+        print "done cp.py"
