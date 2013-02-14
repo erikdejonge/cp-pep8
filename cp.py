@@ -274,8 +274,8 @@ def main():
 
     if ".cf" not in fname:
         myfile.close()
-    #    mylines = open(args.myfile, "r")
-        mylines = cStringIO.StringIO(data)
+        mylines = open(args.myfile, "r")
+        #mylines = cStringIO.StringIO(data)
 
     resolve_func = 0
     debuginfo = ""
