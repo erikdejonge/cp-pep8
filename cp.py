@@ -353,7 +353,9 @@ def main():
                 debuginfo = "error state (wrning)"
             elif ".$on" in line:
                 debuginfo = "0n event"
-                add_enter = True
+                if scoped == 0:
+                    debuginfo += " on same scope "
+                    add_enter = True
             elif ".bind" in line:
                 debuginfo = "b1nd event"
                 add_enter = True
@@ -363,7 +365,7 @@ def main():
                 if prev_line:
                     if not in_test(["if", "else", "->", "=>"], prev_line):
                         add_enter = True
-            elif func_def(line) and not resolve_func:
+            elif func_def(line):
                 debuginfo = "function def"
                 if line.find(" ") is not 0:
                     add_double_enter = True
@@ -371,7 +373,7 @@ def main():
                     if not func_def(prev_line):
                         debuginfo = "function def nested"
                         if not class_method(prev_line) and not keyword(prev_line):
-                            debuginfo += " after method"
+                            debuginfo += " somewhere"
                             add_enter = True
                         if first_method_factory:
                             debuginfo += "first method factory"
@@ -379,6 +381,8 @@ def main():
                         if on_scope(line):
                             debuginfo += " on scope"
                             add_enter = True
+                    else:
+                        debuginfo = "functiondef after functiondef"
                 if first_method_factory:
                     first_method_factory = False
             elif class_method_call(line):
@@ -394,22 +398,25 @@ def main():
                             if len(prev_line) > 0:
                                 add_double_enter = True
                             else:
+                                debuginfo += "after non empty line"
                                 add_enter = True
                         else:
-                            add_enter = True
-                if resolve_func:
-                    debuginfo = "resolveresult"
+                            debuginfo += " not on globalscope"
             elif anon_func(line) and not in_test([".directive", "$watch"], line):
                 if not resolve_func:
                     debuginfo = "anonymousfunction"
                     if line.find(" ") is not 0:
                         add_double_enter = True
                 else:
-                    debuginfo = "resolveresult"
+                    debuginfo = "resolve result 2"
             elif "if" in line and line.strip().find("if") is 0:
                 debuginfo = "if statement"
+
                 if not func_def(prev_line) and not class_method(prev_line) and not keyword(prev_line):
-                    add_enter = True
+                    debuginfo += " not after func, class or keyword"
+                    if scoped >= 1:
+                        debuginfo = " and new scope"
+                        add_enter = True
             elif in_test_kw(["when"], line):
                 debuginfo = in_test_result(["when"], line) + " statement"
             elif in_test_kw(["switch", "for", "while"], line):
@@ -474,7 +481,7 @@ def main():
                 if on_scope(line):
                     debuginfo += " on scope"
 
-                if scoped >= 1:
+                if scoped >= 2:
                     add_enter = True
                     debuginfo += " new scope"
             elif function_call(line):
@@ -583,7 +590,7 @@ def main():
                 line = line.replace("(", " ").replace(")", " ").replace("throw", "warning")
 
             if resolve_func:
-                if anon_func(line):
+                if anon_func(line) and in_test(["(", ")"], line) and not "=" in line:
                     if resolve_func:
                         if prev_line:
                             if not (".then" in prev_line or "->" in prev_line or "=>" in prev_line):
