@@ -22,7 +22,11 @@ def anon_func(line):
     line = str(line)
     if in_test(["warning", "print"], line):
         return False
-    return "->" in line or "=>" in line
+    if "->" in line:
+        return True
+    if "=>" in line:
+        return True
+    return False
 
 
 def parenthesis(line):
@@ -53,7 +57,7 @@ def func_def(line):
     if in_test(["warning", "print"], line):
         return False
 
-    return ("->" in line or "=>" in line) and "=" in line
+    return ("->" in line or "=>" in line) and "= " in line
 
 
 def method_call(line):
@@ -85,7 +89,7 @@ def scoped_method_call(line):
         return False
 
     line = str(line)
-    return ("=" in line and ("->" in line or "=>" in line)) or (scope_declaration(line) and "()" in line and line.find("     ") is not 0)
+    return ("= " in line and ("->" in line or "=>" in line)) or (scope_declaration(line) and "()" in line and line.find("     ") is not 0)
 
 
 def some_func(line):
@@ -94,7 +98,7 @@ def some_func(line):
 
 def assignment(line):
     line = line.strip()
-    if line.count("=") is 1 and not is_member_var(line):
+    if line.count("= ") is 1 and not is_member_var(line):
         if not some_func(line):
             return True
     return False
@@ -590,7 +594,7 @@ def main():
                 line = line.replace("(", " ").replace(")", " ").replace("throw", "warning")
 
             if resolve_func:
-                if anon_func(line) and in_test(["(", ")"], line) and not "=" in line:
+                if anon_func(line) and in_test(["(", ")"], line) and not "= " in line:
                     if resolve_func:
                         if prev_line:
                             if not (".then" in prev_line or "->" in prev_line or "=>" in prev_line):
