@@ -14,10 +14,18 @@ def replace_variables():
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
     return color_vals_to_keep, undo_variables, variables
 
+
 def func_test(funcs, line):
     for func in funcs:
         res = func(line)
         if res:
+            return True
+    return False
+
+
+def global_class_declare(line):
+    if line.strip().find("=") == len(line.strip()) - 1:
+        if line.find(" ") != 0:
             return True
     return False
 
@@ -76,7 +84,7 @@ def method_call(line):
 def class_method(line):
     line = str(line)
 
-    if in_test(["warning", "print"], line):
+    if in_test(["print"], line):
         return False
 
     return ("->" in line or "=>" in line) and ":" in line
@@ -112,7 +120,7 @@ def assignment(line):
 
 
 def keyword(line):
-    if line.strip()=="":
+    if line.strip() == "":
         return True
     if in_test(["print", "switch", "for", "when", "if", "else", "while", "try", "catch", "$on"], line):
         return True
@@ -239,9 +247,10 @@ def function_call(line):
 def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, line_cnt):
     if ".factory" in line:
         add_double_enter = True
-
         debuginfo = ".factory"
-
+    elif global_class_declare(line):
+        debuginfo = "global_class_declare"
+        add_enter = True
     elif global_object_method_call(line):
         debuginfo = "global method call"
         add_double_enter = True
@@ -276,7 +285,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                             add_enter = True
                     else:
                         add_enter = True
-    elif line.strip().find("warning") == 0:
+    elif line.strip().find("warning") == 0 and ":" not in line:
         debuginfo = "error state (wrning)"
     elif ".$on" in line:
         debuginfo = "0n event"
@@ -345,6 +354,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             debuginfo = "resolve result 2"
     elif "if" in line and line.strip().find("if") is 0:
         debuginfo = str(scoped) + " if statement"
+        if scoped > 1:
+            debuginfo = " on prev scope"
+            add_enter = True
+
         if scoped == 0:
             debuginfo += " on same scope"
             add_enter = True
@@ -670,7 +683,6 @@ def init_file(args):
         #fname = fname.replace("__init__.py", "")
         #fname = fname.replace("/:", ":")
     return buffer_string, fname, myfile, num, orgfname
-
 
 
 def init_cp(args, fname, myfile):
