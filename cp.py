@@ -58,9 +58,7 @@ def anon_func_param(line):
 
 
 def functional(line):
-    if "_.filter" in line:
-        return True
-    if "_.map" in line:
+    if "_." in line:
         return True
     return False
 
@@ -292,6 +290,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if scoped == 0:
             debuginfo += " on same scope "
             add_enter = True
+        if scoped == 0:
+            debuginfo += " on same scope "
+            add_enter = True
+
     elif ".bind" in line:
         debuginfo = "b1nd event"
         add_enter = True
@@ -311,18 +313,23 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         else:
             if not func_def(prev_line):
                 debuginfo = "function def nested"
-                if keyword(prev_line):
+                if class_method(prev_line):
+                    debuginfo += " after method"
+                elif in_test(["if", "else"], prev_line):
+                    debuginfo += " after if or else"
+                elif keyword(prev_line):
                     debuginfo += " after keyword"
-                if not class_method(prev_line) and not keyword(prev_line) and not assignment(prev_line):
+                    add_enter = True
+                elif not class_method(prev_line) and not keyword(prev_line) and not assignment(prev_line):
                     debuginfo += " somewhere"
                     add_enter = True
-                if first_method_factory:
+                elif first_method_factory:
                     debuginfo += "first method factory"
                     add_enter = True
-                if on_scope(line):
+                elif on_scope(line):
                     debuginfo += " on scope"
                     add_enter = True
-                if scoped > 0:
+                elif scoped > 0:
                     debuginfo += " on previous scope"
                     add_enter = True
 
@@ -354,7 +361,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             debuginfo = "resolve result 2"
     elif "if" in line and line.strip().find("if") is 0:
         debuginfo = str(scoped) + " if statement"
-        if scoped > 1:
+        if scoped > 0:
             debuginfo = " on prev scope"
             add_enter = True
 
@@ -363,8 +370,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_enter = True
 
         if not func_def(prev_line) and not class_method(prev_line) and not keyword(prev_line):
-            add_enter = False
-            debuginfo += " not after func, class or keyword"
             if scoped >= 1:
                 debuginfo = " and new scope"
                 add_enter = True
@@ -426,10 +431,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             debuginfo += " on global"
             if not global_line(prev_line):
                 add_double_enter = True
-
-        if on_scope(line):
+        if scoped > 0:
+            debuginfo += " on prev scope"
+            add_enter = True
+        elif on_scope(line):
             debuginfo += " on scope"
-
         if scoped >= 2:
             add_enter = True
             debuginfo += " new scope"
@@ -633,6 +639,7 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                 if question:
                     line += "?"
 
+
                 if orgfname.endswith(".py"):
                     if found_color:
                         line = line.replace("print(", "print \"\\033[93m\" + log_date_time_string(), ")
@@ -822,7 +829,7 @@ def main():
         buffer_string += line
 
     open(args.myfile, "w").write("\n\n" + buffer_string.lstrip())
-
+    print "pretty print", args.myfile, "done"
 
 if __name__ == "__main__":
     from lockfile import FileLock
@@ -830,4 +837,4 @@ if __name__ == "__main__":
     lock = FileLock("cplockfile")
     with lock:
         main()
-        print "done cp.py"
+
