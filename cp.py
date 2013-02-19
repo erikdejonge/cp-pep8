@@ -359,20 +359,25 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 add_double_enter = True
         else:
             debuginfo = "resolve result 2"
-    elif "if" in line and line.strip().find("if") is 0:
+    elif "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
         debuginfo = str(scoped) + " if statement"
         if scoped > 0:
-            debuginfo = " on prev scope"
+            debuginfo += " on prev scope"
             add_enter = True
 
         if scoped == 0:
             debuginfo += " on same scope"
-            add_enter = True
+            if "if" in prev_line:
+                debuginfo += " after if"
+                add_enter = True
 
         if not func_def(prev_line) and not class_method(prev_line) and not keyword(prev_line):
             if scoped >= 1:
                 debuginfo = " and new scope"
                 add_enter = True
+        if "else" in line:
+            debuginfo += " else"
+            add_enter = False
     elif in_test_kw(["when"], line):
         debuginfo = in_test_result(["when"], line) + " statement"
     elif in_test_kw(["switch", "for", "while"], line):
