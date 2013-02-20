@@ -293,10 +293,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if scoped == 0:
             debuginfo += " on same scope "
             add_enter = True
-
     elif ".bind" in line:
         debuginfo = "b1nd event"
-        add_enter = True
     elif "$observe" in line and "$observe" not in prev_line:
         debuginfo = "observe method"
         add_enter = True
