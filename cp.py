@@ -124,8 +124,8 @@ def keyword(line):
         return True
     elif some_func(line):
         return True
-    elif anon_func(line):
-        return True
+    #elif anon_func(line):
+    #    return True
     return False
 
 
@@ -318,6 +318,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 elif keyword(prev_line):
                     debuginfo += " after keyword"
                     add_enter = True
+                if anon_func(prev_line):
+                    debuginfo += " after anon func"
                 elif not class_method(prev_line) and not keyword(prev_line) and not assignment(prev_line):
                     debuginfo += " somewhere"
                     add_enter = True
