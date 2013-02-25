@@ -10,9 +10,9 @@ ADDCOMMENT_WITH_FOUND_TYPE = False
 def replace_variables():
     variables = ["print", "warning", "emit_event", "urls.command", "urls.postcommand"]
     undo_variables = []
-
+    watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
-    return color_vals_to_keep, undo_variables, variables
+    return color_vals_to_keep, undo_variables, variables, watch_variables
 
 
 def func_test(funcs, line):
@@ -436,7 +436,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             debuginfo += " on global"
             if not global_line(prev_line):
                 add_double_enter = True
-        if scoped > 0:
+        if scoped > 1:
             debuginfo += " on prev scope"
             add_enter = True
         elif on_scope(line):
@@ -698,7 +698,7 @@ def init_file(args):
 
 
 def init_cp(args, fname, myfile):
-    color_vals_to_keep, undo_variables, variables = replace_variables()
+    color_vals_to_keep, undo_variables, variables, watch_vars = replace_variables()
     mylines = []
     fname = fname.replace("coffee", "cf")
     import cStringIO
@@ -720,7 +720,7 @@ def init_cp(args, fname, myfile):
     debuginfo = ""
     in_if = False
     first_method_factory = first_method_class = False
-    return cStringIO, cnt, color_vals_to_keep, debuginfo, first_method_class, first_method_factory, fname, in_if, location_id, mylines, resolve_func, undo_variables, variables
+    return cStringIO, cnt, color_vals_to_keep, debuginfo, first_method_class, first_method_factory, fname, in_if, location_id, mylines, resolve_func, undo_variables, variables, watch_vars
 
 
 def prepare_line(cnt, line, mylines):
@@ -778,12 +778,16 @@ def main():
 
     buffer_string, fname, myfile, num, orgfname = init_file(args)
 
-    cStringIO, cnt, color_vals_to_keep, debuginfo, first_method_class, first_method_factory, fname, in_if, location_id, mylines, resolve_func, undo_variables, variables = init_cp(args, fname, myfile)
+    cStringIO, cnt, color_vals_to_keep, debuginfo, first_method_class, first_method_factory, fname, in_if, location_id, mylines, resolve_func, undo_variables, variables, watch_vars = init_cp(args, fname, myfile)
 
     line_cnt = 0
     for line in mylines:
         line_cnt += 1
         line = line.replace("fingerprint", "fingerpr1nt")
+        for v in watch_vars:
+            if v.lower() in line.lower():
+                print line
+
         process_line = True
         if ".cf" in fname:
             add_double_enter, add_enter, line, next_line, prev_line, scoped = prepare_line(cnt, line, mylines)
