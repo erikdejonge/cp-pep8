@@ -124,13 +124,18 @@ def keyword(line):
         return True
     elif some_func(line):
         return True
-    #elif anon_func(line):
+        #elif anon_func(line):
     #    return True
     return False
 
 
 def indentation(line):
-    return line.count("    ")
+    cnt = 0
+    for c in line:
+        if c != " ":
+            break
+        cnt += 1
+    return float(cnt) / 4
 
 
 def data_assignment(line, prev_line):
@@ -242,7 +247,17 @@ def function_call(line):
     return False
 
 
-def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, line_cnt):
+def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt):
+    line_indent = indentation(line)
+
+    if "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
+        if line_indent in if_cnt:
+            if_cnt[line_indent] = (if_cnt[line_indent][0] + 1, if_cnt[line_indent][0])
+        else:
+            if_cnt[line_indent] = (0, 0)
+    else:
+        if_cnt[line_indent] = (0, 0)
+
     if ".factory" in line:
         add_double_enter = True
         debuginfo = ".factory"
@@ -311,6 +326,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         else:
             if not func_def(prev_line):
                 debuginfo = "function def nested"
+                if assignment(prev_line):
+                    debuginfo = "function def nested after assignement"
+                    add_enter = True
                 if class_method(prev_line):
                     debuginfo += " after method"
                 elif in_test(["if", "else"], prev_line):
@@ -360,20 +378,24 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         else:
             debuginfo = "resolve result 2"
     elif "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
-        debuginfo = str(scoped) + " if statement"
-        if scoped > 0:
-            debuginfo += " on prev scope"
+        debuginfo = "indent:" + str(int(line_indent)) + " ifcnt:" + str(if_cnt[line_indent][0]) + ":" + str(if_cnt[line_indent][1]) + " if statement"
+
+        if scoped > 1:
+            debuginfo += " big scope change"
             add_enter = True
 
         if scoped == 0:
             debuginfo += " on same scope"
+            if assignment(prev_line):
+                debuginfo += " after assignement"
+                add_enter = True
             if "if" in prev_line:
                 debuginfo += " after if"
                 add_enter = True
 
         if not func_def(prev_line) and not class_method(prev_line) and not keyword(prev_line):
-            if scoped >= 1:
-                debuginfo = " and new scope"
+            if if_cnt[line_indent][0] == 1 and (if_cnt[line_indent][0] - if_cnt[line_indent][1] == 1):
+                debuginfo += " and new scope"
                 add_enter = True
         if "else" in line:
             debuginfo += " else"
@@ -432,6 +454,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 add_enter = False
     elif assignment(line):
         debuginfo = "assignment"
+        if scoped > 0:
+            debuginfo += " prev scope"
+            add_enter = True
+
         if global_line(line):
             debuginfo += " on global"
             if not global_line(prev_line):
@@ -516,7 +542,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             if not is_member_var(prev_line):
                 add_double_enter = True
                 debuginfo += " new scope"
-    return add_double_enter, add_enter, debuginfo, resolve_func
+
+    return add_double_enter, add_enter, debuginfo, resolve_func, if_cnt
 
 
 def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, mylines, prev_line):
@@ -643,7 +670,6 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                             line += ")"
                 if question:
                     line += "?"
-
 
                 if orgfname.endswith(".py"):
                     if found_color:
@@ -781,6 +807,7 @@ def main():
     cStringIO, cnt, color_vals_to_keep, debuginfo, first_method_class, first_method_factory, fname, in_if, location_id, mylines, resolve_func, undo_variables, variables, watch_vars = init_cp(args, fname, myfile)
 
     line_cnt = 0
+    if_cnt = {}
     for line in mylines:
         line_cnt += 1
         line = line.replace("fingerprint", "fingerpr1nt")
@@ -792,7 +819,7 @@ def main():
         if ".cf" in fname:
             add_double_enter, add_enter, line, next_line, prev_line, scoped = prepare_line(cnt, line, mylines)
 
-            add_double_enter, add_enter, debuginfo, resolve_func = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, line_cnt)
+            add_double_enter, add_enter, debuginfo, resolve_func, if_cnt = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt)
 
             add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, scoped)
 
@@ -839,6 +866,7 @@ def main():
 
     open(args.myfile, "w").write("\n\n" + buffer_string.lstrip())
     print "pretty print", args.myfile, "done"
+
 
 if __name__ == "__main__":
     from lockfile import FileLock
