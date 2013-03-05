@@ -675,7 +675,7 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                     if found_color:
                         line = line.replace("print(", "print \"\\033[93m\" + log_date_time_string(), ")
                     else:
-                        line = line.replace("print(", "print log_date_time_string(), ")
+                        line = line.replace("print(", "print ")
                         #line = line.replace("print(", "print ")
                     if line.strip().startswith("print"):
                         line = line.replace("print(", "print ")
