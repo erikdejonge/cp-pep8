@@ -9,7 +9,7 @@ ADDCOMMENT_WITH_FOUND_TYPE = False
 
 def replace_variables():
     variables = ["print", "warning", "emit_event", "urls.command", "urls.postcommand"]
-    undo_variables = []
+    undo_variables = ["print"]
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
     return color_vals_to_keep, undo_variables, variables, watch_variables
@@ -629,7 +629,6 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         line = line.replace(", '\\033[m'", "")
                     else:
                         line = line.replace('log_date_time_string(),', "")
-
                 if fname in line:
                     line2 = line.replace(fname, "")
                     lines = line2.split(",")
@@ -685,6 +684,15 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                     if "print(" in line:
                         line = line.replace("print(", "print ")
                         line = line[:len(line) - 1]
+                    for i in range(0, 5):
+                        line = line.replace("print  ", "print ")
+                    if "print " in line:
+                        line = line.replace("print", "console?.log?") + " if running_local()"
+                    if "warning(" in line:
+                        line = line.replace("warning(", "warning ")
+                        line = line[:len(line) - 1]
+                    if "warning " in line:
+                        line = line.replace("warning", "console?.error?")
 
                 if found_color:
                     line += ", '\\033[m'"
@@ -765,6 +773,11 @@ def prepare_line(cnt, line, mylines):
     line = ltemp
     line = line.replace("\n", "")
     add_enter = add_double_enter = False
+
+    line = line.replace("console.log ", "console?.log? ")
+    line = line.replace("console?.log?", "print")
+    line = line.replace("console?.error?", "warning")
+
     return add_double_enter, add_enter, line, next_line, prev_line, scoped
 
 
@@ -817,6 +830,11 @@ def main():
 
         process_line = True
         if ".cf" in fname:
+            if "console" in line:
+                for i in range(0, line.count("if running_local()")):
+                    line = line.replace("if running_local()", "")
+                line = line.replace("log?  ", "log? ")
+
             add_double_enter, add_enter, line, next_line, prev_line, scoped = prepare_line(cnt, line, mylines)
 
             add_double_enter, add_enter, debuginfo, resolve_func, if_cnt = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt)
