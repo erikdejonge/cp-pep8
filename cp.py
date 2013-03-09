@@ -687,12 +687,12 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                     for i in range(0, 5):
                         line = line.replace("print  ", "print ")
                     if "print " in line:
-                        line = line.replace("print", "console?.log?") + " if running_local()"
+                        line = line.replace("print", "console.log")# + " if running_local()"
                     if "warning(" in line:
                         line = line.replace("warning(", "warning ")
                         line = line[:len(line) - 1]
                     if "warning " in line:
-                        line = line.replace("warning", "console?.error?")
+                        line = line.replace("warning", "console.error")
 
                 if found_color:
                     line += ", '\\033[m'"
