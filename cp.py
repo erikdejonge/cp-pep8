@@ -647,14 +647,13 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
 
                 if replace_variable + "(msg" not in line:
                     line = line.replace(replace_variable + "(", replace_variable)
-                    if not args.reverse:
-                        location = fname + ":" + "@@@@"
-                        location_id += 1
+                    location = fname + ":" + "@@@@"
+                    location_id += 1
 
-                        if replace_variable not in undo_variables:
-                            line = line.replace(replace_variable, replace_variable + "(\"" + str(location) + "\",")
-                        else:
-                            line = line.replace(replace_variable, replace_variable + "(").replace("( \"", "(\"")
+                    if replace_variable not in undo_variables:
+                        line = line.replace(replace_variable, replace_variable + "(\"" + str(location) + "\",")
+                    else:
+                        line = line.replace(replace_variable, replace_variable + "(").replace("( \"", "(\"")
                 for i in range(0, 20):
                     line = line.rstrip(",")
                     line = line.rstrip()
@@ -686,12 +685,12 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         line = line[:len(line) - 1]
                     for i in range(0, 5):
                         line = line.replace("print  ", "print ")
-                    if "print " in line:
-                        line = line.replace("print", "console.log")# + " if running_local()"
+                    if "print " in line and args.release == "0":
+                        line = line.replace("print", "console.log")
                     if "warning(" in line:
                         line = line.replace("warning(", "warning ")
                         line = line[:len(line) - 1]
-                    if "warning " in line:
+                    if "warning " in line and args.release == "0":
                         line = line.replace("warning", "console.error")
 
                 if found_color:
@@ -709,7 +708,7 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
 def arg_parse():
     parser = ArgumentParser()
     parser.add_argument("-f", dest="myfile")
-    parser.add_argument("-r", dest="reverse")
+    parser.add_argument("-r", dest="release")
     args = parser.parse_args()
     return args
 
@@ -777,6 +776,7 @@ def prepare_line(cnt, line, mylines):
     line = line.replace("console.log ", "console?.log? ")
     line = line.replace("console?.log?", "print")
     line = line.replace("console?.error?", "warning")
+    line = line.replace("console.log", "print")
 
     return add_double_enter, add_enter, line, next_line, prev_line, scoped
 
