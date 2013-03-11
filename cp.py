@@ -393,10 +393,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 debuginfo += " after if"
                 add_enter = True
 
-        if not func_def(prev_line) and not class_method(prev_line) and not keyword(prev_line):
-            if if_cnt[line_indent][0] == 1 and (if_cnt[line_indent][0] - if_cnt[line_indent][1] == 1):
-                debuginfo += " and new scope"
-                add_enter = True
+        #if not func_def(prev_line) and not class_method(prev_line) and not keyword(prev_line):
+        #    if if_cnt[line_indent][0] == 1 and (if_cnt[line_indent][0] - if_cnt[line_indent][1] == 1):
+        #        debuginfo += " and new scope"
+        #        add_enter = True
         if "else" in line:
             debuginfo += " else"
             add_enter = False
