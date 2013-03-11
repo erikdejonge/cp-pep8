@@ -684,7 +684,7 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         line = line.replace("print(", "print ")
                         line = line[:len(line) - 1]
                     for i in range(0, 5):
-                        line = line.replace("print ", "print ")
+                        line = line.replace("print  ", "print ")
                     if "print " in line and args.release == "0":
                         line = line.replace("print", "console.log")
                     if "warning(" in line:
