@@ -310,6 +310,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_enter = True
     elif ".bind" in line:
         debuginfo = "b1nd event"
+    elif line.strip().find("it ") == 0:
+        if not some_func(prev_line) and not anon_func(prev_line):
+            debuginfo = "test statement"
+            add_enter = True
     elif "$observe" in line and "$observe" not in prev_line:
         debuginfo = "observe method"
         add_enter = True
@@ -338,6 +342,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     add_enter = True
                 if anon_func(prev_line):
                     debuginfo += " after anon func"
+                    add_enter = False
                 elif not class_method(prev_line) and not keyword(prev_line) and not assignment(prev_line):
                     debuginfo += " somewhere"
                     add_enter = True
@@ -373,6 +378,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif anon_func(line) and not in_test([".directive", "$watch"], line):
         if not resolve_func:
             debuginfo = "anonymousfunction"
+            if line.count("    ") is 1 and not assignment(prev_line) and not func_def(prev_line):
+                debuginfo = "anonymousfunction2"
+                add_enter = True
             if line.find(" ") is not 0:
                 add_double_enter = True
         else:
@@ -582,7 +590,7 @@ def add_debuginfo(debuginfo, line):
 
 
 def sanatize_line(line):
-    if not in_test(["=>", "!=", "==", "?", "ng-", "input", "type=", "/=", "\=", ":", "replace"], line):
+    if not in_test(["=>", "!=", "==", "?", "ng-", "input", "type=", "/=", "\=", ":", "replace", "element"], line):
         line = line.replace("=>", "@>").replace("( ", "(").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
     for i in range(0, 10):
         line = line.replace("( ", "(")
@@ -882,7 +890,7 @@ def main():
         num += 1
         buffer_string += line
 
-    open(args.myfile, "w").write("\n\n" + buffer_string.lstrip())
+    open(args.myfile, "w").write("\n\n" + buffer_string.strip() + "\n\n")
     print "pretty print", args.myfile, "done"
 
 
@@ -890,6 +898,13 @@ if __name__ == "__main__":
     from lockfile import FileLock
 
     lock = FileLock("cplockfile")
-    with lock:
-        main()
+    try:
+        with lock:
+            main()
+    finally:
+        lock.break_lock()
+        for i in os.listdir("."):
+            if "myra.local" in str(i):
+                os.system("rm myra.local-*")
+                break
 
