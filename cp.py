@@ -2,6 +2,7 @@
 """ add linenumbers to coffee """
 
 import os
+import time
 from argparse import ArgumentParser
 
 ADDCOMMENT_WITH_FOUND_TYPE = False
@@ -810,9 +811,6 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                     if next_line:
                         if "else" not in line:
                             add_enter = True
-    if "throw" in line:
-        print "WARNING THROW", line
-        line = line.replace("(", " ").replace(")", " ").replace("throw", "warning")
     return add_double_enter, add_enter, debuginfo, line
 
 
@@ -894,17 +892,28 @@ def main():
     print "pretty print", args.myfile, "done"
 
 
+def lock_acquire(key):
+    lfile = key + ".lock"
+    cnt = 0
+    while os.path.exists(lfile):
+        time.sleep(0.1)
+        cnt += 1
+        if cnt > 200:
+            os.remove(lfile)
+    open(lfile, "w").write("x")
+
+
+def lock_release(key):
+    lfile = key + ".lock"
+    if os.path.exists(lfile):
+        os.remove(lfile)
+        return True
+    return True
+
+
 if __name__ == "__main__":
-    from lockfile import FileLock
-
-    lock = FileLock("cplockfile")
     try:
-        with lock:
-            main()
+        lock_acquire("cp")
+        main()
     finally:
-        lock.break_lock()
-        for i in os.listdir("."):
-            if "myra.local" in str(i):
-                os.system("rm myra.local-*")
-                break
-
+        lock_release("cp")
