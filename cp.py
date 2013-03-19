@@ -315,6 +315,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if not some_func(prev_line) and not anon_func(prev_line):
             debuginfo = "test statement"
             add_enter = True
+    elif line.strip().find("describe ") == 0:
+        if not some_func(prev_line) and not anon_func(prev_line):
+            debuginfo = "describe statement"
+            add_enter = True
     elif "$observe" in line and "$observe" not in prev_line:
         debuginfo = "observe method"
         add_enter = True
@@ -591,8 +595,11 @@ def add_debuginfo(debuginfo, line):
 
 
 def sanatize_line(line):
-    if not in_test(["=>", "!=", "==", "?", "ng-", "input", "type=", "/=", "\=", ":", "replace", "element"], line):
+    if not in_test(["=>", "!=", "==", "?", "ng-", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element"], line):
         line = line.replace("=>", "@>").replace("( ", "(").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
+        if not "+=" in line and not "++" in line:
+            line = line.replace("+", " + ")
+            line = line.replace("  +  ", " + ")
     for i in range(0, 10):
         line = line.replace("( ", "(")
         line = line.replace("  =", " =")
