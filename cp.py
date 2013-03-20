@@ -112,7 +112,7 @@ def some_func(line):
 
 def assignment(line):
     line = line.strip()
-    if line.count("= ") is 1 and not is_member_var(line):
+    if "==" not in line and line.count("= ") is 1 and not is_member_var(line):
         if not some_func(line):
             return True
     return False
