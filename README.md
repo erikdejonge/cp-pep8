@@ -24,8 +24,59 @@ You can use this print method
 <pre>
 
 print = (msg, others...) ->
+    if exist(window.globals["g_browser"])
+        if window.globals["g_browser"].browser == 'Chrome'
+            switch _.size(others)
+                when 0
+                    console?.log "%c" + msg, 'color: crimson', others
+                when 1
+                    console?.log "%c" + msg, 'color: crimson', others[0]
+                when 2
+                    if others[0].indexOf?(".cf") > 0
+                        console?.log "%c" + msg + " " + others[0], 'color: crimson', others[1]
+                    else
+                        console?.log "%c" + msg, 'color: crimson', others[0], others[1]
+                when 3
+                    if others[0].indexOf?(".cf") > 0
+                        console?.log "%c" + msg + " " + others[0], 'color: crimson', others[1], others[2]
+                    else
+                        console?.log "%c" + msg, 'color: crimson', others[0], others[1], others[2]
+                when 4
+                    console?.log "%c" + msg, 'color: crimson', others[0], others[1], others[2], others[3]
+                else
+                    console?.log others, msg
+
+        else
+            switch _.size(others)
+                when 0
+                    console?.log msg
+                when 1
+                    console?.log msg + " " + others[0]
+                when 2
+                    console?.log msg + " " + others[0] + " " + others[1]
+                when 3
+                    console?.log msg + " " + others[0] + " " + others[1] + " " + others[2]
+                when 4
+                    console?.log msg + " " + others[0] + " " + others[1] + " " + others[2] + " " + others[3]
+                else
+                    console?.log others, msg
+
+    else
+        console?.log msg, others
+    if not exist_truth(window.cvar_show_debug_info)
+        return
     if msg.replace?
-        msg = msg.replace(".cf", ".cf")
+        shortdate = "" + (get_local_time() - start_time) / 1000
+
+        while shortdate.length < 6
+            shortdate += " "
+
+        shortdate += " "
+
+        while msg.length < 22
+            msg += " "
+
+        msg = shortdate + msg
         others2 = []
 
         coffee2cf = (obj) ->
@@ -37,63 +88,59 @@ print = (msg, others...) ->
         others = (coffee2cf(obj) for obj in others)
         others_length = others.length
 
-        if others_length > 1
-            if others[0]?
-                if others[0].indexOf?
-                    if others[0].indexOf(".cf") is not -1
-                        msg = others[0]
-
-                        if others_length > 1
-                            others[0] = others[1]
-
-                        if others_length > 2
-                            others[1] = others[2]
-
-                        if others_length > 3
-                            others[2] = others[3]
-                        others_length -= 1
-
-        while msg.length < 20
-            msg += " "
-
         if others?
-            if others_length > 0
-                switch others_length
-                    when 1
-                        console?.log? msg, others[0]
+            cnt = 0
 
-                    when 2
-                        msg2 = others[0]
+            loop_others = (i) ->
+                if exist(i)
+                    l = i.length
+                else
+                    l = "undefined".length
+                if other_with[cnt]?
+                    if other_with[cnt] < l
+                        other_with[cnt] = l + 2
+                else
+                    other_with[cnt] = l + 2
 
-                        if msg2?
-                            while msg2.length < 20
-                                msg2 += " "
-                            console?.log? msg, msg2, others[1]
-                        else
-                            console?.log? msg, others
+                cnt += 1
+            _.each(others, loop_others)
+            print_str = ""
+            cnt = 0
 
-                    when 3
-                        msg2 = others[0]
+            spaces = (n) ->
+                c = 0
+                s = " "
 
-                        while msg2.length < 20
-                            msg2 += " "
-                        console?.log? msg, msg2, others[1], others[2]
+                while c < n
+                    s += " "
+                    c += 1
+                return s
 
-                    when 4
-                        msg2 = others[0]
-                        msg3 = others[1]
-
-                        while msg2.length < 20
-                            msg2 += " "
-
-                        while msg3.length < 20
-                            msg3 += " "
-                        console?.log? msg, msg2, msg3, others[2], others[3]
+            found_object = -1
+            num_objects = 0
+            create_print_string = (s) ->
+                if _.isObject(s)
+                    found_object = cnt
+                    num_objects += 1
+                else
+                    if exist(s)
+                        print_str += s + spaces(other_with[cnt] - s.length)
                     else
-                        console?.log? msg, others
+                        print_str += s + " "
+
+                cnt += 1
+            _.each(others, create_print_string)
+            if found_object != -1
+                if num_objects > 1
+                    window.g_logfile.push(msg)
+                else
+                    window.g_logfile.push(msg + " " + print_str + " " + others[found_object])
             else
-                console?.log? msg
+                window.g_logfile.push(msg + " " + print_str)
         else
-            console?.log? msg, others
+            window.g_logfile.push(msg + " " + String(others))
+
+        window.g_logfile = window.g_logfile[_.size(window.g_logfile) - 150..]
         return 1
+
 </pre>
