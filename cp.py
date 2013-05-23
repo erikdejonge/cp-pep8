@@ -10,7 +10,7 @@ ADDCOMMENT_WITH_FOUND_TYPE = False
 
 def replace_variables():
     variables = ["print", "warning", "emit_event", "urls.command", "urls.postcommand"]
-    undo_variables = ["print"]
+    undo_variables = [""]
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
     return color_vals_to_keep, undo_variables, variables, watch_variables
