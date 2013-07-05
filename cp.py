@@ -131,7 +131,7 @@ def assignment(line):
 def keyword(line):
     if line.strip() == "":
         return True
-    if in_test(["print", "switch", "for", "when", "if", "else", "while", "try", "unless", "catch", "$on", "$("], line):
+    if in_test(["print", "switch", "for", "when", "if", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
         return True
     elif some_func(line):
         return True
@@ -230,7 +230,7 @@ def is_test(items, line):
 
 def is_member_var(line):
     line = str(line)
-    if (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not in_test(["warning"], line):
+    if (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not in_test(["warning"], line) and not keyword(line):
         return True
     return False
 
@@ -479,7 +479,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                         add_enter = True
                         debuginfo += "method call after assignment"
                     else:
-                        test_items = ["print", "when", "_.keys"]
+                        test_items = ["print", "when", "_.keys", "finally", "except"]
                         if in_test(test_items, prev_line):
                             debuginfo += " after " + str(in_test_result(test_items, prev_line)).replace("print", "pr1nt")
                         else:
