@@ -1,7 +1,7 @@
 coffeescript-pretty-print
 =========================
 
-pretty printer for coffeescript
+pretty printer for coffeescript and python
 
 reformats coffeescript in a consistant way, usage
 
