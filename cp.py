@@ -1,16 +1,20 @@
-# coding=utf-8
-""" add linenumbers to coffee """
+#!/usr/bin/python
 
 import os
 import time
 from argparse import ArgumentParser
+import sys
+reload(sys)
+# noinspection PyUnresolvedReferences
+sys.setdefaultencoding("utf-8")
 
 ADDCOMMENT_WITH_FOUND_TYPE = False
 
+datastructure_define = False
 
 def replace_variables():
-    variables = ["print", "warning", "emit_event", "urls.command", "urls.postcommand"]
-    undo_variables = [""]
+    variables = ["print", "warning", "emit_event", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
+    undo_variables = []
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
     return color_vals_to_keep, undo_variables, variables, watch_variables
@@ -72,12 +76,18 @@ def func_def(line):
     if in_test(["warning", "print"], line):
         return False
 
-    return ("->" in line or "=>" in line) and "= " in line
+    is_func = ("->" in line or "=>" in line) and "= " in line
+
+    if not is_func:
+        if "def " in line and ":" in line:
+            is_func = True
+
+    return is_func
 
 
 def method_call(line):
     line = str(line)
-    return (line.find("(") is 1 and line.find(")") is 1) or ("$(this)." in line and line.find("(") is 1 and line.find(")") is 1)
+    return (line.count("(") is 1 and line.count(")") is 1) or ("$(this)." in line and line.count("(") is 1 and line.count(")") is 1)
 
 
 def class_method(line):
@@ -121,7 +131,7 @@ def assignment(line):
 def keyword(line):
     if line.strip() == "":
         return True
-    if in_test(["print", "switch", "for", "when", "if", "else", "while", "try", "catch", "$on"], line):
+    if in_test(["print", "switch", "for", "when", "if", "else", "while", "try", "unless", "catch", "$on", "$("], line):
         return True
     elif some_func(line):
         return True
@@ -262,12 +272,20 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if ".factory" in line:
         add_double_enter = True
         debuginfo = ".factory"
+    if "unless" in line:
+        add_enter = True
+        debuginfo = "unless"
     elif global_class_declare(line):
         debuginfo = "global_class_declare"
         add_enter = True
+    elif "timer.event" in line:
+        if not keyword(prev_line):
+            debuginfo = "timer"
+            add_enter = True
     elif global_object_method_call(line):
         debuginfo = "global method call"
-        add_double_enter = True
+        if "# noins" not in prev_line and "import " not in prev_line:
+            add_double_enter = True
     elif class_method(line):
         if first_method_class:
             debuginfo = "classmethod " + str(first_method_class)
@@ -287,8 +305,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 add_enter = True
             else:
                 if scoped < 0:
-                    add_enter = True
-                    debuginfo += " in a nested scope"
+                    if "unless" not in prev_line:
+                        add_enter = True
+                        debuginfo += " in a nested scope"
+                    else:
+                        debuginfo += " in a nested scope after unless"
                 else:
                     if indentation(line) == 1:
                         debuginfo += " indented 1"
@@ -308,6 +329,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_enter = True
         if scoped == 0:
             debuginfo += " on same scope "
+            add_enter = True
+    elif "_.defer" in line:
+        debuginfo = "deferred call"
+        if not func_def(prev_line):
             add_enter = True
     elif ".bind" in line:
         debuginfo = "b1nd event"
@@ -369,6 +394,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_enter = True
             debuginfo += " scoped"
     elif scoped_method_call(line):
+
         if prev_line:
             if not func_test([method_call, class_method], prev_line.strip()) and not in_test([".then", "if", "->", "=>", "else"], prev_line):
                 debuginfo = ".method define or scoped method call"
@@ -393,8 +419,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
         debuginfo = "indent:" + str(int(line_indent)) + " ifcnt:" + str(if_cnt[line_indent][0]) + ":" + str(if_cnt[line_indent][1]) + " if statement"
 
-        if scoped > 1:
-            debuginfo += " big scope change"
+        if scoped > 0:
+            debuginfo += " scope change"
             add_enter = True
 
         if scoped == 0:
@@ -416,9 +442,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif in_test_kw(["when"], line):
         debuginfo = in_test_result(["when"], line) + " statement"
     elif in_test_kw(["switch", "for", "while"], line):
-        debuginfo = in_test_result(["switch", "when", "while", "if", "for"], line) + " statement"
+        debuginfo = in_test_result(["switch", "try", "when", "while", "if", "for"], line) + " statement"
         if prev_line:
-            if not in_test(["when", "if", "->", "=>", "else", "switch"], prev_line):
+            if not in_test(["when", "if", "->", "=>", "def ", "else", "switch", "try", "# noinspection"], prev_line):
                 if in_test(["return"], prev_line) and in_test(["when"], line) and scoped > 1:
                     debuginfo += " prevented when statement"
                 else:
@@ -434,8 +460,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             debuginfo += "assigned "
         if line.find(" ") is not 0:
             debuginfo += "method call global scope"
-            add_enter = False
-            add_double_enter = True
+            if "# noins" not in prev_line and "import " not in prev_line:
+                add_enter = False
+                add_double_enter = True
         elif prev_line:
             if method_call(prev_line):
                 if ws(line) < ws(prev_line):
@@ -458,7 +485,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                         else:
                             debuginfo += " not after assignment"
                             add_enter = True
-                if in_test(["$watch", "if", "else"], prev_line.strip()):
+                if in_test(["$watch", "if", "else", "for", "while", "try:", "# noinspection"], prev_line.strip()):
                     debuginfo += "method call after 1f 3lse or w@tch"
                     add_enter = False
                     add_double_enter = False
@@ -466,7 +493,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 debuginfo += "method call nested "
                 add_enter = False
     elif assignment(line):
-        debuginfo = "assignment"
+        global datastructure_define
+        if "[" in line and not "]" in line:
+            debuginfo = "datastructure assignment"
+            datastructure_define = True
+        else:
+            debuginfo = "assignment"
         if scoped > 0:
             debuginfo += " prev scope"
             add_enter = True
@@ -486,21 +518,27 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif function_call(line):
         debuginfo = "function call"
         if not function_call(prev_line):
-            if "return" in prev_line:
+            if "return" in prev_line and not "_return" in prev_line:
+                debuginfo = " after return"
                 add_enter = True
         if prev_line.strip() == ")":
+            debuginfo = " new line"
             add_enter = True
     elif start_in_test(["class"], line):
         debuginfo = "class"
         add_double_enter = True
     elif "except" in line:
         debuginfo = "except"
-        add_enter = True
+        #add_enter = True
     elif line.lstrip().startswith("$scope") and in_test(["->", "=>"], line):
         debuginfo = "scoped method define"
         if prev_line:
             if not ")" is prev_line.strip():
                 add_enter = True
+    elif "$(e" in line:
+        debuginfo = "jquery"
+        if not keyword(prev_line):
+            add_enter = True
     elif "$watch" in line:
         debuginfo = "watch def"
         if not keyword(prev_line):
@@ -556,11 +594,22 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 add_double_enter = True
                 debuginfo += " new scope"
 
+    if "]" in line and not "[]" in line:
+        if datastructure_define:
+            debuginfo += " end datastructure_define"
+        datastructure_define = False
+
+    if datastructure_define:
+        add_double_enter = False
+        add_enter = False
+
     return add_double_enter, add_enter, debuginfo, resolve_func, if_cnt
 
 
 def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, mylines, prev_line):
     #print debuginfo, add_enter, add_double_enter
+    global datastructure_define
+
     if add_double_enter:
         cont = True
         if cnt - 1 > 0:
@@ -589,13 +638,13 @@ def add_debuginfo(debuginfo, line):
         line = line + " # ##@ " + debuginfo.replace("i", "1").replace("return", "retrn")
         if ef > 0 and ef is not 0:
             line += "\n"
-        debuginfo = None
+        debuginfo = ""
 
     return debuginfo, line
 
 
 def sanatize_line(line):
-    if not in_test(["=>", "!=", "==", "?", "ng-", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element"], line):
+    if not in_test([")", "=>", "!=", "==", "$(", "?", "ng-", "trim", "strip", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element"], line):
         line = line.replace("=>", "@>").replace("( ", "(").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
         if not "+=" in line and not "++" in line:
             line = line.replace("+", " + ")
@@ -624,6 +673,7 @@ def coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_
     return add_enter, debuginfo, resolve_func
 
 
+# noinspection PyUnusedLocal
 def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, orgfname, undo_variables, variables):
     for replace_variable in variables:
         check_split = line.split(" ")
@@ -701,13 +751,13 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         line = line[:len(line) - 1]
                     for i in range(0, 5):
                         line = line.replace("print  ", "print ")
-                    if "print " in line and args.release == "0":
-                        line = line.replace("print", "console.log")
+                        #if "print " in line and args.release == "0":
+                    #    line = line.replace("print", "console?.log?")
                     if "warning(" in line:
                         line = line.replace("warning(", "warning ")
                         line = line[:len(line) - 1]
-                    if "warning " in line and args.release == "0":
-                        line = line.replace("warning", "console.error")
+                        #if "warning " in line and args.release == "0":
+                        #    line = line.replace("warning", "console?.error?")
 
                 if found_color:
                     line += ", '\\033[m'"
@@ -732,6 +782,12 @@ def arg_parse():
 def init_file(args):
     myfile = None
     if args.myfile:
+        myfile = open(args.myfile, "r")
+        content = ""
+        for i in myfile:
+            if str(i).strip() != "":
+                content += i
+        open(args.myfile, "w").write(content)
         myfile = open(args.myfile, "r")
     else:
         print "no -f (file) given as argument"
@@ -761,7 +817,8 @@ def init_cp(args, fname, myfile):
         mylines.append(line + "\n")
     cnt = 0
     location_id = 0
-    if ".cf" not in fname:
+
+    if ".cf" not in fname and ".py" not in fname:
         myfile.close()
         mylines = open(args.myfile, "r")
         #mylines = cStringIO.StringIO(data)
@@ -789,9 +846,11 @@ def prepare_line(cnt, line, mylines):
     line = line.replace("\n", "")
     add_enter = add_double_enter = False
 
-    line = line.replace("console.log ", "console?.log? ")
-    line = line.replace("console?.log?", "print")
+    #line = line.replace("console.log ", "console?.log? ")
+    #line = line.replace("console?.log", "console?.log")
+    #line = line.replace("console?.log?", "print")
     line = line.replace("console?.error?", "warning")
+    line = line.replace("console?.error", "warning")
     line = line.replace("console.log", "print")
 
     return add_double_enter, add_enter, line, next_line, prev_line, scoped
@@ -827,6 +886,8 @@ def main():
     """
 
     args = arg_parse()
+    if args.myfile == "cp.py":
+        return
 
     buffer_string, fname, myfile, num, orgfname = init_file(args)
 
@@ -842,29 +903,29 @@ def main():
                 print line
 
         process_line = True
-        if ".cf" in fname:
-            if "console" in line:
-                for i in range(0, line.count("if running_local()")):
-                    line = line.replace("if running_local()", "")
-                line = line.replace("log?  ", "log? ")
 
-            add_double_enter, add_enter, line, next_line, prev_line, scoped = prepare_line(cnt, line, mylines)
+        if "console" in line:
+            for i in range(0, line.count("if running_local()")):
+                line = line.replace("if running_local()", "")
+            line = line.replace("log?  ", "log? ")
 
-            add_double_enter, add_enter, debuginfo, resolve_func, if_cnt = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt)
+        add_double_enter, add_enter, line, next_line, prev_line, scoped = prepare_line(cnt, line, mylines)
 
-            add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, scoped)
+        add_double_enter, add_enter, debuginfo, resolve_func, if_cnt = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt)
 
-            add_enter, debuginfo, resolve_func = coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_line, resolve_func)
+        add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, scoped)
 
-            if ".cf" in fname:
-                line = coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, mylines, prev_line)
+        add_enter, debuginfo, resolve_func = coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_line, resolve_func)
 
-            if not ADDCOMMENT_WITH_FOUND_TYPE:
-                debuginfo = None
+        #if ".cf" in fname:
+        line = coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, mylines, prev_line)
 
-            debuginfo, line = add_debuginfo(debuginfo, line)
+        if not ADDCOMMENT_WITH_FOUND_TYPE:
+            debuginfo = ""
 
-            line = sanatize_line(line)
+        debuginfo, line = add_debuginfo(debuginfo, line)
+
+        line = sanatize_line(line)
 
         restore_color = None
         if orgfname.strip().endswith(".py"):
