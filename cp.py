@@ -289,6 +289,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_double_enter = True
         else:
             debuginfo += "after keyword"
+    elif line.strip().startswith("try"):
+        if not keyword(prev_line):
+            debuginfo = "try"
+            add_enter = True
     elif "timer.event" in line:
         if not keyword(prev_line):
             debuginfo = "timer"
@@ -677,7 +681,7 @@ def add_debuginfo(debuginfo, line):
 
 def sanatize_line(line):
     if not in_test([")", "=>", "!=", "==", "$(", "?", "ng-", "trim", "strip", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element"], line):
-        line = line.replace("=>", "@>").replace("( ", "(").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
+        line = line.replace("=>", "@>").replace("( ", "(").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("* =", "*=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
         if not "+=" in line and not "++" in line:
             line = line.replace("+", " + ")
             line = line.replace("  +  ", " + ")
