@@ -12,6 +12,7 @@ ADDCOMMENT_WITH_FOUND_TYPE = False
 
 datastructure_define = False
 
+
 def replace_variables():
     variables = ["print", "warning", "emit_event", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
     undo_variables = []
@@ -131,11 +132,11 @@ def assignment(line):
 def keyword(line):
     if line.strip() == "":
         return True
-    if in_test(["print", "switch", "for", "when", "if", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
+    if in_test(["print", "# noinspection", "super", "pass", "switch", "raise", "for", "when", "if", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
         return True
     elif some_func(line):
         return True
-        #elif anon_func(line):
+    #elif anon_func(line):
     #    return True
     return False
 
@@ -167,8 +168,8 @@ def comment(line):
     if not line:
         return False
 
-    line = line.strip().replace("# ##@", "")
-    if line.startswith("#"):
+    line = line.strip().replace("# ##^", "")
+    if line.startswith("#") and "noinspection" not in line:
         return True
     else:
         return False
@@ -217,7 +218,7 @@ def in_test_kw(items, line):
 def in_test_result(items, line):
     for item in items:
         if item in line:
-            return item
+            return item.replace('"""', '')
     return None
 
 
@@ -230,7 +231,7 @@ def is_test(items, line):
 
 def is_member_var(line):
     line = str(line)
-    if (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not in_test(["warning"], line) and not keyword(line):
+    if not "@param" in line and (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not in_test(["warning"], line) and not keyword(line):
         return True
     return False
 
@@ -248,7 +249,8 @@ def global_object_method_call(line):
 
 def class_method_call(line):
     if line.strip().find("@") == 0:
-        return True
+        if "(" in line and ")" in line:
+            return True
     return False
 
 
@@ -275,9 +277,18 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if "unless" in line:
         add_enter = True
         debuginfo = "unless"
+    elif line.strip().startswith("@") and not "(" in line and not '"""' in prev_line and not "param" in line:
+        add_enter = True
+        debuginfo = "property"
     elif global_class_declare(line):
         debuginfo = "global_class_declare"
         add_enter = True
+    elif "# noinspection" in line:
+        debuginfo = "pycharm directive"
+        if not keyword(prev_line):
+            add_double_enter = True
+        else:
+            debuginfo += "after keyword"
     elif "timer.event" in line:
         if not keyword(prev_line):
             debuginfo = "timer"
@@ -376,6 +387,16 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 elif not class_method(prev_line) and not keyword(prev_line) and not assignment(prev_line):
                     debuginfo += " somewhere"
                     add_enter = True
+                    if "return" in prev_line:
+                        add_enter = True
+                        debuginfo += " in a class"
+                    if scoped > 1:
+                        add_enter = True
+                        debuginfo = "scope change"
+                    if "@" in prev_line or keyword(prev_line):
+                        add_enter = False
+                        debuginfo += " after property or kw"
+
                 elif first_method_factory:
                     debuginfo += "first method factory"
                     add_enter = True
@@ -444,7 +465,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif in_test_kw(["switch", "for", "while"], line):
         debuginfo = in_test_result(["switch", "try", "when", "while", "if", "for"], line) + " statement"
         if prev_line:
-            if not in_test(["when", "if", "->", "=>", "def ", "else", "switch", "try", "# noinspection"], prev_line):
+            if not in_test(["when", "if", "->", "=>", '"""', "def ", "else", "switch", "try", "# noinspection"], prev_line):
                 if in_test(["return"], prev_line) and in_test(["when"], line) and scoped > 1:
                     debuginfo += " prevented when statement"
                 else:
@@ -479,14 +500,14 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                         add_enter = True
                         debuginfo += "method call after assignment"
                     else:
-                        test_items = ["print", "when", "_.keys", "finally", "except"]
+                        test_items = ["print", "when", "_.keys", "finally", "except", '"""']
                         if in_test(test_items, prev_line):
                             debuginfo += " after " + str(in_test_result(test_items, prev_line)).replace("print", "pr1nt")
                         else:
                             debuginfo += " not after assignment"
                             add_enter = True
                 if in_test(["$watch", "if", "else", "for", "while", "try:", "# noinspection"], prev_line.strip()):
-                    debuginfo += "method call after 1f 3lse or w@tch"
+                    debuginfo += "method call after 1f 3lse or wtch"
                     add_enter = False
                     add_double_enter = False
             else:
@@ -566,9 +587,17 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif "setInterval" in line or "setTimeout" in line:
         debuginfo = "setInterval timeout"
     elif "return" in line:
+        add_enter = True
         debuginfo = "retrn"
-        if prev_line:
+        if '"""' in prev_line:
+            add_enter = False
+            debuginfo = " after doc comment"
+        elif func_def(prev_line):
+            add_enter = False
+            debuginfo += " after funcdef"
+        elif prev_line:
             debuginfo += " | "
+
             if next_line:
                 if (prev_line.strip() == "") or ("else" in prev_line) or ("else" in next_line) and not in_test(["setInterval", "setTimeout"], prev_line):
                     debuginfo += " after empty line time func or 3lse"
@@ -578,6 +607,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             elif "return" in prev_line:
                 debuginfo += " after rturn"
                 #add_enter = True
+            elif keyword(prev_line):
+                debuginfo += "after keyword"
+                add_enter = False
             else:
                 if next_line and not in_test(["setInterval", "setTimeout"], prev_line):
                     if "class" not in next_line or len(next_line) > 0:
@@ -635,7 +667,7 @@ def add_debuginfo(debuginfo, line):
         ef = line.find("\n")
         if ef > 0 and ef is not 0:
             line = line.rstrip("\n")
-        line = line + " # ##@ " + debuginfo.replace("i", "1").replace("return", "retrn")
+        line = line + " # ##^ " + debuginfo.replace("i", "1").replace("return", "retrn")
         if ef > 0 and ef is not 0:
             line += "\n"
         debuginfo = ""
@@ -837,7 +869,7 @@ def prepare_line(cnt, line, mylines):
     if next_line:
         next_line = mylines[cnt + 1]
     scoped = scope_diff(line, prev_line)
-    ls = line.split("# ##@ ")
+    ls = line.split("# ##^ ")
     ltemp = ls[0].rstrip()
     if ADDCOMMENT_WITH_FOUND_TYPE:
         if ltemp.strip() == "" and len(ls) > 0:
