@@ -237,7 +237,7 @@ def is_test(items, line):
 
 def is_member_var(line):
     line = str(line)
-    if not "= {" in line and not "@param" in line and (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not in_test(["warning"], line) and not keyword(line):
+    if not "[" in line and not "]" in line and not "= {" in line and not "@param" in line and (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not in_test(["warning"], line) and not keyword(line):
         return True
     return False
 
@@ -270,7 +270,7 @@ def double_meth_call(line):
     return "self" in line and line.count("(") > 1
 
 
-def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt):
+def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment):
     line_indent = indentation(line)
 
     if "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
@@ -284,16 +284,20 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if ".factory" in line:
         add_double_enter = True
         debuginfo = ".factory"
-    if "unless" in line:
+    if line.startswith("class"):
+        add_double_enter = True
+        debuginfo = "class def"
+    elif "unless" in line:
         add_enter = True
         debuginfo = "unless"
     elif line.strip().startswith("@") and not "(" in line and not '"""' in prev_line and not "param" in line:
         add_enter = True
-        debuginfo = "property"
+        debuginfo = "property "
     elif double_meth_call(line):
-        if not double_meth_call(prev_line):
-            debuginfo = "double method call"
-            add_enter = True
+        if not keyword(prev_line):
+            if not double_meth_call(prev_line):
+                debuginfo = "double method call"
+                add_enter = True
     elif global_class_declare(line):
         debuginfo = "global_class_declare"
         add_enter = True
@@ -419,7 +423,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     if "@" in prev_line or keyword(prev_line):
                         add_enter = False
                         debuginfo += " after property or kw"
-
                 elif first_method_factory:
                     debuginfo += "first method factory"
                     add_enter = True
@@ -428,6 +431,14 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     add_enter = True
                 elif scoped > 0:
                     debuginfo += " on previous scope"
+                    add_enter = True
+                if "(self" in line and not "class" in prev_line and not '"""' in prev_line and not prev_line.strip().startswith("@"):
+                    debuginfo += " a python class"
+                    add_double_enter = False
+                    add_enter = True
+                if "(self" in line and ("class" in prev_line or '"""' in prev_line) and not prev_line.strip().startswith("@"):
+                    debuginfo += " first method"
+                    add_double_enter = False
                     add_enter = True
 
             else:
@@ -606,8 +617,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         debuginfo = "no-inspection"
         add_enter = True
     elif "raise" in line:
-        debuginfo = "raise"
-        add_enter = True
+        if not keyword(prev_line):
+            debuginfo = "raise"
+            add_enter = True
     elif "try" in line:
         debuginfo = "try"
     elif "angular.module" in line:
@@ -629,6 +641,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if '"""' in prev_line:
             add_enter = False
             debuginfo = " after doc comment"
+        elif keyword(prev_line):
+            add_enter = False
+            debuginfo = " after keyword"
         elif func_def(prev_line):
             add_enter = False
             debuginfo += " after funcdef"
@@ -656,6 +671,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     #add_enter = True
     elif "print" in line:
         debuginfo = "debug statement"
+    if line.count('"""') % 2 != 0:
+        if in_python_comment:
+            in_python_comment = False
+        else:
+            in_python_comment = True
+
     if "]" in line and not "[]" in line:
         if datastructure_define:
             debuginfo += " end datastructure_define"
@@ -664,8 +685,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if datastructure_define:
         add_double_enter = False
         add_enter = False
+    if in_python_comment:
+        add_double_enter = False
+        add_enter = False
 
-    return add_double_enter, add_enter, debuginfo, resolve_func, if_cnt
+    return in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt
 
 
 def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, mylines, prev_line):
@@ -871,6 +895,9 @@ def init_cp(args, fname, myfile):
     import cStringIO
 
     data = myfile.read()
+    if "ADDTYPES" in data:
+        global ADDCOMMENT_WITH_FOUND_TYPE
+        ADDCOMMENT_WITH_FOUND_TYPE = True
     for i in range(0, 10):
         data = data.replace("\n\n", "\n")
     data = data.replace(")->", ") ->")
@@ -957,6 +984,7 @@ def main():
 
     line_cnt = 0
     if_cnt = {}
+    in_python_comment = False
     for line in mylines:
         line_cnt += 1
         line = line.replace("fingerprint", "fingerpr1nt")
@@ -973,7 +1001,7 @@ def main():
 
         add_double_enter, add_enter, line, next_line, prev_line, scoped = prepare_line(cnt, line, mylines)
 
-        add_double_enter, add_enter, debuginfo, resolve_func, if_cnt = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt)
+        in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment)
 
         add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, scoped)
 
@@ -1018,7 +1046,7 @@ def main():
         num += 1
         buffer_string += line
 
-    open(args.myfile, "w").write("\n\n" + buffer_string.strip() + "\n\n")
+    open(args.myfile, "w").write("\n\n" + buffer_string.strip() + "\n")
     print "pretty print", args.myfile, "done"
 
 
