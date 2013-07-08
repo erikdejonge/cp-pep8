@@ -87,6 +87,9 @@ def func_def(line):
 
 
 def method_call(line):
+    if line.count("(") == 1:
+        if line.count("str(") == 1:
+            return False
     line = str(line)
     return (line.count("(") is 1 and line.count(")") is 1) or ("$(this)." in line and line.count("(") is 1 and line.count(")") is 1)
 
@@ -132,11 +135,11 @@ def assignment(line):
 def keyword(line):
     if line.strip() == "":
         return True
-    if in_test(["print", "# noinspection", "super", "pass", "switch", "raise", "for", "when", "if", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
+    if in_test(["print", "# noinspection", "except", "super", "pass", "switch", "raise", "for", "when", "if", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
         return True
     elif some_func(line):
         return True
-    #elif anon_func(line):
+        #elif anon_func(line):
     #    return True
     return False
 
@@ -197,8 +200,11 @@ def scope_diff(line, prev_line):
 
 def in_test(items, line):
     for item in items:
+        if item == line:
+            return True
         if item in line:
             return True
+
     return False
 
 
@@ -231,7 +237,7 @@ def is_test(items, line):
 
 def is_member_var(line):
     line = str(line)
-    if not "@param" in line and (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not in_test(["warning"], line) and not keyword(line):
+    if not "= {" in line and not "@param" in line and (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not in_test(["warning"], line) and not keyword(line):
         return True
     return False
 
@@ -260,6 +266,10 @@ def function_call(line):
     return False
 
 
+def double_meth_call(line):
+    return "self" in line and line.count("(") > 1
+
+
 def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt):
     line_indent = indentation(line)
 
@@ -280,6 +290,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif line.strip().startswith("@") and not "(" in line and not '"""' in prev_line and not "param" in line:
         add_enter = True
         debuginfo = "property"
+    elif double_meth_call(line):
+        if not double_meth_call(prev_line):
+            debuginfo = "double method call"
+            add_enter = True
     elif global_class_declare(line):
         debuginfo = "global_class_declare"
         add_enter = True
@@ -289,6 +303,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_double_enter = True
         else:
             debuginfo += "after keyword"
+        if next_line:
+            if keyword(next_line):
+                if "class" not in next_line:
+                    add_enter = True
+                    add_double_enter = False
     elif line.strip().startswith("try"):
         if not keyword(prev_line):
             debuginfo = "try"
@@ -419,7 +438,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_enter = True
             debuginfo += " scoped"
     elif scoped_method_call(line):
-
         if prev_line:
             if not func_test([method_call, class_method], prev_line.strip()) and not in_test([".then", "if", "->", "=>", "else"], prev_line):
                 debuginfo = ".method define or scoped method call"
@@ -456,6 +474,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             if "if" in prev_line:
                 debuginfo += " after if"
                 add_enter = True
+            if method_call(prev_line):
+                debuginfo += " after method call"
+                add_enter = True
 
         #if not func_def(prev_line) and not class_method(prev_line) and not keyword(prev_line):
         #    if if_cnt[line_indent][0] == 1 and (if_cnt[line_indent][0] - if_cnt[line_indent][1] == 1):
@@ -479,6 +500,17 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif ".directive" in line:
         add_enter = True
         debuginfo = ".directive"
+    elif is_member_var(line):
+        ls = line.strip().split(" ")
+        first_word = ""
+        if ls > 0:
+            first_word = ls[0]
+        if not keyword(first_word):
+            debuginfo = "member initialization"
+            if scoped > 0:
+                if not is_member_var(prev_line):
+                    add_double_enter = True
+                    debuginfo += " new scope"
     elif method_call(line):
         debuginfo = "methodcall "
         if assignment(line):
@@ -499,9 +531,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 debuginfo += "method call"
                 if data_assignment(line, prev_line):
                     debuginfo += "method call data assignment"
+                    add_enter = False
                 else:
                     if assignment(prev_line):
-                        add_enter = True
+                        add_enter = False
                         debuginfo += "method call after assignment"
                     else:
                         test_items = ["print", "when", "_.keys", "finally", "except", '"""', "->", "=>"]
@@ -623,13 +656,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     #add_enter = True
     elif "print" in line:
         debuginfo = "debug statement"
-    elif is_member_var(line):
-        debuginfo = "member initialization"
-        if scoped > 0:
-            if not is_member_var(prev_line):
-                add_double_enter = True
-                debuginfo += " new scope"
-
     if "]" in line and not "[]" in line:
         if datastructure_define:
             debuginfo += " end datastructure_define"
@@ -870,7 +896,7 @@ def prepare_line(cnt, line, mylines):
     next_line = None
     if cnt > 1:
         prev_line = mylines[cnt - 1]
-    if next_line:
+    if len(mylines) > cnt + 1:
         next_line = mylines[cnt + 1]
     scoped = scope_diff(line, prev_line)
     ls = line.split("# ##^ ")
