@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# coding=utf-8
 
 import os
 import time
@@ -740,6 +741,7 @@ def sanatize_line(line):
         line = line.replace("  =", " =")
         line = line.replace("  is  ", " is ")
         line = line.replace("  is not  ", " is ")
+    line = line.replace("coding = utf-8", "coding=utf-8")
     line += "\n"
     return line
 
@@ -1046,7 +1048,7 @@ def main():
         num += 1
         buffer_string += line
 
-    open(args.myfile, "w").write("\n\n" + buffer_string.strip() + "\n")
+    open(args.myfile, "w").write(buffer_string.strip() + "\n")
     print "pretty print", args.myfile, "done"
 
 
