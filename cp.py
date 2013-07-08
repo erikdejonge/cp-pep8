@@ -394,6 +394,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 add_enter = True
     elif func_def(line):
         debuginfo = "function def"
+
         if line.find(" ") is not 0:
             add_double_enter = True
         else:
@@ -444,6 +445,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
 
             else:
                 debuginfo = "functiondef after functiondef"
+        if line.strip().startswith("def "):
+            add_enter = True
+            add_double_enter = True
+            debuginfo += " python"
     elif class_method_call(line):
         debuginfo = "class method call"
         if scoped > 1:
@@ -564,7 +569,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 add_enter = False
     elif assignment(line):
         global datastructure_define
-        if "[" in line and not "]" in line:
+        if "[" in line and not "]" in line and not "\\033[" in line:
             debuginfo = "datastructure assignment"
             datastructure_define = True
         else:
@@ -684,9 +689,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         datastructure_define = False
 
     if datastructure_define:
+        debuginfo += " in datastructure_define"
         add_double_enter = False
         add_enter = False
     if in_python_comment:
+        debuginfo += " in in_python_comment"
         add_double_enter = False
         add_enter = False
 
