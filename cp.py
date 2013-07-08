@@ -504,7 +504,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                         add_enter = True
                         debuginfo += "method call after assignment"
                     else:
-                        test_items = ["print", "when", "_.keys", "finally", "except", '"""']
+                        test_items = ["print", "when", "_.keys", "finally", "except", '"""', "->", "=>"]
                         if in_test(test_items, prev_line):
                             debuginfo += " after " + str(in_test_result(test_items, prev_line)).replace("print", "pr1nt")
                         else:
