@@ -446,9 +446,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             else:
                 debuginfo = "functiondef after functiondef"
         if line.strip().startswith("def "):
-            add_enter = True
-            add_double_enter = True
-            debuginfo += " python"
+            if not "(self" in line:
+                add_enter = True
+                add_double_enter = True
+                debuginfo += " python"
     elif class_method_call(line):
         debuginfo = "class method call"
         if scoped > 1:
