@@ -268,7 +268,7 @@ def function_call(line):
 
 
 def double_meth_call(line):
-    return "self" in line and line.count("(") > 1
+    return "self" in line and line.count("()") > 1
 
 
 def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment):
@@ -319,10 +319,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif line.strip().startswith("try"):
         if not keyword(prev_line):
             debuginfo = "try"
-            add_enter = True
-    elif "timer.event" in line:
-        if not keyword(prev_line):
-            debuginfo = "timer"
             add_enter = True
     elif global_object_method_call(line):
         debuginfo = "global method call"
