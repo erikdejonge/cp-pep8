@@ -452,7 +452,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             else:
                 debuginfo = "functiondef after functiondef"
         if line.strip().startswith("def "):
-            if not "(self" in line and not "(cls" in line and not "@staticmethod" in prev_line:
+            if not "(self" in line and not "(cls" in line and not "@staticmethod" in prev_line and not prev_line.strip().startswith("def ") and not line.startswith(" "):
                 add_enter = True
                 add_double_enter = True
                 debuginfo += " python"
