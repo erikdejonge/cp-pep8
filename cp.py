@@ -294,7 +294,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif "unless" in line:
         add_enter = True
         debuginfo = "unless"
-    elif line.strip().startswith("@") and not "(" in line and not '"""' in prev_line and not "param" in line:
+    elif line.strip().startswith("@") and not line.strip().startswith("@m_") and not "(" in line and not '"""' in prev_line and not "param" in line:
         add_enter = True
         debuginfo = "property "
     elif double_meth_call(line):
