@@ -441,6 +441,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     debuginfo += " a python class"
                     add_double_enter = False
                     add_enter = True
+                    if "noinspection" in prev_line:
+                        debuginfo += " after no inspection"
+                        add_enter = False
                 if "(self" in line and ("class" in prev_line or '"""' in prev_line) and not prev_line.strip().startswith("@"):
                     debuginfo += " first method"
                     add_double_enter = False
