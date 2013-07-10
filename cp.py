@@ -6,7 +6,7 @@ import time
 from argparse import ArgumentParser
 import sys
 reload(sys)
-# noinspection PyUnresolvedReferences
+#noinspection PyUnresolvedReferences
 sys.setdefaultencoding("utf-8")
 
 ADDCOMMENT_WITH_FOUND_TYPE = False
@@ -136,7 +136,7 @@ def assignment(line):
 def keyword(line):
     if line.strip() == "":
         return True
-    if in_test(["print", "# noinspection", "except", "super", "pass", "switch", "raise", "for", "when", "if", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
+    if in_test(["class", "print", "#noinspection", "except", "super", "pass", "switch", "raise", "for", "when", "if", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
         return True
     elif some_func(line):
         return True
@@ -288,6 +288,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if line.startswith("class"):
         add_double_enter = True
         debuginfo = "class def"
+    elif line.strip().startswith("class"):
+        add_enter = True
+        debuginfo = "class def"
     elif "unless" in line:
         add_enter = True
         debuginfo = "unless"
@@ -302,7 +305,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif global_class_declare(line):
         debuginfo = "global_class_declare"
         add_enter = True
-    elif "# noinspection" in line:
+    elif "#noinspection" in line:
         debuginfo = "pycharm directive"
         if not keyword(prev_line):
             add_double_enter = True
@@ -446,7 +449,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             else:
                 debuginfo = "functiondef after functiondef"
         if line.strip().startswith("def "):
-            if not "(self" in line:
+            if not "(self" in line and not "(cls" in line and not "@staticmethod" in prev_line:
                 add_enter = True
                 add_double_enter = True
                 debuginfo += " python"
@@ -508,7 +511,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif in_test_kw(["switch", "for", "while"], line):
         debuginfo = in_test_result(["switch", "try", "when", "while", "if", "for"], line) + " statement"
         if prev_line:
-            if not in_test(["when", "if", "->", "=>", '"""', "def ", "else", "switch", "try", "# noinspection"], prev_line):
+            if not in_test(["when", "if", "->", "=>", '"""', "def ", "else", "switch", "try", "#noinspection"], prev_line):
                 if in_test(["return"], prev_line) and in_test(["when"], line) and scoped > 1:
                     debuginfo += " prevented when statement"
                 else:
@@ -527,7 +530,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             debuginfo = "member initialization"
             if scoped > 0:
                 if not is_member_var(prev_line):
-                    add_double_enter = True
+                    add_enter = True
                     debuginfo += " new scope"
     elif method_call(line):
         debuginfo = "methodcall "
@@ -555,13 +558,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                         add_enter = False
                         debuginfo += "method call after assignment"
                     else:
-                        test_items = ["print", "when", "_.keys", "finally", "except", '"""', "->", "=>"]
+                        test_items = ["@staticmethod", "print", "when", "_.keys", "finally", "except", '"""', "->", "=>"]
                         if in_test(test_items, prev_line):
                             debuginfo += " after " + str(in_test_result(test_items, prev_line)).replace("print", "pr1nt")
                         else:
                             debuginfo += " not after assignment"
                             add_enter = True
-                if in_test(["$watch", "if", "else", "for", "while", "try:", "# noinspection"], prev_line.strip()):
+                if in_test(["$watch", "if", "else", "for", "while", "try:", "#noinspection"], prev_line.strip()):
                     debuginfo += "method call after 1f 3lse or wtch"
                     add_enter = False
                     add_double_enter = False
@@ -671,7 +674,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 add_enter = False
             else:
                 if next_line and not in_test(["setInterval", "setTimeout"], prev_line):
-                    if "class" not in next_line or len(next_line) > 0:
+                    if "class" not in next_line or len(str(next_line)) > 0:
                         debuginfo += " after js time func"
                 elif scoped > 1:
                     debuginfo += " after scope d!ff " + str(scoped)
@@ -738,8 +741,8 @@ def add_debuginfo(debuginfo, line):
     return debuginfo, line
 
 
-def sanatize_line(line):
-    if not in_test([")", "=>", "!=", "==", "$(", "?", "ng-", "trim", "strip", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element"], line):
+def sanatize_line(line, next_line):
+    if not (line.strip().endswith(",") or ")" in next_line) and not in_test([")", "=>", "!=", "==", "$(", "?", "ng-", "trim", "strip", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element"], line):
         line = line.replace("=>", "@>").replace("( ", "(").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("* =", "*=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
         if not "+=" in line and not "++" in line:
             line = line.replace("+", " + ")
@@ -769,7 +772,7 @@ def coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_
     return add_enter, debuginfo, resolve_func
 
 
-# noinspection PyUnusedLocal
+#noinspection PyUnusedLocal
 def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, orgfname, undo_variables, variables):
     for replace_variable in variables:
         check_split = line.split(" ")
@@ -948,6 +951,7 @@ def prepare_line(cnt, line, mylines):
     #line = line.replace("console.log ", "console?.log? ")
     #line = line.replace("console?.log", "console?.log")
     #line = line.replace("console?.log?", "print")
+    line = line.replace("# noinspection", "#noinspection")
     line = line.replace("console?.error?", "warning")
     line = line.replace("console?.error", "warning")
     line = line.replace("console.log", "print")
@@ -1025,7 +1029,7 @@ def main():
 
         debuginfo, line = add_debuginfo(debuginfo, line)
 
-        line = sanatize_line(line)
+        line = sanatize_line(line, str(next_line))
 
         restore_color = None
         if orgfname.strip().endswith(".py"):
