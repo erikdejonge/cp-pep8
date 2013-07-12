@@ -1000,7 +1000,6 @@ def main():
     in_python_comment = False
     for line in mylines:
         line_cnt += 1
-        line = line.replace("fingerprint", "fingerpr1nt")
         for v in watch_vars:
             if v.lower() in line.lower():
                 print line
@@ -1043,7 +1042,6 @@ def main():
         if restore_color:
             line = line.replace('93m', restore_color)
 
-        line = line.replace("fingerpr1nt", "fingerprint")
         buffer_string += line
         num += 1
         cnt += 1
