@@ -133,10 +133,18 @@ def assignment(line):
     return False
 
 
+def elif_switch(line):
+    if line.strip() == "":
+        return True
+    if in_test(["elif", "else"], line):
+        return True
+    return False
+
+
 def keyword(line):
     if line.strip() == "":
         return True
-    if in_test(["class", "print", "#noinspection", "except", "super", "pass", "switch", "raise", "for", "when", "if", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
+    if in_test(["class", "print", "#noinspection", "except", "super", "pass", "switch", "raise", "for", "when", "if", "elif", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
         return True
     elif some_func(line):
         return True
@@ -543,8 +551,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         elif prev_line:
             if method_call(prev_line):
                 if ws(line) < ws(prev_line):
-                    debuginfo += "method call higher scope"
-                    add_enter = True
+                    if not elif_switch(prev_line):
+                        debuginfo += "method call higher scope"
+                        add_enter = False
                 else:
                     debuginfo += "nested method call"
             elif not func_test([func_def, scoped_method_call, method_call, class_method], prev_line.strip()):
