@@ -318,10 +318,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if not keyword(prev_line):
             add_double_enter = True
         else:
+            add_enter = False
             debuginfo += "after keyword"
         if next_line:
-            if keyword(next_line):
+            if keyword(next_line) and not keyword(prev_line):
                 if "class" not in next_line:
+                    debuginfo += " keyword (not class) in nextline"
                     add_enter = True
                     add_double_enter = False
     elif line.strip().startswith("try"):
