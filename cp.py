@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # coding=utf-8
-
+"""
+cp.py
+"""
 import os
 import time
 from argparse import ArgumentParser
@@ -15,6 +17,11 @@ datastructure_define = False
 
 
 def replace_variables():
+    """
+
+
+    @return: @rtype:
+    """
     variables = ["print", "warning", "emit_event", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
     undo_variables = []
     watch_variables = []
@@ -23,6 +30,12 @@ def replace_variables():
 
 
 def func_test(funcs, line):
+    """
+
+    @param funcs:
+    @param line:
+    @return: @rtype:
+    """
     for func in funcs:
         res = func(line)
         if res:
@@ -31,6 +44,11 @@ def func_test(funcs, line):
 
 
 def global_class_declare(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     if line.strip().find("=") == len(line.strip()) - 1:
         if line.find(" ") != 0:
             return True
@@ -38,10 +56,20 @@ def global_class_declare(line):
 
 
 def on_scope(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     return line.strip().find("$scope.") == 0
 
 
 def anon_func(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     line = str(line)
     if in_test(["warning", "print"], line):
         return False
@@ -53,10 +81,20 @@ def anon_func(line):
 
 
 def parenthesis(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     return ("(" in line) and (")" in line)
 
 
 def anon_func_param(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     if functional(line):
         return False
 
@@ -65,12 +103,22 @@ def anon_func_param(line):
 
 
 def functional(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     if "_." in line:
         return True
     return False
 
 
 def func_def(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     if functional(line):
         return False
     line = str(line)
@@ -88,6 +136,11 @@ def func_def(line):
 
 
 def method_call(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     if line.count("(") == 1:
         if line.count("str(") == 1:
             return False
@@ -96,6 +149,11 @@ def method_call(line):
 
 
 def class_method(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     line = str(line)
 
     if in_test(["print"], line):
@@ -105,12 +163,22 @@ def class_method(line):
 
 
 def scope_declaration(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     if line.strip().find("$scope") == 0:
         return True
     return False
 
 
 def scoped_method_call(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     if functional(line):
         return False
 
@@ -122,10 +190,20 @@ def scoped_method_call(line):
 
 
 def some_func(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     return func_test([func_def, class_method, scoped_method_call], line)
 
 
 def assignment(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     line = line.strip()
     if "==" not in line and line.count("= ") is 1 and not is_member_var(line):
         if not some_func(line):
@@ -134,6 +212,11 @@ def assignment(line):
 
 
 def elif_switch(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     if line.strip() == "":
         return True
     if in_test(["elif", "else"], line):
@@ -142,6 +225,11 @@ def elif_switch(line):
 
 
 def keyword(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     if line.strip() == "":
         return True
     if in_test(["class", "print", "#noinspection", "except", "super", "catch", "pass", "switch", "raise", "for", "when", "if", "elif", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
@@ -154,6 +242,11 @@ def keyword(line):
 
 
 def indentation(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     cnt = 0
     for c in line:
         if c != " ":
@@ -163,6 +256,12 @@ def indentation(line):
 
 
 def data_assignment(line, prev_line):
+    """
+
+    @param line:
+    @param prev_line:
+    @return: @rtype:
+    """
     lvalue = "-"
     if '["' in line and '"]' in line:
         line = line.replace('["', ".")
@@ -177,6 +276,11 @@ def data_assignment(line, prev_line):
 
 
 def comment(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     if not line:
         return False
 
@@ -188,6 +292,11 @@ def comment(line):
 
 
 def ws(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     cnt = 0
     for i in line:
         if i != " ":
@@ -197,6 +306,12 @@ def ws(line):
 
 
 def scope_diff(line, prev_line):
+    """
+
+    @param line:
+    @param prev_line:
+    @return: @rtype:
+    """
     if not prev_line:
         return 0
 
@@ -208,6 +323,12 @@ def scope_diff(line, prev_line):
 
 
 def in_test(items, line):
+    """
+
+    @param items:
+    @param line:
+    @return: @rtype:
+    """
     for item in items:
         if item == line:
             return True
@@ -218,6 +339,12 @@ def in_test(items, line):
 
 
 def start_in_test(items, line):
+    """
+
+    @param items:
+    @param line:
+    @return: @rtype:
+    """
     line = line.strip()
     for item in items:
         if line.startswith(item):
@@ -226,11 +353,23 @@ def start_in_test(items, line):
 
 
 def in_test_kw(items, line):
+    """
+
+    @param items:
+    @param line:
+    @return: @rtype:
+    """
     items = [x + " " for x in items]
     return in_test(items, line)
 
 
 def in_test_result(items, line):
+    """
+
+    @param items:
+    @param line:
+    @return: @rtype:
+    """
     for item in items:
         if item in line:
             return item.replace('"""', '')
@@ -238,6 +377,12 @@ def in_test_result(items, line):
 
 
 def is_test(items, line):
+    """
+
+    @param items:
+    @param line:
+    @return: @rtype:
+    """
     for item in items:
         if item is line.strip():
             return True
@@ -245,6 +390,11 @@ def is_test(items, line):
 
 
 def is_member_var(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     line = str(line)
     if not "[" in line and not "]" in line and not "= {" in line and not "@param" in line and (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not in_test(["warning"], line) and not keyword(line):
         return True
@@ -252,10 +402,20 @@ def is_member_var(line):
 
 
 def global_line(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     return line.find(" ") != 0
 
 
 def global_object_method_call(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     if global_line(line):
         if "." in line and parenthesis(line):
             return True
@@ -263,6 +423,11 @@ def global_object_method_call(line):
 
 
 def class_method_call(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     if line.strip().find("@") == 0:
         if "(" in line and ")" in line:
             return True
@@ -270,16 +435,43 @@ def class_method_call(line):
 
 
 def function_call(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     if parenthesis(line) and not "." in line:
         return True
     return False
 
 
 def double_meth_call(line):
+    """
+
+    @param line:
+    @return: @rtype:
+    """
     return "self" in line and line.count("()") > 1
 
 
 def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment):
+    """
+
+    @param add_double_enter:
+    @param add_enter:
+    @param debuginfo:
+    @param first_method_class:
+    @param first_method_factory:
+    @param line:
+    @param next_line:
+    @param prev_line:
+    @param resolve_func:
+    @param scoped:
+    @param if_cnt:
+    @param in_python_comment:
+    @return: @rtype:
+    """
+    line_redone = org_line = line
     line_indent = indentation(line)
 
     if "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
@@ -696,6 +888,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             in_python_comment = False
         else:
             in_python_comment = True
+            if next_line.count('"""') > 0:
+                docstring = prev_line.replace("def ", "").replace("class ", "").strip()
+                if "(" in docstring:
+                    docstring = docstring.split("(")[0]
+                line_redone += "\n" + line.replace('"""', "") + docstring
 
     if "]" in line and not "[]" in line:
         if datastructure_define:
@@ -710,12 +907,25 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         debuginfo += " in in_python_comment"
         add_double_enter = False
         add_enter = False
+        if line.strip().startswith("@param"):
+            if not next_line.strip().startswith("@type"):
+                line_redone += "\n" + org_line.split("@param")[0] + "@type " + line.strip().split("@param")[1].split(":")[0].strip() + ": "
 
-    return in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt
+    return in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line_redone
 
 
 def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, mylines, prev_line):
     #print debuginfo, add_enter, add_double_enter
+    """
+
+    @param add_double_enter:
+    @param add_enter:
+    @param cnt:
+    @param line:
+    @param mylines:
+    @param prev_line:
+    @return: @rtype:
+    """
     global datastructure_define
 
     if add_double_enter:
@@ -739,6 +949,12 @@ def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, 
 
 
 def add_debuginfo(debuginfo, line):
+    """
+
+    @param debuginfo:
+    @param line:
+    @return: @rtype:
+    """
     if debuginfo:
         ef = line.find("\n")
         if ef > 0 and ef is not 0:
@@ -752,6 +968,12 @@ def add_debuginfo(debuginfo, line):
 
 
 def sanatize_line(line, next_line):
+    """
+
+    @param line:
+    @param next_line:
+    @return: @rtype:
+    """
     if not (line.strip().endswith(",") or ")" in next_line) and not in_test([")", "=>", "!=", "==", "$(", "?", "ng-", "trim", "strip", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element"], line):
         line = line.replace("=>", "@>").replace("( ", "(").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("* =", "*=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
         if not "+=" in line and not "++" in line:
@@ -768,6 +990,15 @@ def sanatize_line(line, next_line):
 
 
 def coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_line, resolve_func):
+    """
+
+    @param add_enter:
+    @param debuginfo:
+    @param line:
+    @param prev_line:
+    @param resolve_func:
+    @return: @rtype:
+    """
     if resolve_func:
         if anon_func(line) and in_test(["(", ")"], line) and not "= " in line:
             if resolve_func:
@@ -784,6 +1015,17 @@ def coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_
 
 #noinspection PyUnusedLocal
 def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, orgfname, undo_variables, variables):
+    """
+
+    @param args:
+    @param fname:
+    @param line:
+    @param location_id:
+    @param orgfname:
+    @param undo_variables:
+    @param variables:
+    @return: @rtype:
+    """
     for replace_variable in variables:
         check_split = line.split(" ")
         check_split2 = []
@@ -809,7 +1051,9 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                     lines = line2.split(",")
 
                     def lnr(i):
-                        """ lnr """
+                        """ lnr
+                        @param i:
+                        """
                         if ":" not in i:
                             return i
 
@@ -881,6 +1125,11 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
 
 
 def arg_parse():
+    """
+
+
+    @return: @rtype:
+    """
     parser = ArgumentParser()
     parser.add_argument("-f", dest="myfile")
     parser.add_argument("-r", dest="release")
@@ -889,6 +1138,11 @@ def arg_parse():
 
 
 def init_file(args):
+    """
+
+    @param args:
+    @return: @rtype:
+    """
     myfile = None
     if args.myfile:
         myfile = open(args.myfile, "r")
@@ -912,6 +1166,13 @@ def init_file(args):
 
 
 def init_cp(args, fname, myfile):
+    """
+
+    @param args:
+    @param fname:
+    @param myfile:
+    @return: @rtype:
+    """
     color_vals_to_keep, undo_variables, variables, watch_vars = replace_variables()
     mylines = []
     fname = fname.replace("coffee", "cf")
@@ -942,6 +1203,13 @@ def init_cp(args, fname, myfile):
 
 
 def prepare_line(cnt, line, mylines):
+    """
+
+    @param cnt:
+    @param line:
+    @param mylines:
+    @return: @rtype:
+    """
     prev_line = ""
     next_line = None
     if cnt > 1:
@@ -970,6 +1238,17 @@ def prepare_line(cnt, line, mylines):
 
 
 def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, scoped):
+    """
+
+    @param add_double_enter:
+    @param add_enter:
+    @param cnt:
+    @param debuginfo:
+    @param line:
+    @param next_line:
+    @param scoped:
+    @return: @rtype:
+    """
     if comment(line):
         if debuginfo:
             debuginfo = "comment -> " + debuginfo
@@ -1024,7 +1303,7 @@ def main():
 
         add_double_enter, add_enter, line, next_line, prev_line, scoped = prepare_line(cnt, line, mylines)
 
-        in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment)
+        in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment)
 
         add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, scoped)
 
@@ -1073,6 +1352,10 @@ def main():
 
 
 def lock_acquire(key):
+    """
+
+    @param key:
+    """
     lfile = key + ".lock"
     cnt = 0
     while os.path.exists(lfile):
@@ -1084,6 +1367,11 @@ def lock_acquire(key):
 
 
 def lock_release(key):
+    """
+
+    @param key:
+    @return: @rtype:
+    """
     lfile = key + ".lock"
     if os.path.exists(lfile):
         os.remove(lfile)
