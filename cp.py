@@ -232,7 +232,7 @@ def keyword(line):
     """
     if line.strip() == "":
         return True
-    if in_test(["class", "print", "#noinspection", "except", "super", "catch", "pass", "switch", "raise", "for", "when", "if", "elif", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
+    if in_test(["class", "print", "#noinspection", "except", "with", "super", "catch", "pass", "switch", "raise", "for", "when", "if", "elif", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
         return True
     elif some_func(line):
         return True
@@ -485,9 +485,14 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if ".factory" in line:
         add_double_enter = True
         debuginfo = ".factory"
+
     if line.startswith("class"):
         add_double_enter = True
         debuginfo = "class def"
+    elif "__main__'" in line:
+        debuginfo = "main"
+        add_double_enter = True
+
     elif line.strip().startswith("class"):
         add_enter = True
         debuginfo = "class def"
@@ -508,7 +513,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif "#noinspection" in line:
         debuginfo = "pycharm directive"
         if not keyword(prev_line):
-            add_double_enter = True
+            add_enter = True
         else:
             add_enter = False
             debuginfo += "after keyword"
