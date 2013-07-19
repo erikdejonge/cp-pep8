@@ -1266,6 +1266,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
     @param line:
     @param next_line:
     @param scoped:
+    @param if_cnt:
     @return: @rtype:
     """
     if comment(line):
