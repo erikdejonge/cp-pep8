@@ -119,6 +119,8 @@ def func_def(line):
     @param line:
     @return: @rtype:
     """
+    if line.strip().startswith("def "):
+        return True
     if functional(line):
         return False
     line = str(line)
@@ -472,15 +474,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     @return: @rtype:
     """
     line_redone = org_line = line
-    line_indent = indentation(line)
+    prev_ifcnt = if_cnt
+    if scoped > 0:
+        if if_cnt > 0:
+            if_cnt -= scoped
 
-    if "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
-        if line_indent in if_cnt:
-            if_cnt[line_indent] = (if_cnt[line_indent][0] + 1, if_cnt[line_indent][0])
-        else:
-            if_cnt[line_indent] = (0, 0)
-    else:
-        if_cnt[line_indent] = (0, 0)
+    if line.strip().startswith("if"):
+        if_cnt += 1
 
     if ".factory" in line:
         add_double_enter = True
@@ -489,10 +489,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if line.startswith("class"):
         add_double_enter = True
         debuginfo = "class def"
+    elif comment(line):
+        debuginfo = "a comment"
+        add_enter = True
     elif "__main__'" in line:
-        debuginfo = "main"
         add_double_enter = True
-
+        debuginfo = "main"
     elif line.strip().startswith("class"):
         add_enter = True
         debuginfo = "class def"
@@ -604,7 +606,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if line.find(" ") is not 0:
             add_double_enter = True
         else:
-            if not func_def(prev_line):
+            if not func_def(prev_line) or comment(prev_line):
                 debuginfo = "function def nested"
                 if assignment(prev_line):
                     debuginfo = "function def nested after assignement"
@@ -687,7 +689,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         else:
             debuginfo = "resolve result 2"
     elif "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
-        debuginfo = "indent:" + str(int(line_indent)) + " ifcnt:" + str(if_cnt[line_indent][0]) + ":" + str(if_cnt[line_indent][1]) + " if statement"
+        debuginfo = " if statement"
 
         if scoped > 0:
             debuginfo += " scope change"
@@ -705,10 +707,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 debuginfo += " after method call"
                 add_enter = True
 
-        #if not func_def(prev_line) and not class_method(prev_line) and not keyword(prev_line):
-        #    if if_cnt[line_indent][0] == 1 and (if_cnt[line_indent][0] - if_cnt[line_indent][1] == 1):
-        #        debuginfo += " and new scope"
-        #        add_enter = True
         if "else" in line:
             debuginfo += " else"
             add_enter = False
@@ -739,9 +737,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     add_enter = True
                     debuginfo += " new scope"
     elif method_call(line):
-        debuginfo = "methodcall "
+        debuginfo = "methodcall"
         if assignment(line):
-            debuginfo += "assigned "
+            debuginfo += " and assigned "
         if line.find(" ") is not 0:
             debuginfo += "method call global scope"
             if "# noins" not in prev_line and "import " not in prev_line:
@@ -751,26 +749,36 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             if method_call(prev_line):
                 if ws(line) < ws(prev_line):
                     if not elif_switch(prev_line):
-                        debuginfo += "method call higher scope"
+                        debuginfo += " method call higher scope"
                         add_enter = False
                 else:
                     debuginfo += "nested method call"
             elif not func_test([func_def, scoped_method_call, method_call, class_method], prev_line.strip()):
-                debuginfo += "method call"
                 if data_assignment(line, prev_line):
-                    debuginfo += "method call data assignment"
+                    debuginfo += "method call data assignment " + str(if_cnt)
                     add_enter = False
+                    if prev_ifcnt > 0:
+                        debuginfo += " after if"
+                        add_enter = True
                 else:
                     if assignment(prev_line):
-                        add_enter = False
-                        debuginfo += "method call after assignment"
+                        if scoped == 0:
+                            add_enter = False
+                            debuginfo += " after assignment"
+                        else:
+                            add_enter = True
+                            debuginfo += " scope change"
+
                     else:
                         test_items = ["@staticmethod", "catch", "print", "when", "_.keys", "finally", "except", '"""', "->", "=>"]
                         if in_test(test_items, prev_line):
                             debuginfo += " after " + str(in_test_result(test_items, prev_line)).replace("print", "pr1nt")
                         else:
-                            debuginfo += " not after assignment"
-                            add_enter = True
+                            if comment(prev_line):
+                                debuginfo += " after comment"
+                            else:
+                                debuginfo += " not after assignment"
+                                add_enter = True
                 if in_test(["$watch", "if", "else", "for", "while", "try:", "#noinspection"], prev_line.strip()):
                     debuginfo += "method call after 1f 3lse or wtch"
                     add_enter = False
@@ -1242,7 +1250,7 @@ def prepare_line(cnt, line, mylines):
     return add_double_enter, add_enter, line, next_line, prev_line, scoped
 
 
-def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, scoped):
+def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, scoped, if_cnt):
     """
 
     @param add_double_enter:
@@ -1259,7 +1267,8 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
             debuginfo = "comment -> " + debuginfo
         else:
             debuginfo = "comment"
-        add_enter = False
+
+        add_enter = True
         add_double_enter = False
     if add_double_enter:
         add_enter = False
@@ -1274,6 +1283,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                     if next_line:
                         if "else" not in line:
                             add_enter = True
+    debuginfo += " " + str(if_cnt)
     return add_double_enter, add_enter, debuginfo, line
 
 
@@ -1291,7 +1301,7 @@ def main():
     cStringIO, cnt, color_vals_to_keep, debuginfo, first_method_class, first_method_factory, fname, in_if, location_id, mylines, resolve_func, undo_variables, variables, watch_vars = init_cp(args, fname, myfile)
 
     line_cnt = 0
-    if_cnt = {}
+    if_cnt = 0
     in_python_comment = False
     for line in mylines:
         line_cnt += 1
@@ -1310,7 +1320,7 @@ def main():
 
         in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment)
 
-        add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, scoped)
+        add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, scoped, if_cnt)
 
         add_enter, debuginfo, resolve_func = coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_line, resolve_func)
 
