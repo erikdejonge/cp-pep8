@@ -569,6 +569,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                         add_enter = True
     elif line.strip().find("warning") == 0 and ":" not in line:
         debuginfo = "error state (wrning)"
+    elif "@unittest" in line:
+        add_enter = True
+        debuginfo = "unittest decorator"
     elif ".$on" in line:
         debuginfo = "0n event"
         if scoped == 0:
@@ -613,6 +616,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     add_enter = True
                 if class_method(prev_line):
                     debuginfo += " after method"
+                elif "@unittest" in prev_line:
+                    debuginfo += " after unittest decorator"
+                    add_enter = False
                 elif in_test(["if", "else"], prev_line):
                     debuginfo += " after if or else"
                 elif keyword(prev_line):
