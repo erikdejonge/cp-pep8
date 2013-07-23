@@ -501,7 +501,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif "unless" in line:
         add_enter = True
         debuginfo = "unless"
-    elif line.strip().startswith("@") and not line.strip().startswith("@m_") and not "(" in line and not '"""' in prev_line and not "param" in line:
+    elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not "(" in line and not '"""' in prev_line and not "param" in line:
         add_enter = True
         debuginfo = "property "
     elif double_meth_call(line):
@@ -651,7 +651,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 if "(self" in line and not "class" in prev_line and not '"""' in prev_line and not prev_line.strip().startswith("@"):
                     debuginfo += " a python class"
                     add_double_enter = False
-                    add_enter = True
+                    if "#@" in prev_line or "# @" in prev_line:
+                        debuginfo += " after commented out property"
+                        add_enter = False
+                    else:
+                        add_enter = True
                     if "noinspection" in prev_line:
                         debuginfo += " after no inspection"
                         add_enter = False
