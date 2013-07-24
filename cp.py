@@ -489,6 +489,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if line.startswith("class"):
         add_double_enter = True
         debuginfo = "class def"
+    elif "raise" in prev_line:
+        if "except" not in line:
+            debuginfo = " after raise"
+            add_enter = True
     elif comment(line):
         debuginfo = "a comment"
         add_enter = True
