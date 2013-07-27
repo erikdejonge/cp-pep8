@@ -234,7 +234,7 @@ def keyword(line):
     """
     if line.strip() == "":
         return True
-    if in_test(["class", "print", "#noinspection", "except", "with", "super", "catch", "pass", "switch", "raise", "for", "when", "if", "elif", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
+    if in_test(["class", "print", "#noinspection", "except", "with", "super", "catch", " pass", "switch", "raise", "for", "when", "if", "elif", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
         return True
     elif some_func(line):
         return True
@@ -493,6 +493,46 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if "except" not in line:
             debuginfo = " after raise"
             add_enter = True
+    elif "raise" in line:
+        debuginfo = " raise"
+        if not in_test(["if"], prev_line):
+            debuginfo = " after if"
+            add_enter = True
+    elif "return" in line:
+        add_enter = True
+        debuginfo = "retrn"
+        if '"""' in prev_line:
+            add_enter = False
+            debuginfo = " after doc comment"
+        elif keyword(prev_line):
+            add_enter = False
+            debuginfo = " after keyword"
+        elif func_def(prev_line):
+            add_enter = False
+            debuginfo += " after funcdef"
+        elif prev_line:
+            debuginfo += " | "
+
+            if next_line:
+                if (prev_line.strip() == "") or ("else" in prev_line) or ("else" in next_line) and not in_test(["setInterval", "setTimeout"], prev_line):
+                    debuginfo += " after empty line time func or 3lse"
+            elif is_test([")"], prev_line.strip()) or in_test(["_.filter", "_.map"], prev_line):
+                debuginfo += " after close or underscore func"
+                #add_enter = True
+            elif "return" in prev_line:
+                debuginfo += " after rturn"
+                #add_enter = True
+            elif keyword(prev_line):
+                debuginfo += "after keyword"
+                add_enter = False
+            else:
+                if next_line and not in_test(["setInterval", "setTimeout"], prev_line):
+                    if "class" not in next_line or len(str(next_line)) > 0:
+                        debuginfo += " after js time func"
+                elif scoped > 1:
+                    debuginfo += " after scope d!ff " + str(scoped)
+                    #add_enter = True
+
     elif comment(line):
         debuginfo = "a comment"
         add_enter = True
@@ -771,9 +811,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 if data_assignment(line, prev_line):
                     debuginfo += "method call data assignment " + str(if_cnt)
                     add_enter = False
-                    if prev_ifcnt > 0:
-                        debuginfo += " after if"
-                        add_enter = True
+                    #if prev_ifcnt > 0:
+                    #    debuginfo += " after if"
+                    #    add_enter = True
                 else:
                     if assignment(prev_line):
                         if scoped == 0:
@@ -874,40 +914,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         add_double_enter = True
     elif "setInterval" in line or "setTimeout" in line:
         debuginfo = "setInterval timeout"
-    elif "return" in line:
-        add_enter = True
-        debuginfo = "retrn"
-        if '"""' in prev_line:
-            add_enter = False
-            debuginfo = " after doc comment"
-        elif keyword(prev_line):
-            add_enter = False
-            debuginfo = " after keyword"
-        elif func_def(prev_line):
-            add_enter = False
-            debuginfo += " after funcdef"
-        elif prev_line:
-            debuginfo += " | "
-
-            if next_line:
-                if (prev_line.strip() == "") or ("else" in prev_line) or ("else" in next_line) and not in_test(["setInterval", "setTimeout"], prev_line):
-                    debuginfo += " after empty line time func or 3lse"
-            elif is_test([")"], prev_line.strip()) or in_test(["_.filter", "_.map"], prev_line):
-                debuginfo += " after close or underscore func"
-                #add_enter = True
-            elif "return" in prev_line:
-                debuginfo += " after rturn"
-                #add_enter = True
-            elif keyword(prev_line):
-                debuginfo += "after keyword"
-                add_enter = False
-            else:
-                if next_line and not in_test(["setInterval", "setTimeout"], prev_line):
-                    if "class" not in next_line or len(str(next_line)) > 0:
-                        debuginfo += " after js time func"
-                elif scoped > 1:
-                    debuginfo += " after scope d!ff " + str(scoped)
-                    #add_enter = True
     elif "print" in line:
         debuginfo = "debug statement"
     if line.count('"""') % 2 != 0:
