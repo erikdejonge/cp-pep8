@@ -474,7 +474,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     @return: @rtype:
     """
     line_redone = org_line = line
-    prev_ifcnt = if_cnt
+
     if scoped > 0:
         if if_cnt > 0:
             if_cnt -= scoped
@@ -499,43 +499,41 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             debuginfo = " after if"
             add_enter = True
     elif "return" in line:
-        add_enter = True
-        debuginfo = "retrn"
-        if '"""' in prev_line:
-            add_enter = False
-            debuginfo = " after doc comment"
-        elif keyword(prev_line):
-            add_enter = False
-            debuginfo = " after keyword"
-        elif func_def(prev_line):
-            add_enter = False
-            debuginfo += " after funcdef"
-        elif prev_line:
-            debuginfo += " | "
-
-            if next_line:
-                if (prev_line.strip() == "") or ("else" in prev_line) or ("else" in next_line) and not in_test(["setInterval", "setTimeout"], prev_line):
-                    debuginfo += " after empty line time func or 3lse"
-            elif is_test([")"], prev_line.strip()) or in_test(["_.filter", "_.map"], prev_line):
-                debuginfo += " after close or underscore func"
-                #add_enter = True
-            elif "return" in prev_line:
-                debuginfo += " after rturn"
-                #add_enter = True
-            elif keyword(prev_line):
-                debuginfo += "after keyword"
+        if not comment(line) and not comment(prev_line):
+            add_enter = True
+            debuginfo = "retrn"
+            if '"""' in prev_line:
                 add_enter = False
-            else:
-                if next_line and not in_test(["setInterval", "setTimeout"], prev_line):
-                    if "class" not in next_line or len(str(next_line)) > 0:
-                        debuginfo += " after js time func"
-                elif scoped > 1:
-                    debuginfo += " after scope d!ff " + str(scoped)
-                    #add_enter = True
+                debuginfo = " after doc comment"
+            elif keyword(prev_line):
+                add_enter = False
+                debuginfo = " after keyword"
+            elif func_def(prev_line):
+                add_enter = False
+                debuginfo += " after funcdef"
+            elif prev_line:
+                debuginfo += " | "
 
-    elif comment(line):
-        debuginfo = "a comment"
-        add_enter = True
+                if next_line:
+                    if (prev_line.strip() == "") or ("else" in prev_line) or ("else" in next_line) and not in_test(["setInterval", "setTimeout"], prev_line):
+                        debuginfo += " after empty line time func or 3lse"
+                elif is_test([")"], prev_line.strip()) or in_test(["_.filter", "_.map"], prev_line):
+                    debuginfo += " after close or underscore func"
+                    #add_enter = True
+                elif "return" in prev_line:
+                    debuginfo += " after rturn"
+                    #add_enter = True
+                elif keyword(prev_line):
+                    debuginfo += "after keyword"
+                    add_enter = False
+                else:
+                    if next_line and not in_test(["setInterval", "setTimeout"], prev_line):
+                        if "class" not in next_line or len(str(next_line)) > 0:
+                            debuginfo += " after js time func"
+                    elif scoped > 1:
+                        debuginfo += " after scope d!ff " + str(scoped)
+                        #add_enter = True
+
     elif "__main__'" in line:
         add_double_enter = True
         debuginfo = "main"
@@ -1270,9 +1268,11 @@ def prepare_line(cnt, line, mylines):
     return add_double_enter, add_enter, line, next_line, prev_line, scoped
 
 
-def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, scoped, if_cnt):
+def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, prev_line, scoped, if_cnt):
     """
 
+
+    @param prev_line:
     @param add_double_enter:
     @param add_enter:
     @param cnt:
@@ -1288,9 +1288,9 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
             debuginfo = "comment -> " + debuginfo
         else:
             debuginfo = "comment"
-
-        add_enter = True
-        add_double_enter = False
+        if not comment(prev_line):
+            add_enter = True
+            add_double_enter = False
     if add_double_enter:
         add_enter = False
 
@@ -1303,6 +1303,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                         add_enter = True
                     if next_line:
                         if "else" not in line:
+                            debuginfo = " scope"
                             add_enter = True
     debuginfo += " " + str(if_cnt)
     return add_double_enter, add_enter, debuginfo, line
@@ -1341,7 +1342,7 @@ def main():
 
         in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment)
 
-        add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, scoped, if_cnt)
+        add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, prev_line, scoped, if_cnt)
 
         add_enter, debuginfo, resolve_func = coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_line, resolve_func)
 
