@@ -504,6 +504,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if not comment(line) and not comment(prev_line):
             add_enter = False
             debuginfo = "retrn"
+            if whitespace(prev_line) - whitespace(line) > 0:
+                add_enter = True
+                debuginfo = " whitespace"
             if '"""' in prev_line:
                 add_enter = False
                 debuginfo = " after doc comment"
