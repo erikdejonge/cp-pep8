@@ -293,7 +293,7 @@ def comment(line):
         return False
 
 
-def ws(line):
+def whitespace(line):
     """
 
     @param line:
@@ -317,8 +317,8 @@ def scope_diff(line, prev_line):
     if not prev_line:
         return 0
 
-    lws = ws(line)
-    pws = ws(prev_line)
+    lws = whitespace(line)
+    pws = whitespace(prev_line)
     dif = (pws - lws) / 4
 
     return dif
@@ -502,7 +502,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_enter = True
     elif "return" in line:
         if not comment(line) and not comment(prev_line):
-            add_enter = True
+            add_enter = False
             debuginfo = "retrn"
             if '"""' in prev_line:
                 add_enter = False
@@ -766,7 +766,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_enter = False
     elif in_test_kw(["when"], line):
         debuginfo = in_test_result(["when"], line) + " statement"
-    elif in_test_kw(["switch", "for", "while"], line):
+    elif in_test_kw(["switch", "for", "while"], line) and not in_test_kw(["switch", "for", "while"], prev_line) and not comment(prev_line):
         debuginfo = in_test_result(["switch", "try", "when", "while", "if", "for"], line) + " statement"
         if prev_line:
             if not in_test(["when", "if", "->", "=>", '"""', "def ", "else", "switch", "try", "#noinspection"], prev_line):
@@ -801,10 +801,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 add_double_enter = True
         elif prev_line:
             if method_call(prev_line):
-                if ws(line) < ws(prev_line):
+                if whitespace(line) < whitespace(prev_line):
                     if not elif_switch(prev_line):
-                        debuginfo += " method call higher scope"
-                        add_enter = False
+                        debuginfo += " method call higher scope " + str(whitespace(prev_line) - whitespace(line))
+                        if whitespace(prev_line) - whitespace(line) > 0:
+                            add_enter = True
+                            debuginfo += " scope>2 "
                 else:
                     debuginfo += "nested method call"
             elif not func_test([func_def, scoped_method_call, method_call, class_method], prev_line.strip()):
