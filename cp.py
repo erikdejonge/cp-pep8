@@ -559,7 +559,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         add_enter = True
     elif "#noinspection" in line:
         debuginfo = "pycharm directive"
-        if not keyword(prev_line):
+        if not keyword(prev_line) or "return" in prev_line:
             add_enter = True
         else:
             add_enter = False
