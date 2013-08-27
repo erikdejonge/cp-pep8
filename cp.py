@@ -1181,13 +1181,13 @@ def init_file(args):
     """
     myfile = None
     if args.myfile:
-        myfile = open(args.myfile, "r")
+        myfile = open(args.myfile)
         content = ""
         for i in myfile:
             if str(i).strip() != "":
                 content += i
         open(args.myfile, "w").write(content)
-        myfile = open(args.myfile, "r")
+        myfile = open(args.myfile)
     else:
         print "no -f (file) given as argument"
         exit(1)
@@ -1229,7 +1229,7 @@ def init_cp(args, fname, myfile):
 
     if ".cf" not in fname and ".py" not in fname:
         myfile.close()
-        mylines = open(args.myfile, "r")
+        mylines = open(args.myfile)
         #mylines = cStringIO.StringIO(data)
     resolve_func = 0
     debuginfo = ""
