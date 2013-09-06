@@ -232,7 +232,7 @@ def keyword(line):
     """
     if line.strip() == "":
         return True
-    if in_test(["class", "print", "#noinspection", "except", "del", "return", "with", "super", "catch", " pass", "switch", "raise", "for", "when", "if", "elif", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
+    if in_test(["class", "print", "require", "#noinspection", "except", "del", "return", "with", "super", "catch", " pass", "switch", "raise", "for", "when", "if", "elif", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
         return True
     elif some_func(line):
         return True
@@ -487,6 +487,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if line.startswith("class"):
         add_double_enter = True
         debuginfo = "class def"
+    elif "require" in line:
+        pass
     elif "raise" in prev_line:
         if "except" not in line:
             debuginfo = " after raise"
