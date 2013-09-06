@@ -1137,6 +1137,7 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         line = line[:len(line) - 1]
 
                 else:
+
                     if "print(" in line:
                         line = line.replace("print(", "print ")
                         line = line[:len(line) - 1]
