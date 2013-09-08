@@ -141,6 +141,8 @@ def method_call(line):
     @param line:
     @return: @rtype:
     """
+    if line.strip().endswith(","):
+        return False
     if line.count("(") == 1:
         if line.count("str(") == 1:
             return False
