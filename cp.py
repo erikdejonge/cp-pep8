@@ -1097,12 +1097,12 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                     line2 = line.replace(fname, "")
                     lines = line2.split(",")
 
-                    def lnr(i):
+                    def lnr(code_line):
                         """ lnr
-                        @param i:
+                        @param code_line:
                         """
-                        if ":" not in i:
-                            return i
+                        if ":" not in code_line:
+                            return code_line
 
                     lines = [i.strip() for i in lines if lnr(i)]
                     line = line2.split(replace_variable)[0]
