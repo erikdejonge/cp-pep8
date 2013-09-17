@@ -544,6 +544,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif "__main__'" in line:
         add_double_enter = True
         debuginfo = "main"
+    elif "noinspection" in line:
+        debuginfo = "no-inspection"
+        if not next_line.startswith(" "):
+            add_enter = True
+        if next_line.startswith("def "):
+            add_double_enter = True
     elif line.strip().startswith("class"):
         add_enter = True
         debuginfo = "class def"
@@ -654,7 +660,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 add_enter = True
     elif func_def(line):
         debuginfo = "function def"
-
         if line.find(" ") is not 0:
             add_double_enter = True
         else:
@@ -716,10 +721,15 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             else:
                 debuginfo = "functiondef after functiondef"
         if line.strip().startswith("def "):
-            if not "(self" in line and not "(cls" in line and not "@staticmethod" in prev_line and not prev_line.strip().startswith("def ") and not line.startswith(" "):
+            if not "(self" in line and not "(cls" in line and not "@staticmethod" in prev_line and not prev_line.strip().startswith("def ") and not line.startswith(" ") and not "#noinspection" in prev_line:
                 add_enter = True
                 add_double_enter = True
                 debuginfo += " python"
+            elif "noinspection" in prev_line:
+                add_enter = False
+                add_double_enter = False
+                debuginfo += " after noinspection"
+
     elif class_method_call(line):
         debuginfo = "class method call"
         if scoped > 1:
@@ -899,9 +909,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if not keyword(prev_line):
             if scoped == 0:
                 add_enter = True
-    elif "#noinspection" in line:
-        debuginfo = "no-inspection"
-        add_enter = True
     elif "raise" in line:
         if not keyword(prev_line):
             debuginfo = "raise"
@@ -1205,7 +1212,7 @@ def init_file(args):
         #fname = fname.replace("/:", ":")
     return buffer_string, fname, myfile, num, orgfname
 
-
+#noinspection PyPep8Naming
 def init_cp(args, fname, myfile):
     """
 
@@ -1318,7 +1325,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
     debuginfo += " " + str(if_cnt)
     return add_double_enter, add_enter, debuginfo, line
 
-
+#noinspection PyPep8Naming
 def main():
     """
         main function
