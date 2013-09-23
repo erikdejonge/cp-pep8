@@ -147,6 +147,8 @@ def method_call(line):
         if line.count("str(") == 1:
             return False
     line = str(line)
+    if line.find(":") != 0:
+        return False
     return (line.count("(") is 1 and line.count(")") is 1) or ("$(this)." in line and line.count("(") is 1 and line.count(")") is 1)
 
 
@@ -489,6 +491,21 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if line.startswith("class"):
         add_double_enter = True
         debuginfo = "class def"
+    elif "#noinspection" in line:
+        debuginfo = "pycharm directive"
+        if not keyword(prev_line) or "return" in prev_line:
+            add_enter = True
+        else:
+            add_enter = False
+            debuginfo += "after keyword"
+        if next_line:
+            if keyword(next_line) and not keyword(prev_line):
+                if "class" not in next_line:
+                    debuginfo += " keyword (not class) in nextline"
+                    add_enter = True
+                    add_double_enter = False
+        if next_line.startswith("def "):
+            add_double_enter = True
     elif "require" in line:
         pass
     elif "raise" in prev_line:
@@ -544,12 +561,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif "__main__'" in line:
         add_double_enter = True
         debuginfo = "main"
-    elif "noinspection" in line:
-        debuginfo = "no-inspection"
-        if not next_line.startswith(" "):
-            add_enter = True
-        if next_line.startswith("def "):
-            add_double_enter = True
     elif line.strip().startswith("class"):
         add_enter = True
         debuginfo = "class def"
@@ -567,26 +578,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif global_class_declare(line):
         debuginfo = "global_class_declare"
         add_enter = True
-    elif "#noinspection" in line:
-        debuginfo = "pycharm directive"
-        if not keyword(prev_line) or "return" in prev_line:
-            add_enter = True
-        else:
-            add_enter = False
-            debuginfo += "after keyword"
-        if next_line:
-            if keyword(next_line) and not keyword(prev_line):
-                if "class" not in next_line:
-                    debuginfo += " keyword (not class) in nextline"
-                    add_enter = True
-                    add_double_enter = False
     elif line.strip().startswith("try"):
         if not keyword(prev_line):
             debuginfo = "try"
             add_enter = True
     elif global_object_method_call(line):
         debuginfo = "global method call"
-        if "# noins" not in prev_line and "import " not in prev_line:
+        if "#noinspection" not in prev_line and "import " not in prev_line:
             add_double_enter = True
     elif class_method(line):
         if first_method_class:
@@ -1391,13 +1389,14 @@ def main():
         cnt += 1
 
     myfile.close()
+
     sio_file2 = cStringIO.StringIO("\n" + buffer_string.lstrip())
     #open(args.myfile, "w").write()
 
-    num = 1
+    num = 0
     buffer_string = ""
     for line in sio_file2:
-        line = line.replace("@@@@", str(num + 1))
+        line = line.replace("@@@@", str(num))
         num += 1
         buffer_string += line
 
