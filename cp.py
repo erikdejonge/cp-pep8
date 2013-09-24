@@ -620,7 +620,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                             add_enter = True
                     else:
                         add_enter = True
-    elif line.strip().find("warning") == 0 and ":" not in line:
+    elif line.strip().find("warning") == 0 and ":" not in line and ">" not in line:
         debuginfo = "error state (wrning)"
     elif "@unittest" in line:
         add_enter = True
