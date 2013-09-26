@@ -506,8 +506,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     add_double_enter = False
         if next_line.startswith("def "):
             add_double_enter = True
-    elif "require" in line:
-        pass
     elif "raise" in prev_line:
         if "except" not in line:
             debuginfo = " after raise"
