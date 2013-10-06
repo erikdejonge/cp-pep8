@@ -1392,13 +1392,20 @@ def main():
     #open(args.myfile, "w").write()
 
     num = 0
+    if str(args.myfile).endswith(".coffee"):
+        num += 1
+
     buffer_string = ""
     for line in sio_file2:
         line = line.replace("@@@@", str(num))
         num += 1
         buffer_string += line
 
-    open(args.myfile, "w").write(buffer_string.strip() + "\n")
+    if str(args.myfile).endswith(".coffee"):
+        finalbuf = "\n" + buffer_string.strip() + "\n"
+        open(args.myfile, "w").write(finalbuf)
+    else:
+        open(args.myfile, "w").write(buffer_string.strip() + "\n")
     print "pretty print", args.myfile, "done"
 
 
