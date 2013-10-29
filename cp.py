@@ -580,6 +580,30 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if not keyword(prev_line):
             debuginfo = "try"
             add_enter = True
+    elif assignment(line):
+        global datastructure_define
+        if "[" in line and not "]" in line and not "\\033[" in line:
+            debuginfo = "datastructure assignment"
+            datastructure_define = True
+        else:
+            debuginfo = "assignment"
+        if scoped > 0:
+            debuginfo += " prev scope"
+            add_enter = True
+
+        if global_line(line):
+            debuginfo += " on global"
+            if not global_line(prev_line):
+                add_double_enter = True
+        if scoped > 1:
+            debuginfo += " on prev scope"
+            add_enter = True
+        elif on_scope(line):
+            debuginfo += " on scope"
+        if scoped >= 2:
+            add_enter = True
+            debuginfo += " new scope"
+
     elif global_object_method_call(line):
         debuginfo = "global method call"
         if "#noinspection" not in prev_line and "import " not in prev_line:
@@ -853,29 +877,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             else:
                 debuginfo += "method call nested "
                 add_enter = False
-    elif assignment(line):
-        global datastructure_define
-        if "[" in line and not "]" in line and not "\\033[" in line:
-            debuginfo = "datastructure assignment"
-            datastructure_define = True
-        else:
-            debuginfo = "assignment"
-        if scoped > 0:
-            debuginfo += " prev scope"
-            add_enter = True
-
-        if global_line(line):
-            debuginfo += " on global"
-            if not global_line(prev_line):
-                add_double_enter = True
-        if scoped > 1:
-            debuginfo += " on prev scope"
-            add_enter = True
-        elif on_scope(line):
-            debuginfo += " on scope"
-        if scoped >= 2:
-            add_enter = True
-            debuginfo += " new scope"
     elif function_call(line):
         debuginfo = "function call"
         if not function_call(prev_line):
