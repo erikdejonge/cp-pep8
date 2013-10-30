@@ -458,7 +458,7 @@ def double_meth_call(line):
     return "self" in line and line.count("()") > 1
 
 
-def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment):
+def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname):
     """
 
     @param add_double_enter:
@@ -927,6 +927,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         debuginfo = "setInterval timeout"
     elif "print" in line:
         debuginfo = "debug statement"
+
+    if "{" in line and "}" in line and ":" in line and "," in line :
+        nesting = line.find("{")
+        if fname.endswith(".py"):
+            line_redone = line.replace(",", ",\n"+nesting*" ")
+            
     if line.count('"""') % 2 != 0:
         if in_python_comment:
             in_python_comment = False
@@ -1354,7 +1360,7 @@ def main():
 
         add_double_enter, add_enter, line, next_line, prev_line, scoped = prepare_line(cnt, line, mylines)
 
-        in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment)
+        in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname)
 
         add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, prev_line, scoped, if_cnt)
 
