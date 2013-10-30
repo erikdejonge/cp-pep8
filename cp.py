@@ -928,11 +928,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif "print" in line:
         debuginfo = "debug statement"
 
-    if "{" in line and "}" in line and ":" in line and "," in line :
+    if "{" in line and "}" in line and ":" in line and "," in line and line.strip().endswith("}"):
         nesting = line.find("{")
         if fname.endswith(".py"):
             line_redone = line.replace(",", ",\n"+nesting*" ")
-            
+
     if line.count('"""') % 2 != 0:
         if in_python_comment:
             in_python_comment = False
