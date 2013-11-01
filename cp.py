@@ -1283,7 +1283,7 @@ def prepare_line(cnt, line, mylines):
     line = line.replace("# noinspection", "#noinspection")
     line = line.replace("console?.error?", "warning")
     line = line.replace("console?.error", "warning")
-    line = line.replace("console.log", "print")
+    #line = line.replace("console.log", "print")
 
     return add_double_enter, add_enter, line, next_line, prev_line, scoped
 
