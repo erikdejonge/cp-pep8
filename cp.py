@@ -1310,7 +1310,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
             debuginfo = "comment -> " + debuginfo
         else:
             debuginfo = "comment"
-        if not comment(prev_line):
+        if not comment(prev_line) and not "else:" in prev_line:
             add_enter = True
             add_double_enter = False
     if add_double_enter:
