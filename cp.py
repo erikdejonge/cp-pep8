@@ -525,7 +525,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if not in_test(["if", "else", "except"], prev_line):
             debuginfo += " after if"
             add_enter = True
-    elif "pass" == line.strip():
+    elif "pass" == prev_line.strip():
         debuginfo = " pass"
         add_enter = True
 
