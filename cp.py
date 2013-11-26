@@ -7,6 +7,7 @@ import os
 import time
 from argparse import ArgumentParser
 import sys
+
 reload(sys)
 
 #noinspection PyUnresolvedReferences
@@ -74,10 +75,8 @@ def anon_func(line):
     if in_test(["warning", "print"], line):
         return False
 
-
     if "->" in line:
         return True
-
 
     if "=>" in line:
         return True
@@ -256,7 +255,7 @@ def keyword(line):
     if line.strip() == "":
         return True
 
-    if in_test(get_keywords(), line):
+    if in_test(get_keywords(), line, words=True):
         return True
 
     elif some_func(line):
@@ -354,7 +353,9 @@ def scope_diff(line, prev_line):
     pws = whitespace(prev_line)
     dif = (pws - lws) / 4
     return dif
-def in_test(items, line, return_val=False):
+
+
+def in_test(items, line, return_val=False, words=False):
     """
     @param items:
     @type items:
@@ -369,11 +370,11 @@ def in_test(items, line, return_val=False):
             if return_val:
                 return item
             return True
-
-        if item in line:
-            if return_val:
-                return item
-            return True
+        if not words:
+            if item in line:
+                if return_val:
+                    return item
+                return True
     if return_val:
         return ""
     return False
@@ -419,6 +420,8 @@ def in_test_result(items, line):
         if item in line:
             return item.replace('"""', '')
     return None
+
+
 def is_test(items, line):
     """
     @param items:
@@ -429,6 +432,8 @@ def is_test(items, line):
         if item is line.strip():
             return True
     return False
+
+
 def is_member_var(line):
     """
     @param line:
@@ -438,12 +443,16 @@ def is_member_var(line):
     if not "[" in line and not "]" in line and not "= {" in line and not "@param" in line and (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not in_test(["warning"], line) and not keyword(line):
         return True
     return False
+
+
 def global_line(line):
     """
     @param line:
     @return: @rtype:
     """
     return line.find(" ") != 0
+
+
 def global_object_method_call(line):
     """
     @param line:
@@ -453,6 +462,8 @@ def global_object_method_call(line):
         if "." in line and parenthesis(line):
             return True
     return False
+
+
 def class_method_call(line):
     """
     @param line:
@@ -462,6 +473,8 @@ def class_method_call(line):
         if "(" in line and ")" in line:
             return True
     return False
+
+
 def function_call(line):
     """
     @param line:
@@ -470,12 +483,16 @@ def function_call(line):
     if parenthesis(line) and not "." in line:
         return True
     return False
+
+
 def double_meth_call(line):
     """
     @param line:
     @return: @rtype:
     """
-    return "self" in line and line.count("()") > 1
+    return "self" in line and line.count(".()") > 1 and "strip" not in line
+
+
 def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname):
     """
     @param add_double_enter:
@@ -506,11 +523,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         debuginfo = "class def"
     elif "#noinspection" in line:
         debuginfo = "pycharm directive"
-        if not keyword(prev_line) or "return" in prev_line or "raise" in prev_line:
+        if (not keyword(prev_line) or "return" in prev_line or "raise" in prev_line) and not start_in_test(["if"], prev_line):
+            debuginfo += " prev_line (if)" + str(start_in_test(["if"], prev_line))
             add_enter = True
         else:
             add_enter = False
-            debuginfo += "after keyword"
+            debuginfo += "after keyword " + in_test(get_keywords(), prev_line, return_val=True)
         if next_line:
             if keyword(next_line) and not keyword(prev_line):
                 if "class" not in next_line:
@@ -529,8 +547,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
 
     elif "raise" in line:
         debuginfo = " raise"
-        if not in_test(["if", "else", "except"], prev_line):
-            debuginfo += " after if"
+        if not in_test(["if", "else", "except"], prev_line) and not '##' in prev_line:
+            debuginfo += " statement" + prev_line
             add_enter = True
     elif "return" in line:
         if not comment(line) and not comment(prev_line):
@@ -600,7 +618,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         debuginfo = "global_class_declare"
         add_enter = True
     elif line.strip().startswith("try"):
-        if not keyword(prev_line):
+        if not keyword(prev_line) and not prev_line.strip().startswith("try"):
             debuginfo = "try"
             add_enter = True
     elif assignment(line):
@@ -970,9 +988,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if "{" in line and "}" in line and ":" in line and "," in line and line.strip().endswith("}"):
         nesting = line.find("{")
         if fname.endswith(".py"):
-            line_redone = line.replace(",", ",\n"+nesting*" ")
+            line_redone = line.replace(",", ",\n" + nesting * " ")
     if line.strip().startswith("from ") and "import" in line and "\\" not in line:
-        line_redone = line.replace(",", ", \\\n"+3*" ")
+        line_redone = line.replace(",", ", \\\n" + 3 * " ")
 
     if line.count('"""') % 2 != 0:
         if in_python_comment:
@@ -1010,7 +1028,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
 
 
 def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, mylines, prev_line):
-
     #print debuginfo, add_enter, add_double_enter
     """
     @param add_double_enter:
@@ -1086,18 +1103,18 @@ def sanatize_line(line, next_line):
     """
 
     if not (line.strip().endswith(",") or ")" in next_line) and not in_test([")", "=>", "!=", "==", "$(", "?", "ng-", "trim", "strip", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element"], line):
-        line = line.replace("=>", "@>").replace("(", "(").replace("=", " = ").replace(" =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("* =", "*=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
+        line = line.replace("=>", "@>").replace("( ", "(").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("* =", "*=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
         if not "+=" in line and not "++" in line:
             line = line.replace("+", " + ")
             line = line.replace("  +  ", " + ")
 
     for i in range(0, 10):
-        line = line.replace("(", "(")
-        line = line.replace(" =", " =")
-        line = line.replace(" is ", " is ")
-        line = line.replace(" is ", " is ")
+        line = line.replace("( ", "(")
+        line = line.replace("  =", " =")
+        line = line.replace("  is  ", " is ")
+        line = line.replace("  is not  ", " is ")
 
-    line = line.replace("coding=utf-8", "coding=utf-8")
+    line = line.replace("coding = utf-8", "coding=utf-8")
     line += "\n"
     return line
 
@@ -1130,7 +1147,6 @@ def coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_
             resolve_func -= 1
 
     return add_enter, debuginfo, resolve_func
-
 
 #noinspection PyUnusedLocal
 def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, orgfname, undo_variables, variables):
@@ -1308,7 +1324,6 @@ def init_file(args):
         #fname = fname.replace("/:", ":")
     return buffer_string, fname, myfile, num, orgfname
 
-
 #noinspection PyPep8Naming
 def init_cp(args, fname, myfile):
     """
@@ -1324,6 +1339,7 @@ def init_cp(args, fname, myfile):
     mylines = []
     fname = fname.replace("coffee", "cf")
     import cStringIO
+
     data = myfile.read()
 
     if "ADDTYPES" in data:
@@ -1423,8 +1439,9 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
         if debuginfo:
             debuginfo = "comment -> " + debuginfo
         else:
-            debuginfo = "comment"
-        if not comment(prev_line) and not "else:" in prev_line:
+            debuginfo = "comment sc:" + str(scoped)
+
+        if not comment(prev_line) and not "else:" in prev_line and scoped > 0:
             add_enter = True
             add_double_enter = False
 
@@ -1445,7 +1462,6 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
 
     debuginfo += " " + str(if_cnt)
     return add_double_enter, add_enter, debuginfo, line
-
 
 #noinspection PyPep8Naming
 def main():
@@ -1561,6 +1577,7 @@ def lock_release(key):
         os.remove(lfile)
         return True
     return True
+
 
 if __name__ == "__main__":
     try:
