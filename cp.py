@@ -512,7 +512,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     debuginfo += " keyword (not class) in nextline"
                     add_enter = True
                     add_double_enter = False
-        if next_line.strip().startswith("def "):
+        if next_line.rstrip().startswith("def "):
             add_double_enter = True
     elif "raise" in prev_line:
         if "except" not in line:
