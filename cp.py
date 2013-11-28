@@ -944,8 +944,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         nesting = line.find("{")
         if fname.endswith(".py"):
             line_redone = line.replace(",", ",\n"+nesting*" ")
-    if line.strip().startswith("from ") and "import" in line and "\\" not in line:
-        line_redone = line.replace(",", ", \\\n"+3*" ")
 
     if line.count('"""') % 2 != 0:
         if in_python_comment:
