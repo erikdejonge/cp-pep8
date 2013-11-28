@@ -525,10 +525,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if not in_test(["if", "else", "except"], prev_line):
             debuginfo += " after if"
             add_enter = True
-    elif "pass" == prev_line.strip():
-        debuginfo = " pass"
-        add_enter = True
-
     elif "return" in line:
         if not comment(line) and not comment(prev_line):
             add_enter = False
@@ -813,6 +809,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_enter = False
     elif in_test_kw(["when"], line):
         debuginfo = in_test_result(["when"], line) + " statement"
+    elif "pass" == prev_line.strip():
+        debuginfo = " pass"
+        add_enter = True
     elif in_test_kw(["switch", "for", "while"], line) and not in_test_kw(["switch", "for", "while"], prev_line) and not comment(prev_line):
         debuginfo = in_test_result(["switch", "try", "when", "while", "if", "for"], line) + " statement"
         if prev_line:
