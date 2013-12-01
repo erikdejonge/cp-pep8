@@ -815,7 +815,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif in_test_kw(["switch", "for", "while"], line) and not in_test_kw(["switch", "for", "while"], prev_line) and not comment(prev_line):
         debuginfo = in_test_result(["switch", "try", "when", "while", "if", "for"], line) + " statement"
         if prev_line:
-            if not in_test(["when", "if", "->", "=>", '"""', "def ", "else", "switch", "try", "#noinspection"], prev_line):
+            if not in_test(["when", "if", "->", "=>", '"""', "def ", "else", "with", "switch", "try", "#noinspection"], prev_line):
                 if in_test(["return"], prev_line) and in_test(["when"], line) and scoped > 1:
                     debuginfo += " prevented when statement"
                 else:
