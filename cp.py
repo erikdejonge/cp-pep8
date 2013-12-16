@@ -665,7 +665,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_enter = True
     elif "set_time_out" in line:
         debuginfo = "set_time_out"
-        if not func_def(prev_line) and not start_in_test(["if"], prev_line):
+        if not func_def(prev_line) and not start_in_test(["if", "else"], prev_line):
             add_enter = True
     elif ".bind" in line:
         debuginfo = "b1nd event"
