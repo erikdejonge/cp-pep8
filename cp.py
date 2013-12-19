@@ -161,7 +161,8 @@ def class_method(line):
     line = str(line)
 
     if in_test(["print"], line):
-        return False
+        if not in_test([":", "->", "=>"], line):
+            return False
 
     return ("->" in line or "=>" in line) and ":" in line
 
@@ -938,6 +939,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         debuginfo = "setInterval timeout"
     elif "print" in line:
         debuginfo = "debug statement"
+        if "->" in line:
+            debuginfo = "func with print"
+            add_enter = True
+            if class_method(prev_line):
+                debuginfo = "func with print after classmethod"
+                add_enter = False
 
     if "{" in line and "}" in line and ":" in line and "," in line and line.strip().endswith("}"):
         nesting = line.find("{")
@@ -1125,7 +1132,7 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         line += linet
                         line += ", "
 
-                if replace_variable + "(msg" not in line:
+                if replace_variable + "(msg" not in line and "do " not in line:
                     line = line.replace(replace_variable + "(", replace_variable)
                     location = fname + ":" + "@@@@"
                     location_id += 1
