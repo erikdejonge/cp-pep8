@@ -5,6 +5,7 @@ cp.py
 """
 import os
 import time
+import uuid
 from argparse import ArgumentParser
 import sys
 reload(sys)
@@ -1190,6 +1191,7 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
 
                 if replace_variable == "throw":
                     line = line.replace(",", " +")
+
     return line
 
 
