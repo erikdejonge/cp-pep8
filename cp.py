@@ -5,7 +5,6 @@ cp.py
 """
 import os
 import time
-import uuid
 from argparse import ArgumentParser
 import sys
 reload(sys)
