@@ -1432,7 +1432,7 @@ def main():
         open(args.myfile, "w").write(finalbuf)
     else:
         open(args.myfile, "w").write(buffer_string.strip() + "\n")
-    print "pretty print", args.myfile, "done"
+    print "pretty print", os.path.basename(os.path.dirname(args.myfile))+"/"+os.path.basename(args.myfile), "done"
 
 
 def lock_acquire(key):
