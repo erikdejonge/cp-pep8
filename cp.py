@@ -1458,7 +1458,11 @@ def lock_release(key):
     """
     lfile = key + ".lock"
     if os.path.exists(lfile):
-        os.remove(lfile)
+        # noinspection PyBroadException
+        try:
+            os.remove(lfile)
+        except:
+            pass
         return True
     return True
 
