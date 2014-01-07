@@ -1000,6 +1000,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                     mytype = "str"
                                 elif typeitem.startswith("b_"):
                                     mytype = "bool"
+                                elif typeitem.startswith("request"):
+                                    mytype = "HttpRequest"
                                 elif typeitem.startswith("serverconfig"):
                                     mytype = "ServerConfig"
                                 if typeval:
@@ -1019,8 +1021,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                             mytype = "int"
                                         except:
                                             pass
-
-                                typeitem = "@type " + typeitem + ": " + mytype
+                                if "kwargs" in typeitem or "args" in typeitem:
+                                    if "kwargs" in typeitem:
+                                        typeitem = "@param kwargs:"
+                                    elif "args" in typeitem:
+                                        typeitem = "@param args:"
+                                else:
+                                    typeitem = "@type " + typeitem + ": " + mytype
                                 docstring += next_line.count(" ") * " " + typeitem + "\n"
 
 
