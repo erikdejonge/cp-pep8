@@ -351,6 +351,7 @@ def in_test(items, line, return_val=False, words=False):
         return ""
     return False
 
+
 def start_in_test(items, line):
     """
 
@@ -949,7 +950,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if "{" in line and "}" in line and ":" in line and "," in line and line.strip().endswith("}"):
         nesting = line.find("{")
         if fname.endswith(".py"):
-            line_redone = line.replace(",", ",\n"+nesting*" ")
+            line_redone = line.replace(",", ",\n" + nesting * " ")
 
     if line.count('"""') % 2 != 0:
         if in_python_comment:
@@ -957,10 +958,38 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         else:
             in_python_comment = True
             if next_line.count('"""') > 0:
-                docstring = prev_line.replace("def ", "").replace("class ", "").strip()
-                if "(" in docstring:
-                    docstring = docstring.split("(")[0]
-                line_redone += "\n" + line.replace('"""', "") + docstring
+                if "(" in prev_line:
+                    #docstring = prev_line.replace("def ", "").replace("class ", "").strip()
+                    docstring = ""
+
+                    if ")" in prev_line:
+                        pls = prev_line.split("(")[1].split(")")[0].split(",")
+                        pls = [x.strip() for x in pls if len(x) > 0]
+
+                        for typeitem in pls:
+                            mytype = "object"
+                            if typeitem.startswith("i_"):
+                                mytype = "int"
+                            elif typeitem.startswith("d_"):
+                                mytype = "dict"
+                            elif typeitem.startswith("l_"):
+                                mytype = "list"
+                            elif typeitem.startswith("f_"):
+                                mytype = "float"
+                            elif typeitem.startswith("u_"):
+                                mytype = "unicode"
+                            elif typeitem.startswith("s_"):
+                                mytype = "str"
+                            elif typeitem.startswith("b_"):
+                                mytype = "bool"
+                            elif typeitem.startswith("serverconfig"):
+                                mytype = "ServerConfig"
+                            if "=" in typeitem:
+                                typeitem = "@type "+typeitem.split("=")[0]+": " + mytype
+                                docstring += next_line.count(" ")*" " + typeitem + "\n"
+
+                        line_redone += "\n" + line.replace('"""', "") + docstring.strip()
+                        
 
     if "]" in line and not "[]" in line:
         if datastructure_define:
@@ -1080,7 +1109,6 @@ def coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_
             resolve_func -= 1
     return add_enter, debuginfo, resolve_func
 
-
 #noinspection PyUnusedLocal
 def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, orgfname, undo_variables, variables):
     """
@@ -1167,7 +1195,6 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         line = line[:len(line) - 1]
 
                 else:
-
                     if "print(" in line:
                         line = line.replace("print(", "print ")
                         line = line[:len(line) - 1]
@@ -1247,7 +1274,6 @@ def init_cp(args, fname, myfile):
     mylines = []
     fname = fname.replace("coffee", "cf")
     import cStringIO
-
     data = myfile.read()
     if "ADDTYPES" in data:
         global ADDCOMMENT_WITH_FOUND_TYPE
@@ -1432,7 +1458,7 @@ def main():
         open(args.myfile, "w").write(finalbuf)
     else:
         open(args.myfile, "w").write(buffer_string.strip() + "\n")
-    print "pretty print", os.path.basename(os.path.dirname(args.myfile))+"/"+os.path.basename(args.myfile), "done"
+    print "pretty print", os.path.basename(os.path.dirname(args.myfile)) + "/" + os.path.basename(args.myfile), "done"
 
 
 def lock_acquire(key):
