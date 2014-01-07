@@ -957,7 +957,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             in_python_comment = False
         else:
             in_python_comment = True
-            if next_line.count('"""') > 0:
+            if next_line.count('"""') > 0 or "rtype" in next_line:
+                if "rtype" in next_line:
+                    next_line = ""
                 if "(" in prev_line:
                     emptydocstring = prev_line.replace("def ", "").replace("class ", "").strip()
                     if "(" in emptydocstring:
@@ -980,6 +982,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
 
                                 if typeitem.startswith("i_"):
                                     mytype = "int"
+                                elif "size" in typeitem:
+                                    mytype = "int"
+                                elif "dict" in typeitem:
+                                    mytype = "dict"
+                                elif "list" in typeitem:
+                                    mytype = "list"
                                 elif typeitem.startswith("d_"):
                                     mytype = "dict"
                                 elif typeitem.startswith("l_"):
