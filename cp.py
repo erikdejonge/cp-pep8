@@ -959,37 +959,46 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             in_python_comment = True
             if next_line.count('"""') > 0:
                 if "(" in prev_line:
-                    #docstring = prev_line.replace("def ", "").replace("class ", "").strip()
+                    emptydocstring = prev_line.replace("def ", "").replace("class ", "").strip()
+                    if "(" in emptydocstring:
+                        emptydocstring = emptydocstring.split("(")[0]
                     docstring = ""
 
                     if ")" in prev_line:
                         pls = prev_line.split("(")[1].split(")")[0].split(",")
                         pls = [x.strip() for x in pls if len(x) > 0]
-
+                        empty = True
                         for typeitem in pls:
-                            mytype = "object"
-                            if typeitem.startswith("i_"):
-                                mytype = "int"
-                            elif typeitem.startswith("d_"):
-                                mytype = "dict"
-                            elif typeitem.startswith("l_"):
-                                mytype = "list"
-                            elif typeitem.startswith("f_"):
-                                mytype = "float"
-                            elif typeitem.startswith("u_"):
-                                mytype = "unicode"
-                            elif typeitem.startswith("s_"):
+                            if typeitem != "self" and typeitem != "Exception" and typeitem != "object":
+                                empty = False
                                 mytype = "str"
-                            elif typeitem.startswith("b_"):
-                                mytype = "bool"
-                            elif typeitem.startswith("serverconfig"):
-                                mytype = "ServerConfig"
-                            if "=" in typeitem:
-                                typeitem = "@type "+typeitem.split("=")[0]+": " + mytype
-                                docstring += next_line.count(" ")*" " + typeitem + "\n"
+                                if typeitem.startswith("i_"):
+                                    mytype = "int"
+                                elif typeitem.startswith("d_"):
+                                    mytype = "dict"
+                                elif typeitem.startswith("l_"):
+                                    mytype = "list"
+                                elif typeitem.startswith("f_"):
+                                    mytype = "float"
+                                elif typeitem.startswith("u_"):
+                                    mytype = "unicode"
+                                elif typeitem.startswith("s_"):
+                                    mytype = "str"
+                                elif typeitem.startswith("b_"):
+                                    mytype = "bool"
+                                elif typeitem.startswith("serverconfig"):
+                                    mytype = "ServerConfig"
+                                if "=" in typeitem:
+                                    typeitem = typeitem.split("=")[0]
+                                typeitem = "@type "+typeitem+": " + mytype
 
-                        line_redone += "\n" + line.replace('"""', "") + docstring.strip()
-                        
+                                docstring += next_line.count(" ")*" " + typeitem + "\n"
+                        if empty:
+                            line_redone += "\n" + line.replace('"""', "") + emptydocstring.strip()
+                        else:
+
+                            line_redone += "\n" + line.replace('"""', "") + docstring.strip()
+
 
     if "]" in line and not "[]" in line:
         if datastructure_define:
