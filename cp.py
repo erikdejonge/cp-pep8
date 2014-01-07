@@ -972,6 +972,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                             if typeitem != "self" and typeitem != "Exception" and typeitem != "object":
                                 empty = False
                                 mytype = "str"
+                                typeval = None
+                                if "=" in typeitem:
+                                    tis = typeitem.split("=")
+                                    typeitem = tis[0]
+                                    typeval = tis[1].strip()
+
                                 if typeitem.startswith("i_"):
                                     mytype = "int"
                                 elif typeitem.startswith("d_"):
@@ -988,17 +994,32 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                     mytype = "bool"
                                 elif typeitem.startswith("serverconfig"):
                                     mytype = "ServerConfig"
-                                if "=" in typeitem:
-                                    typeitem = typeitem.split("=")[0]
-                                typeitem = "@type "+typeitem+": " + mytype
+                                if typeval:
+                                    if typeval == "True" or typeval == "False":
+                                        mytype = "bool"
+                                    elif typeval == "None" or typeval == "None":
+                                        mytype += ", None"
+                                    else:
+                                        try:
+                                            if "." in str(typeval):
+                                                float(typeval)
+                                            mytype = "float"
+                                        except:
+                                            pass
+                                        try:
+                                            int(typeval)
+                                            mytype = "int"
+                                        except:
+                                            pass
 
-                                docstring += next_line.count(" ")*" " + typeitem + "\n"
+                                typeitem = "@type " + typeitem + ": " + mytype
+                                docstring += next_line.count(" ") * " " + typeitem + "\n"
+
+
                         if empty:
                             line_redone += "\n" + line.replace('"""', "") + emptydocstring.strip()
                         else:
-
                             line_redone += "\n" + line.replace('"""', "") + docstring.strip()
-
 
     if "]" in line and not "[]" in line:
         if datastructure_define:
