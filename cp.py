@@ -147,7 +147,7 @@ def method_call(line):
         if line.count("str(") == 1:
             return False
     line = str(line)
-    if line.find(":") != 0:
+    if line.strip().find(":") > 0:
         return False
     return (line.count("(") is 1 and line.count(")") is 1) or ("$(this)." in line and line.count("(") is 1 and line.count(")") is 1)
 
@@ -210,6 +210,9 @@ def assignment(line):
     @return: @rtype:
     """
     line = line.strip()
+    if "memory.set" in line:
+        return True
+
     if "==" not in line and line.count("= ") is 1 and not is_member_var(line):
         if not some_func(line):
             return True
@@ -499,8 +502,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         debuginfo = ".factory"
 
     if line.startswith("class"):
-        add_double_enter = True
-        debuginfo = "class def"
+        if "noinspection" in prev_line:
+            debuginfo = "class def after inspection"
+        else:
+            add_double_enter = True
+            debuginfo = "class def"
     elif "#noinspection" in line:
         debuginfo = "pycharm directive"
         if not keyword(prev_line) or "return" in prev_line or "raise" in prev_line:
@@ -512,11 +518,15 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             if keyword(next_line) and not keyword(prev_line):
                 if "class" not in next_line:
                     debuginfo += " keyword (not class) in nextline"
-                    add_enter = True
-                    add_double_enter = False
+                    add_enter = False
+                    add_double_enter = True
         if next_line.rstrip().startswith("def "):
             add_double_enter = True
+        if next_line.rstrip().startswith("class "):
+            add_double_enter = True
+
     elif "raise" in prev_line:
+        debuginfo = "raise"
         if "except" not in line:
             debuginfo = " after raise"
             add_enter = True
@@ -528,9 +538,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             debuginfo += " after if"
             add_enter = True
     elif "return" in line:
+        debuginfo = "retrn"
         if not comment(line) and not comment(prev_line):
             add_enter = False
-            debuginfo = "retrn"
+
             if whitespace(prev_line) - whitespace(line) > 0:
                 add_enter = True
                 debuginfo = " whitespace"
@@ -579,21 +590,22 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         add_enter = True
         debuginfo = "property "
     elif double_meth_call(line):
+        debuginfo = "double method call"
         if not keyword(prev_line):
             if not double_meth_call(prev_line):
-                debuginfo = "double method call"
                 add_enter = True
     elif global_class_declare(line):
         debuginfo = "global_class_declare"
         add_enter = True
     elif line.strip().startswith("try"):
+        debuginfo = "try"
         if not keyword(prev_line) and not prev_line.strip() == '"""':
-            debuginfo = "try"
             add_enter = True
     elif assignment(line):
+        debuginfo = "assignment"
         global datastructure_define
         if "[" in line and not "]" in line and not "\\033[" in line:
-            debuginfo = "datastructure assignment"
+            debuginfo += " datastructure"
             datastructure_define = True
         else:
             debuginfo = "assignment"
@@ -619,8 +631,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if "#noinspection" not in prev_line and "import " not in prev_line:
             add_double_enter = True
     elif class_method(line):
+        debuginfo = "class_method"
         if first_method_class:
-            debuginfo = "classmethod " + str(first_method_class)
+            debuginfo += " " + str(first_method_class)
 
             if "class" in prev_line:
                 add_enter = False
@@ -672,12 +685,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif ".bind" in line:
         debuginfo = "b1nd event"
     elif line.strip().find("it ") == 0:
+        debuginfo = "test statement"
         if not some_func(prev_line) and not anon_func(prev_line):
-            debuginfo = "test statement"
             add_enter = True
     elif line.strip().find("describe ") == 0:
+        debuginfo = "describe statement"
         if not some_func(prev_line) and not anon_func(prev_line):
-            debuginfo = "describe statement"
             add_enter = True
     elif "$observe" in line and "$observe" not in prev_line:
         debuginfo = "observe method"
@@ -766,9 +779,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_enter = True
             debuginfo += " scoped"
     elif scoped_method_call(line):
+        debuginfo = "scoped_method_call"
         if prev_line:
             if not func_test([method_call, class_method], prev_line.strip()) and not in_test([".then", "if", "->", "=>", "else"], prev_line):
-                debuginfo = ".method define or scoped method call"
+                debuginfo += " method define or scoped method call"
                 if line.find(" ") is not 0:
                     if len(prev_line) > 0:
                         add_double_enter = True
@@ -778,8 +792,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 else:
                     debuginfo += " not on globalscope"
     elif anon_func(line) and not in_test([".directive", "$watch"], line):
+        debuginfo = "anonymousfunction"
         if not resolve_func:
-            debuginfo = "anonymousfunction"
             if line.count("    ") is 1 and not assignment(prev_line) and not func_def(prev_line):
                 debuginfo = "anonymousfunction2"
                 add_enter = True
@@ -796,6 +810,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
 
         if scoped == 0:
             debuginfo += " on same scope"
+            if "_.defer" in prev_line:
+                debuginfo += " after defer call"
+                add_enter = True
+
             if assignment(prev_line):
                 debuginfo += " after assignement"
                 add_enter = True
@@ -828,12 +846,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         add_enter = True
         debuginfo = ".directive"
     elif is_member_var(line):
+        debuginfo = "is_member_var "
         ls = line.strip().split(" ")
         first_word = ""
         if ls > 0:
             first_word = ls[0]
         if not keyword(first_word):
-            debuginfo = "member initialization"
+            debuginfo += " member initialization"
             if scoped > 0:
                 if not is_member_var(prev_line):
                     add_enter = True
@@ -1004,6 +1023,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                     mytype = "HttpRequest"
                                 elif typeitem.startswith("serverconfig"):
                                     mytype = "ServerConfig"
+                                elif typeitem == "cryptobox":
+                                    mytype = "CryptoboxDB"
+                                elif typeitem == "login_token":
+                                    mytype = "LoginToken"
+
                                 if typeval:
                                     if typeval == "True" or typeval == "False":
                                         mytype = "bool"
@@ -1029,7 +1053,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                 else:
                                     typeitem = "@type " + typeitem + ": " + mytype
                                 docstring += next_line.count(" ") * " " + typeitem + "\n"
-
 
                         if empty:
                             line_redone += "\n" + line.replace('"""', "") + emptydocstring.strip()
