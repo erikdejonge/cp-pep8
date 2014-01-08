@@ -1033,6 +1033,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                         mytype = "bool"
                                     elif typeval == "None" or typeval == "None":
                                         mytype += ", None"
+                                    elif '"' in typeval or "'" in typeval:
+                                        mytype = "str"
                                     else:
                                         try:
                                             if "." in str(typeval):
