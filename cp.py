@@ -518,8 +518,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             if keyword(next_line) and not keyword(prev_line):
                 if "class" not in next_line:
                     debuginfo += " keyword (not class) in nextline"
-                    add_enter = False
-                    add_double_enter = True
+                    add_enter = True
+                    add_double_enter = False
         if next_line.rstrip().startswith("def "):
             add_double_enter = True
         if next_line.rstrip().startswith("class "):
