@@ -1446,14 +1446,14 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
     return add_double_enter, add_enter, debuginfo, line
 
 #noinspection PyPep8Naming
-def main():
+def main(args):
     """
         main function
     """
-
-    args = arg_parse()
     if args.myfile == "cp.py":
         return
+
+    print "cp.py -f", os.path.basename(os.path.dirname(args.myfile)) + "/" + os.path.basename(args.myfile)
 
     buffer_string, fname, myfile, num, orgfname = init_file(args)
 
@@ -1530,7 +1530,7 @@ def main():
         open(args.myfile, "w").write(finalbuf)
     else:
         open(args.myfile, "w").write(buffer_string.strip() + "\n")
-    print "pretty print", os.path.basename(os.path.dirname(args.myfile)) + "/" + os.path.basename(args.myfile), "done"
+
 
 
 def lock_acquire(key):
@@ -1540,6 +1540,7 @@ def lock_acquire(key):
     """
     lfile = key + ".lock"
     cnt = 0
+
     while os.path.exists(lfile):
         time.sleep(0.1)
         cnt += 1
@@ -1566,8 +1567,10 @@ def lock_release(key):
 
 
 if __name__ == "__main__":
+    args = arg_parse()
+    lock = os.path.dirname(os.path.join(os.getcwd(), args.myfile))+"/cp"
     try:
-        lock_acquire("cp")
-        main()
+        lock_acquire(lock)
+        main(args)
     finally:
-        lock_release("cp")
+        lock_release(lock)
