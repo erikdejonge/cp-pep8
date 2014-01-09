@@ -20,7 +20,7 @@ def replace_variables():
     """
     @return: @rtype:
     """
-    variables = ["print", "warning", "emit_event", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
+    variables = ["utils.print_once", "print", "warning", "emit_event", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
     undo_variables = []
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
@@ -1202,12 +1202,15 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
     @return: @rtype:
     """
     for replace_variable in variables:
+        #if "print_once" in line:
+        #    line = line.replace("print_once(", "print_once (")
         check_split = line.split(" ")
         check_split2 = []
         for i in check_split:
             check_split2.extend(i.split("("))
 
         check_split = [x.strip() for x in check_split2]
+
         found_color = False
         if replace_variable in check_split and len(line.strip()) > 0:
             if replace_variable + " = " not in line:
@@ -1268,24 +1271,22 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         line = line.replace("print(", "print \"\\033[93m\" + log_date_time_string(), ")
                     else:
                         line = line.replace("print(", "print ")
-                        #line = line.replace("print(", "print ")
                     if line.strip().startswith("print"):
                         line = line.replace("print(", "print ")
                         line = line[:len(line) - 1]
-
                 else:
                     if "print(" in line:
                         line = line.replace("print(", "print ")
                         line = line[:len(line) - 1]
                     for i in range(0, 5):
                         line = line.replace("print  ", "print ")
-                        #if "print " in line and args.release == "0":
-                    #    line = line.replace("print", "console?.log?")
                     if "warning(" in line:
                         line = line.replace("warning(", "warning ")
                         line = line[:len(line) - 1]
-                        #if "warning " in line and args.release == "0":
-                        #    line = line.replace("warning", "console?.error?")
+                    if "print_once(" in line:
+                        print line
+                        line = line.replace("print_once(", "print_once ")
+                        line = line[:len(line) - 1]
 
                 if found_color:
                     line += ", '\\033[m'"
