@@ -123,7 +123,7 @@ def func_def(line):
         return False
     line = str(line)
 
-    if in_test(["warning", "print"], line):
+    if in_test(["warning", "print "], line):
         return False
 
     is_func = ("->" in line or "=>" in line) and "= " in line
@@ -702,16 +702,20 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             if not in_test(["if", "else", "->", "=>"], prev_line):
                 add_enter = True
     elif func_def(line):
+
         debuginfo = "function def"
         if line.find(" ") is not 0:
             add_double_enter = True
         else:
             if not func_def(prev_line) or comment(prev_line):
                 debuginfo = "function def nested"
-                if assignment(prev_line):
+                if func_def(prev_line):
+                    debuginfo += " after function def"
+                    add_enter = False
+                elif assignment(prev_line):
                     debuginfo = "function def nested after assignement"
                     add_enter = True
-                if class_method(prev_line):
+                elif class_method(prev_line):
                     debuginfo += " after method"
                 elif "@unittest" in prev_line:
                     debuginfo += " after unittest decorator"
@@ -721,7 +725,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 elif keyword(prev_line):
                     debuginfo += " after keyword"
                     add_enter = True
-                if anon_func(prev_line):
+                elif anon_func(prev_line):
                     debuginfo += " after anon func"
                     add_enter = False
                 elif not class_method(prev_line) and not keyword(prev_line) and not assignment(prev_line):
@@ -1425,7 +1429,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
             debuginfo = "comment -> " + debuginfo
         else:
             debuginfo = "comment"
-        if not comment(prev_line) and not "else:" in prev_line and not func_def(prev_line):
+        if not comment(prev_line) and not "else:" in prev_line and not func_def(prev_line) and not anon_func(prev_line):
             add_enter = True
             add_double_enter = False
     if add_double_enter:
