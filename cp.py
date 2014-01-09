@@ -1003,6 +1003,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                     mytype = "int"
                                 elif "size" in typeitem:
                                     mytype = "int"
+                                elif "cnt" in typeitem:
+                                    mytype = "int"
                                 elif "dict" in typeitem:
                                     mytype = "dict"
                                 elif "list" in typeitem:
