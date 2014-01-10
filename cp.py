@@ -332,6 +332,8 @@ def scope_diff(line, prev_line):
 
 def in_test(items, line, return_val=False, words=False):
     """
+
+    @param words:
     @param items:
     @type items:
     @param line:
@@ -474,6 +476,8 @@ def double_meth_call(line):
 def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname):
     """
 
+
+    @param fname:
     @param add_double_enter:
     @param add_enter:
     @param debuginfo:
@@ -1284,7 +1288,6 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         line = line.replace("warning(", "warning ")
                         line = line[:len(line) - 1]
                     if "print_once(" in line:
-                        print line
                         line = line.replace("print_once(", "print_once ")
                         line = line[:len(line) - 1]
 
@@ -1457,6 +1460,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
 def main(args):
     """
         main function
+    @param args:
     """
     if args.myfile == "cp.py":
         return
