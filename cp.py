@@ -247,7 +247,7 @@ def keyword(line):
     """
     if line.strip() == "":
         return True
-    if in_test(["class", "print", "require", "#noinspection", "except", "pass", "del", "return", "with", "super", "catch", " pass", "switch", "raise", "for", "when", "if", "elif", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
+    if in_test(["class", "print", "with", "require", "#noinspection", "except", "pass", "del", "return", "with", "super", "catch", " pass", "switch", "raise", "for", "when", "if", "elif", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
         return True
     elif some_func(line):
         return True
@@ -911,7 +911,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                             debuginfo += " scope change"
 
                     else:
-                        test_items = ["@staticmethod", "catch", "print", "when", "_.keys", "finally", "except", '"""', "->", "=>"]
+                        test_items = ["@staticmethod", "catch", "print", "with", "when", "_.keys", "finally", "except", '"""', "->", "=>"]
                         if in_test(test_items, prev_line):
                             debuginfo += " after " + str(in_test_result(test_items, prev_line)).replace("print", "pr1nt")
                         else:
