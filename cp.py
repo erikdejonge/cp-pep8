@@ -1042,7 +1042,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                 elif typeitem.startswith("request"):
                                     mytype = "HttpRequest, django.core.handlers.wsgi.WSGIRequest"
                                 elif typeitem.startswith("serverconfig"):
-                                    mytype = "ServerConfig"
+                                    mytype = "couchdb_api.ServerConfig"
                                 elif typeitem == "cryptobox":
                                     mytype = "CryptoboxDB"
                                 elif typeitem == "login_token":
