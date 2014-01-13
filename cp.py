@@ -548,6 +548,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if not in_test(["if", "else", "except"], prev_line):
             debuginfo += " after if"
             add_enter = True
+        if prev_line.strip().startswith("console"):
+            debuginfo += " after console statement"
+            add_enter = False
+            add_double_enter = False
+
     elif "return" in line:
         debuginfo = "retrn"
         if not comment(line) and not comment(prev_line):
@@ -1042,7 +1047,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                 elif typeitem.startswith("request"):
                                     mytype = "HttpRequest, django.core.handlers.wsgi.WSGIRequest"
                                 elif typeitem.startswith("serverconfig"):
-                                    mytype = "couchdb_api.ServerConfig"
+                                    mytype = "ServerConfig"
                                 elif typeitem == "cryptobox":
                                     mytype = "CryptoboxDB"
                                 elif typeitem == "login_token":
@@ -1097,7 +1102,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if line.strip().startswith("@param"):
             if not next_line.strip().startswith("@type"):
                 line_redone += "\n" + org_line.split("@param")[0] + "@type " + line.strip().split("@param")[1].split(":")[0].strip() + ": "
-
+    debuginfo = debuginfo.replace("  ", " ")
     return in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line_redone
 
 
@@ -1365,7 +1370,7 @@ def init_cp(args, fname, myfile):
     fname = fname.replace("coffee", "cf")
     import cStringIO
     data = myfile.read()
-    if "ADDTYPES" in data:
+    if "ADDTYPES" in data or "addtypes" in data:
         global ADDCOMMENT_WITH_FOUND_TYPE
         ADDCOMMENT_WITH_FOUND_TYPE = True
     for i in range(0, 10):
