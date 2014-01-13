@@ -117,6 +117,9 @@ def func_def(line):
     @param line:
     @return: @rtype:
     """
+    if in_test(["+=", "-=", "++", "--", "*="], line):
+        return False
+
     if line.strip().startswith("def "):
         return True
     if functional(line):
@@ -141,6 +144,9 @@ def method_call(line):
     @param line:
     @return: @rtype:
     """
+    if in_test(["+=", "-=", "++", "--", "*="], line):
+        return False
+
     if line.strip().endswith(","):
         return False
     if line.count("(") == 1:
@@ -159,7 +165,8 @@ def class_method(line):
     @return: @rtype:
     """
     line = str(line)
-
+    if in_test(["+=", "-=", "++", "--", "*="], line):
+        return False
     if in_test(["print"], line):
         if not in_test([":", "->", "=>"], line):
             return False
