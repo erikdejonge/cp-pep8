@@ -591,7 +591,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         add_enter = True
         debuginfo = "unless"
     elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not "(" in line and not '"""' in prev_line and not "param" in line:
-        add_enter = True
+        add_double_enter = True
         debuginfo = "property "
     elif double_meth_call(line):
         debuginfo = "double method call"
@@ -757,8 +757,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     debuginfo += " on previous scope"
                     add_enter = True
                 if "(self" in line and not "class" in prev_line and not '"""' in prev_line and not prev_line.strip().startswith("@"):
-                    debuginfo += " a python class"
-                    add_double_enter = False
+                    debuginfo += " a python class "
+                    add_double_enter = True
                     if "#@" in prev_line or "# @" in prev_line:
                         debuginfo += " after commented out property"
                         add_enter = False
@@ -1447,11 +1447,11 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
             if scoped >= 3:
                 if not class_method(line):
                     if not add_double_enter:
-                        debuginfo = "triple scope change"
+                        debuginfo += "triple scope change"
                         add_enter = True
                     if next_line:
                         if "else" not in line:
-                            debuginfo = " scope"
+                            debuginfo += " scope level "
                             add_enter = True
     debuginfo += " " + str(if_cnt)
     return add_double_enter, add_enter, debuginfo, line
