@@ -796,7 +796,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 add_double_enter = False
                 debuginfo += " after noinspection"
 
-    elif class_method_call(line):
+    elif class_method_call(line) and not fname.endswith(".py"):
         debuginfo = "class method call"
         if scoped > 1:
             add_enter = True
@@ -868,7 +868,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif ".directive" in line:
         add_enter = True
         debuginfo = ".directive"
-    elif is_member_var(line):
+    elif is_member_var(line) and not fname.endswith(".py"):
         debuginfo = "is_member_var "
         ls = line.strip().split(" ")
         first_word = ""
