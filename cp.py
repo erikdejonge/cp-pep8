@@ -518,6 +518,15 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         else:
             add_double_enter = True
             debuginfo = "class def"
+    elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not '"""' in prev_line and not "param" in line:
+        debuginfo = "property " + str(line.find(" "))
+        if line.find(" ") > 0 or line.find(" ") == -1:
+            debuginfo += " global"
+            add_double_enter = True
+        else:
+
+            add_enter = True
+
     elif "#noinspection" in line:
         debuginfo = "pycharm directive"
         if not keyword(prev_line) or "return" in prev_line or "raise" in prev_line:
@@ -602,9 +611,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif "unless" in line:
         add_enter = True
         debuginfo = "unless"
-    elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not "(" in line and not '"""' in prev_line and not "param" in line:
-        add_double_enter = True
-        debuginfo = "property "
     elif double_meth_call(line):
         debuginfo = "double method call"
         if not keyword(prev_line):
@@ -724,7 +730,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
 
         debuginfo = "function def"
         if line.find(" ") is not 0:
-            add_double_enter = True
+            if prev_line.strip().startswith("@"):
+                debuginfo += "after property"
+            else:
+                add_double_enter = True
         else:
             if not func_def(prev_line) or comment(prev_line):
                 debuginfo = "function def nested"
@@ -787,7 +796,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             else:
                 debuginfo = "functiondef after functiondef"
         if line.strip().startswith("def "):
-            if not "(self" in line and not "(cls" in line and not "@staticmethod" in prev_line and not prev_line.strip().startswith("def ") and not line.startswith(" ") and not "#noinspection" in prev_line:
+            if not "(self" in line and not "(cls" in line and not "@" in prev_line and not prev_line.strip().startswith("def ") and not line.startswith(" ") and not "#noinspection" in prev_line:
                 add_enter = True
                 add_double_enter = True
                 debuginfo += " python"
