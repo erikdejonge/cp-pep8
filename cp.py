@@ -778,7 +778,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     add_enter = True
                 if "(self" in line and not "class" in prev_line and not '"""' in prev_line and not prev_line.strip().startswith("@"):
                     debuginfo += " a python class "
-                    add_double_enter = True
+                    add_double_enter = False
                     if "#@" in prev_line or "# @" in prev_line:
                         debuginfo += " after commented out property"
                         add_enter = False
