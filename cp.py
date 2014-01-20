@@ -477,6 +477,8 @@ def double_meth_call(line):
     @param line:
     @return: @rtype:
     """
+    if "serverconfig" in line:
+        return False
     return "self" in line and line.count("()") > 1
 
 
