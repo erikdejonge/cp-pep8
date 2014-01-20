@@ -520,8 +520,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             debuginfo = "class def"
     elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not '"""' in prev_line and not "param" in line:
         debuginfo = "property " + str(line.find(" "))
-
-        add_double_enter = True
+        if line.find(" ") > 0 or line.find(" ") == -1:
+            debuginfo += " global"
+            add_double_enter = True
+        else:
+            add_enter = True
 
     elif "#noinspection" in line:
         debuginfo = "pycharm directive"
