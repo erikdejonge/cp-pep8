@@ -144,6 +144,7 @@ def method_call(line):
     @param line:
     @return: @rtype:
     """
+
     if in_test(["+=", "-=", "++", "--", "*="], line):
         return False
 
@@ -155,7 +156,8 @@ def method_call(line):
     line = str(line)
     if line.strip().find(":") > 0:
         return False
-    return (line.count("(") is 1 and line.count(")") is 1) or ("$(this)." in line and line.count("(") is 1 and line.count(")") is 1)
+    #return (line.count("(") is 1 and line.count(")") is 1) or ("$(this)." in line and line.count("(") is 1 and line.count(")") is 1)
+    return (line.count("(") > 0 and line.count(")") > 0) or ("$(this)." in line and line.count("(") > 0 and line.count(")") > 0)
 
 
 def class_method(line):
