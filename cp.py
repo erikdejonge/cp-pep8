@@ -536,7 +536,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_enter = True
         else:
             add_enter = False
-            debuginfo += "after keyword"
+            debuginfo += " after keyword"
         if next_line:
             if keyword(next_line) and not keyword(prev_line):
                 if "class" not in next_line:
