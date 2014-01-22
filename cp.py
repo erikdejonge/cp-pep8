@@ -548,14 +548,14 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if next_line.rstrip().startswith("class "):
             add_double_enter = True
 
-    elif "raise" in prev_line:
+    elif prev_line.strip().startswith("raise"):
         debuginfo = "raise"
         if "except" not in line:
             debuginfo = " after raise"
             add_enter = True
             if func_def(line) and not "(self" in line:
                 add_double_enter = True
-    elif "raise" in line:
+    elif line.strip().startswith("raise"):
         debuginfo = " raise"
         if not in_test(["if", "else", "except"], prev_line):
             debuginfo += " after if"
