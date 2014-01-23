@@ -503,6 +503,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     @param in_python_comment:
     @return: @rtype:
     """
+    add_docstring = False
     line_redone = org_line = line
 
     if scoped > 0:
@@ -730,7 +731,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             if not in_test(["if", "else", "->", "=>"], prev_line):
                 add_enter = True
     elif func_def(line):
-
+        if '"""' not in next_line:
+            add_docstring = True
         debuginfo = "function def"
         if line.find(" ") is not 0:
             if prev_line.strip().startswith("@"):
@@ -1118,6 +1120,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if line.strip().startswith("@param"):
             if not next_line.strip().startswith("@type"):
                 line_redone += "\n" + org_line.split("@param")[0] + "@type " + line.strip().split("@param")[1].split(":")[0].strip() + ": "
+    if add_docstring:
+        line_redone += "\n"
+        line_redone += " " * (whitespace(line)+4)
+        line_redone += '"""\n'
+        line_redone += " " * (whitespace(line)+4)
+        line_redone += '"""\n'
+
     debuginfo = debuginfo.replace("  ", " ")
     return in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line_redone
 
