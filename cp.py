@@ -117,12 +117,19 @@ def func_def(line):
     @param line:
     @return: @rtype:
     """
+
     if in_test(["+=", "-=", "++", "--", "*="], line):
         return False
 
-    if line.strip().startswith("def "):
+
+    if ", ->" in line.strip():
         return True
-    if functional(line):
+    if ", ->" in line.strip():
+        return True
+
+    elif line.strip().startswith("def "):
+        return True
+    elif functional(line):
         return False
     line = str(line)
 
@@ -524,12 +531,15 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_double_enter = True
             debuginfo = "class def"
     elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not '"""' in prev_line and not "param" in line:
-        debuginfo = "property " + str(line.find(" "))
-        if line.find(" ") > 0 or line.find(" ") == -1:
-            debuginfo += " global"
-            add_double_enter = True
+        debuginfo = "property "
+        if func_def(prev_line):
+            debuginfo += " after func"
         else:
-            add_enter = True
+            if line.find(" ") > 0 or line.find(" ") == -1:
+                debuginfo += " global"
+                add_double_enter = True
+            else:
+                add_enter = True
 
     elif "#noinspection" in line:
         debuginfo = "pycharm directive"
@@ -713,8 +723,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         debuginfo = "set_time_out"
         if not func_def(prev_line) and not start_in_test(["if", "else"], prev_line):
             add_enter = True
-    elif ".bind" in line:
-        debuginfo = "b1nd event"
     elif line.strip().find("it ") == 0:
         debuginfo = "test statement"
         if not some_func(prev_line) and not anon_func(prev_line):
@@ -830,7 +838,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                         add_enter = True
                 else:
                     debuginfo += " not on globalscope"
-    elif anon_func(line) and not in_test([".directive", "$watch"], line):
+    elif anon_func(line) and not in_test([".directive", "$watch", ".bind"], line):
         debuginfo = "anonymousfunction"
         if not resolve_func:
             if line.count("    ") is 1 and not assignment(prev_line) and not func_def(prev_line):
@@ -905,6 +913,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             if "# noins" not in prev_line and "import " not in prev_line:
                 add_enter = False
                 add_double_enter = True
+            if ")()" in line.strip():
+                debuginfo += " end mod"
+                add_enter = False
+                add_double_enter = False
         elif prev_line:
             if method_call(prev_line):
                 if whitespace(line) < whitespace(prev_line):
@@ -1496,6 +1508,10 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                         if "else" not in line:
                             debuginfo += " scope level "
                             add_enter = True
+                    if len(line.strip()) <= 2:
+                        add_enter = False
+                        debuginfo += " some closing tag"
+
     debuginfo += " " + str(if_cnt)
     return add_double_enter, add_enter, debuginfo, line
 
