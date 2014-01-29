@@ -1134,7 +1134,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         debuginfo += " in in_python_comment"
         add_double_enter = False
         add_enter = False
-        if line.strip().startswith("@param"):
+        if line.strip().startswith("@param") and "args" not in line:
             if not next_line.strip().startswith("@type"):
                 line_redone += "\n" + org_line.split("@param")[0] + "@type " + line.strip().split("@param")[1].split(":")[0].strip() + ": "
     if add_docstring and fname.endswith(".py"):
