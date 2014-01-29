@@ -256,7 +256,10 @@ def keyword(line):
     """
     if line.strip() == "":
         return True
-    if in_test(["class", "print", "with", "require", "#noinspection", "except", "pass", "del", "return", "with", "super", "catch", " pass", "switch", "raise", "for", "when", "if", "elif", "else", "while", "finally", "try", "unless", "catch", "$on", "$("], line):
+    kws = ["class", "print", "with", "require", "#noinspection", "except", "pass", "del", "return", "with", "super", "catch", " pass", "switch", "raise", "for", "when", "if", "elif", "else", "while", "finally", "try", "unless", "catch"]
+    kws = [x+" " for x in kws]
+    kws.extend(["$on", "$(", '"""'])
+    if in_test(kws, line):
         return True
     elif some_func(line):
         return True
