@@ -848,6 +848,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 add_double_enter = True
         else:
             debuginfo = "resolve result 2"
+    elif line.strip().startswith("super("):
+        debuginfo = "super"
+        if scoped > 0:
+            debuginfo = " with scope chage"
+            add_enter = True
     elif "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
         debuginfo = " if statement"
 
