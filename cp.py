@@ -533,7 +533,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         else:
             add_double_enter = True
             debuginfo = "class def"
-    elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not '"""' in prev_line and not "param" in line:
+    elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not '"""' in prev_line and not "param" in line and fname.endswith(".py"):
         debuginfo = "property "
         if func_def(prev_line):
             debuginfo += " after func"
@@ -671,6 +671,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         debuginfo = "global method call"
         if "#noinspection" not in prev_line and "import " not in prev_line:
             add_double_enter = True
+    if ": [" in line and not fname.endswith(".py"):
+        debuginfo = "struct coffeescript"
+        add_enter = True
     elif class_method(line):
         debuginfo = "class_method"
         if first_method_class:
@@ -693,9 +696,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 if scoped < 0:
                     if "unless" not in prev_line:
                         add_enter = True
-                        debuginfo += " in a nested scope"
+                        debuginfo += " in a nested scope" + str(global_class_declare(prev_line))
                     else:
                         debuginfo += " in a nested scope after unless"
+
+                    if global_class_declare(prev_line):
+                        debuginfo += " after class declare"
+                        add_enter = False
                 else:
                     if indentation(line) == 1:
                         debuginfo += " indented 1"
