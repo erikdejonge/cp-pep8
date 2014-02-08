@@ -1154,7 +1154,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if line.strip().startswith("@param") and "args" not in line:
             if not next_line.strip().startswith("@type"):
                 line_redone += "\n" + org_line.split("@param")[0] + "@type " + line.strip().split("@param")[1].split(":")[0].strip() + ": "
-    if add_docstring and fname.endswith(".py"):
+    if add_docstring and fname.endswith(".py") and not in_python_comment:
 
         line_redone += "\n"
         line_redone += " " * (whitespace(line)+4)
