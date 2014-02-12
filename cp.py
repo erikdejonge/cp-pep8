@@ -574,6 +574,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if not in_test(["if", "else", "except"], prev_line):
             debuginfo += " after if"
             add_enter = True
+        if not method_call(prev_line):
+            debuginfo += " after methodcall"
+            add_enter = True
         if prev_line.strip().startswith("console"):
             debuginfo += " after console statement"
             add_enter = False
