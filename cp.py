@@ -569,18 +569,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             add_enter = True
             if func_def(line) and not "(self" in line:
                 add_double_enter = True
-    elif line.strip().startswith("raise"):
-        debuginfo = " raise"
-        if not in_test(["if", "else", "except"], prev_line):
-            debuginfo += " after if"
-            add_enter = True
-        if not method_call(prev_line):
-            debuginfo += " after methodcall"
-            add_enter = True
-        if prev_line.strip().startswith("console"):
-            debuginfo += " after console statement"
-            add_enter = False
-            add_double_enter = False
+
     elif "break" == prev_line.strip():
         debuginfo = "break"
         add_enter = True
@@ -978,6 +967,18 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             else:
                 debuginfo += "method call nested "
                 add_enter = False
+    elif line.strip().startswith("raise"):
+        debuginfo = " raise"
+        if not in_test(["if", "else", "except"], prev_line):
+            debuginfo += " after if"
+            add_enter = False
+        elif not method_call(prev_line):
+            debuginfo += " after methodcall"
+            add_enter = False
+        elif prev_line.strip().startswith("console"):
+            debuginfo += " after console statement"
+            add_enter = False
+            add_double_enter = False
     elif function_call(line):
         debuginfo = "function call"
         if not function_call(prev_line):
