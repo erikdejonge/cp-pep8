@@ -938,9 +938,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 if data_assignment(line, prev_line):
                     debuginfo += "method call data assignment " + str(if_cnt)
                     add_enter = False
-                    #if prev_ifcnt > 0:
-                    #    debuginfo += " after if"
-                    #    add_enter = True
                 else:
                     if assignment(prev_line):
                         if scoped == 0:
@@ -949,7 +946,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                         else:
                             add_enter = True
                             debuginfo += " scope change"
-
                     else:
                         test_items = ["@staticmethod", "catch", "print", "with", "when", "_.keys", "finally", "except", '"""', "->", "=>"]
                         if in_test(test_items, prev_line):
@@ -958,8 +954,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                             if comment(prev_line):
                                 debuginfo += " after comment"
                             else:
-                                debuginfo += " not after assignment"
+                                debuginfo += " not after comment"
                                 add_enter = True
+                                if assignment(line):
+                                    debuginfo += " and assigned "
+                                    add_enter = False
                 if in_test(["$watch", "if", "else", "for", "while", "try:", "#noinspection"], prev_line.strip()):
                     debuginfo += "method call after 1f 3lse or wtch"
                     add_enter = False
