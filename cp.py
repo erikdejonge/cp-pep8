@@ -1415,6 +1415,10 @@ def init_file(args):
     orgfname = fname = os.path.basename(args.myfile)
     if "__init__" in fname:
         fname = "/".join(str(args.myfile).split("/")[-2:])
+        if "__init__" in fname:
+            fname = os.path.basename(os.getcwd())
+            fname = fname+"/"+(str(orgfname))
+
         #fname = fname.replace("__init__.py", "")
         #fname = fname.replace("/:", ":")
     return buffer_string, fname, myfile, num, orgfname
@@ -1511,9 +1515,11 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
             debuginfo = "comment -> " + debuginfo
         else:
             debuginfo = "comment"
-        if not comment(prev_line) and not "else:" in prev_line and not func_def(prev_line) and not anon_func(prev_line) and not prev_line.strip().startswith("if "):
-            add_enter = True
+        if not comment(prev_line) and not "else" in prev_line and not func_def(prev_line) and not anon_func(prev_line) and not prev_line.strip().startswith("if "):
+            add_enter = False
             add_double_enter = False
+        if line.find(" ") > 0:
+            add_double_enter = True
     if add_double_enter:
         add_enter = False
 
@@ -1614,7 +1620,8 @@ def main(args):
     for line in sio_file2:
         line = line.replace("@@@@", str(num))
         num += 1
-        buffer_string += line
+        if line.strip() != "#":
+            buffer_string += line
 
     if str(args.myfile).endswith(".coffee"):
         finalbuf = "\n" + buffer_string.strip() + "\n"
