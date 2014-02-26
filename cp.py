@@ -173,6 +173,8 @@ def class_method(line):
     @param line:
     @return: @rtype:
     """
+    if "raise" in line:
+        return False
     line = str(line)
     if in_test(["+=", "-=", "++", "--", "*="], line):
         return False
