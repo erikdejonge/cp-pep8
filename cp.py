@@ -634,7 +634,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         add_enter = True
     elif line.strip().startswith("try"):
         debuginfo = "try"
-        if not keyword(prev_line) and not prev_line.strip() == '"""':
+        if not keyword(prev_line) and not prev_line.strip() == '"""' and not resolve_func:
             add_enter = True
     elif assignment(line):
         debuginfo = "assignment"
