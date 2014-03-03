@@ -1187,9 +1187,10 @@ def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, 
 
     if add_double_enter:
         cont = True
-        if cnt - 1 > 0:
-            if ".module" in prev_line:
-                cont = False
+        #if cnt - 1 > 0:
+        #    if ".module" in prev_line:
+        #        cont = False
+
 
         if cont:
             if cnt - 1 > 0:
@@ -1520,6 +1521,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
         if not comment(prev_line) and not "else" in prev_line and not func_def(prev_line) and not anon_func(prev_line) and not prev_line.strip().startswith("if "):
             add_enter = False
             add_double_enter = False
+            debuginfo = " comment after something"
         if line.find(" ") > 0:
             add_double_enter = True
     if add_double_enter:
@@ -1540,7 +1542,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                         add_enter = False
                         debuginfo += " some closing tag"
 
-    debuginfo += " " + str(if_cnt)
+    debuginfo += " " + str(if_cnt) + str(add_double_enter)
     return add_double_enter, add_enter, debuginfo, line
 
 #noinspection PyPep8Naming
