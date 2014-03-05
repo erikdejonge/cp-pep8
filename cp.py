@@ -572,9 +572,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             if func_def(line) and not "(self" in line:
                 add_double_enter = True
 
-    elif "break" == prev_line.strip():
-        debuginfo = "break"
-        add_enter = True
     elif "return" in line:
         debuginfo = "retrn"
         if not comment(line) and not comment(prev_line):
