@@ -1311,18 +1311,25 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         """ lnr
                         @param code_line:
                         """
-                        if ":" not in code_line:
+                        for i in range(0, 10):
+                            code_line = code_line.replace("print  ", "print ")
+                        if 'print ":' not in code_line:
                             return code_line
 
                     lines = [i.strip() for i in lines if lnr(i)]
+
                     line = line2.split(replace_variable)[0]
+
                     line += replace_variable + " "
                     for linet in lines:
+
                         line += linet
                         line += ", "
 
                 if replace_variable + "(msg" not in line and "do " not in line:
+
                     line = line.replace(replace_variable + "(", replace_variable)
+
                     location = fname + ":" + "@@@@"
                     location_id += 1
 
@@ -1381,8 +1388,6 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
 
 def arg_parse():
     """
-
-
     @return: @rtype:
     """
     parser = ArgumentParser()
@@ -1548,7 +1553,8 @@ def main(args):
         main function
     @param args:
     """
-    if args.myfile == "cp.py":
+    if args.myfile.endswith("cp.py"):
+        print "can't cp myself"
         return
 
     print "cp.py -f", os.path.basename(os.path.dirname(args.myfile)) + "/" + os.path.basename(args.myfile)
