@@ -910,10 +910,17 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 if not is_member_var(prev_line):
                     add_enter = True
                     debuginfo += " new scope"
+    if line.strip().startswith("with") and fname.endswith(".py"):
+        debuginfo = "with statement"
+        add_enter = True
     elif method_call(line):
         debuginfo = "methodcall"
         if assignment(line):
             debuginfo += " and assigned "
+            if fname.endswith(".py"):
+                if scoped > 0:
+                    debuginfo += "in python scope change "
+                    add_enter = True
         if line.find(" ") is not 0:
             debuginfo += "method call global scope"
             if "# noins" not in prev_line and "import " not in prev_line:
@@ -956,8 +963,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                 debuginfo += " not after comment"
                                 add_enter = True
                                 if assignment(line):
-                                    debuginfo += " and assigned "
-                                    add_enter = False
+
+                                    if not fname.endswith(".py"):
+                                        debuginfo += " and assigned in coffee "
+                                        add_enter = False
                 if in_test(["$watch", "if", "else", "for", "while", "try:", "#noinspection"], prev_line.strip()):
                     debuginfo += "method call after 1f 3lse or wtch"
                     add_enter = False
