@@ -151,6 +151,8 @@ def method_call(line):
     @param line:
     @return: @rtype:
     """
+    if line.strip().startswith("self."):
+        return False
 
     if in_test(["+=", "-=", "++", "--", "*="], line):
         return False
@@ -630,9 +632,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         debuginfo = "global_class_declare"
         add_enter = True
     elif line.strip().startswith("try"):
-        debuginfo = "try"
-        if not keyword(prev_line) and not prev_line.strip() == '"""' and not resolve_func:
-            add_enter = True
+        debuginfo = "try statement"
     elif assignment(line):
         debuginfo = "assignment"
         global datastructure_define
@@ -684,26 +684,27 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 debuginfo += " after member var"
                 add_enter = True
             else:
-                if scoped < 0:
-                    if "unless" not in prev_line:
-                        add_enter = True
-                        debuginfo += " in a nested scope" + str(global_class_declare(prev_line))
-                    else:
-                        debuginfo += " in a nested scope after unless"
+                if not fname.endswith(".py"):
+                    if scoped < 0:
+                        if "unless" not in prev_line:
+                            add_enter = True
+                            debuginfo += " in a nested scope" + str(global_class_declare(prev_line))
+                        else:
+                            debuginfo += " in a nested scope after unless"
 
-                    if global_class_declare(prev_line):
-                        debuginfo += " after class declare"
-                        add_enter = False
-                else:
-                    if indentation(line) == 1:
-                        debuginfo += " indented 1"
-                        if scoped >= 1:
-                            debuginfo += " scoped >=1"
-                            add_double_enter = True
+                        if global_class_declare(prev_line):
+                            debuginfo += " after class declare"
+                            add_enter = False
+                    else:
+                        if indentation(line) == 1:
+                            debuginfo += " indented 1"
+                            if scoped >= 1:
+                                debuginfo += " scoped >=1"
+                                add_double_enter = True
+                            else:
+                                add_enter = True
                         else:
                             add_enter = True
-                    else:
-                        add_enter = True
     elif line.strip().find("warning") == 0 and ":" not in line and ">" not in line:
         debuginfo = "error state (wrning)"
     elif "it " in line and ("->" in line or "=>" in line):
@@ -910,7 +911,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 if not is_member_var(prev_line):
                     add_enter = True
                     debuginfo += " new scope"
-    elif method_call(line):
+    elif method_call(line) and not fname.endswith(".py"):
         debuginfo = "methodcall"
         if assignment(line):
             debuginfo += " and assigned "
@@ -1010,8 +1011,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if not keyword(prev_line):
             debuginfo = "raise"
             add_enter = True
-    elif "try" in line:
-        debuginfo = "try"
     elif "angular.module" in line:
         debuginfo = "angular module"
         add_double_enter = True
