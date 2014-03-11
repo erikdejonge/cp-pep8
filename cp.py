@@ -151,8 +151,6 @@ def method_call(line):
     @param line:
     @return: @rtype:
     """
-    if line.strip().startswith("self."):
-        return False
 
     if in_test(["+=", "-=", "++", "--", "*="], line):
         return False
@@ -823,7 +821,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 add_enter = False
                 add_double_enter = False
                 debuginfo += " after noinspection"
-
     elif class_method_call(line) and not fname.endswith(".py"):
         debuginfo = "class method call"
         if scoped > 1:
@@ -913,7 +910,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 if not is_member_var(prev_line):
                     add_enter = True
                     debuginfo += " new scope"
-    elif method_call(line) and not fname.endswith(".py"):
+    elif method_call(line):
         debuginfo = "methodcall"
         if assignment(line):
             debuginfo += " and assigned "
