@@ -1440,6 +1440,8 @@ def init_cp(args, fname, myfile):
     color_vals_to_keep, undo_variables, variables, watch_vars = replace_variables()
     mylines = []
     fname = fname.replace("coffee", "cf")
+    if fname.endswith(".py"):
+        variables.remove("emit_event")
     import cStringIO
     data = myfile.read()
     if "ADDTYPES" in data or "addtypes" in data:
