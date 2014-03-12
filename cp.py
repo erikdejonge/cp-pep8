@@ -1320,7 +1320,8 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         """
                         for i in range(0, 10):
                             code_line = code_line.replace("print  ", "print ")
-                        if 'print ":' not in code_line:
+
+                        if 'print ":' not in code_line and 'warning ":' not in code_line and 'print_once ":' not in code_line:
                             return code_line
 
                     lines = [i.strip() for i in lines if lnr(i)]
