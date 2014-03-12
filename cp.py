@@ -20,7 +20,7 @@ def replace_variables():
     """
     @return: @rtype:
     """
-    variables = ["utils.print_once", "print", "warning", "emit_event", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
+    variables = ["print", "warning", "emit_event"]
     undo_variables = []
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
