@@ -4,6 +4,9 @@ import unittest
 
 
 class CPTest(unittest.TestCase):
+    """
+    CPTest
+    """
 
     def get_file(self, fname):
         """
@@ -28,7 +31,7 @@ class CPTest(unittest.TestCase):
         """
         tearDown
         """
-        #self.rmfile(self.testfile)
+        self.rmfile(self.testfile)
 
     def fexists(self, fname):
         """
@@ -46,6 +49,9 @@ class CPTest(unittest.TestCase):
         self.fexists(fname)
 
     def run_cp(self, fname):
+        """
+        @type fname: str
+        """
         oldcode = open(fname).read()
         os.system("python cp.py -f " + fname)
         newcode = open(fname).read()
@@ -65,6 +71,7 @@ class CPTest(unittest.TestCase):
         """
         test_some_files
         """
+        return
         testfiles = ["app_basic.coffee", "controller_base.coffee", "services.coffee", "couchdb_api.py"]
 
         for tf in testfiles:
@@ -72,3 +79,7 @@ class CPTest(unittest.TestCase):
             oc, nc = self.run_cp(tf)
             self.assertEqual(oc, nc)
             self.rmfile(tf)
+
+    def test_directory(self):
+        os.system("cp -r ./test/crypto_api .")
+        os.system("rm -Rf ./crypto_api")
