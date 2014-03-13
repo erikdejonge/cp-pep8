@@ -1364,7 +1364,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
           cvar.set(member, value);
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1320");
+          warning("services.cf:1319");
           return p.reject(e);
         });
         return p.promise;
@@ -1375,7 +1375,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         http_operation("get", saveobject_type, object_id, "", "").then(function(v) {
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1334");
+          warning("services.cf:1332");
           return p.reject(e);
         });
         return p.promise;
@@ -1386,7 +1386,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         http_operation("dirty_get", saveobject_type, object_id, "", "").then(function(v) {
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1348");
+          warning("services.cf:1345");
           return p.reject(e);
         });
         return p.promise;
@@ -1397,7 +1397,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         http_operation("get_members", saveobject_type, object_id, members, "").then(function(v) {
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1362");
+          warning("services.cf:1358");
           return p.reject(e);
         });
         return p.promise;
@@ -1409,7 +1409,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         http_operation("delete", saveobject_type, object_id, "", "").then(function(v) {
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1377");
+          warning("services.cf:1372");
           return p.reject(e);
         });
         return p.promise;
@@ -1420,7 +1420,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         http_operation("fields", saveobject_type, "", "", "").then(function(v) {
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1391");
+          warning("services.cf:1385");
           return p.reject(e);
         });
         return p.promise;
@@ -1431,7 +1431,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         http_operation("field_unique", saveobject_type, "", member, value).then(function(v) {
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1405");
+          warning("services.cf:1398");
           return p.reject(e);
         });
         return p.promise;
@@ -1442,10 +1442,10 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         p = $q.defer();
         keys = _.keys(value);
         http_operation("new_object", saveobject_type, "", keys, value).then(function(v) {
-          print("services.cf:1418", "new object", saveobject_type, "stored");
+          print("services.cf:1410", "new object", saveobject_type, "stored");
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1422");
+          warning("services.cf:1414");
           return p.reject(e);
         });
         return p.promise;
@@ -1456,7 +1456,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         http_operation("collection", save_object_type, "", "", "").then(function(v) {
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1436");
+          warning("services.cf:1427");
           return p.reject(e);
         });
         return p.promise;
@@ -1467,7 +1467,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         http_operation("collection_maxed", save_object_type, "", "", max_items).then(function(v) {
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1450");
+          warning("services.cf:1440");
           return p.reject(e);
         });
         return p.promise;
@@ -1476,10 +1476,10 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         var p;
         p = $q.defer();
         http_operation("collection_ids", save_object_type, "", "", "").then(function(v) {
-          print("services.cf:1461", v);
+          print("services.cf:1450", v);
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1465");
+          warning("services.cf:1454");
           return p.reject(e);
         });
         return p.promise;
@@ -1490,7 +1490,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         http_operation("collection_on_member_value", save_object_type, "", member, value).then(function(v) {
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1479");
+          warning("services.cf:1467");
           return p.reject(e);
         });
         return p.promise;
@@ -1501,7 +1501,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         http_operation("collection_on_members_value", save_object_type, "", member, value).then(function(v) {
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1493");
+          warning("services.cf:1480");
           return p.reject(e);
         });
         return p.promise;
@@ -1512,7 +1512,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         http_operation("get_object_id", save_object_type, "", member, value).then(function(v) {
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1507", e);
+          warning("services.cf:1493", e);
           return p.reject(e);
         });
         return p.promise;
@@ -1523,7 +1523,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         http_operation("get_loggedin_user", "", "", "", "").then(function(v) {
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1521");
+          warning("services.cf:1506");
           return p.reject(e);
         });
         return p.promise;
@@ -1534,7 +1534,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         http_operation("get_tree_password", "", "", "", "").then(function(v) {
           return p.resolve(v);
         }, function(e) {
-          warning("services.cf:1535");
+          warning("services.cf:1519");
           return p.reject(e);
         });
         return p.promise;
@@ -1564,7 +1564,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
       data["operation"] = operation;
       data["key"] = key;
       data["value"] = value;
-      url = urls.command("services.cf:1565", "cvar");
+      url = urls.command("services.cf:1548", "cvar");
       if (first && operation !== "get_encrypt") {
         loading = true;
         first = false;
@@ -1601,7 +1601,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
       check_operation_in_progress = function() {
         if (operation_in_progress) {
           counter += 1;
-          async_call_retries("services.cf:1605", check_operation_in_progress, counter);
+          async_call_retries("services.cf:1588", check_operation_in_progress, counter);
         } else {
           return do_cvar_operation(operation, key, value).then(function(res) {
             return p.resolve(res);
@@ -1622,7 +1622,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         if (loading) {
           f_cvar_loaded = function() {
             if (_get_cvar_loaded()) {
-              print("services.cf:1630", "cvars", "loaded");
+              print("services.cf:1613", "cvars", "loaded");
               return cvar_promise.resolve();
             }
           };
@@ -1643,7 +1643,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
           }, function(reject_result) {
             cvar_promise.reject(reject_result);
             if (reject_result.status !== 403) {
-              return print("services.cf:1650", "cvar-all rejected", reject_result);
+              return print("services.cf:1633", "cvar-all rejected", reject_result);
             }
           });
         }
@@ -1668,7 +1668,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
             if (utils.exist(val)) {
               return p.resolve(val);
             } else {
-              print("services.cf:1675", "no cvar", key);
+              print("services.cf:1658", "no cvar", key);
               return p.resolve(null);
             }
           }
@@ -1720,7 +1720,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
             key = _ref2[_m];
             resolve_result[key] = b64_object_safe(resolve_result[key]);
             if (!String(key).startsWith("cvar_")) {
-              print("services.cf:1718", "invalid cvar received", key, "deleting it");
+              print("services.cf:1701", "invalid cvar received", key, "deleting it");
               _del(key);
             }
             memory.critical_set(key, resolve_result[key]);
@@ -1731,7 +1731,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         return cvar_promise.resolve(resolve_result);
       }, function(reject_result) {
         if (reject_result.status !== 403) {
-          print("services.cf:1730", reject_result);
+          print("services.cf:1713", reject_result);
         }
         return cvar_promise.reject(reject_result.data);
       });
@@ -1755,7 +1755,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
           }
           return p.resolve(tm);
         }, function(reject) {
-          print("services.cf:1753", "could not get cvar_logon_time", reject);
+          print("services.cf:1737", "could not get cvar_logon_time", reject);
           return p.reject("logontime error");
         });
         return p.promise;
@@ -1780,7 +1780,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
           return loading = false;
         }, function(reject_result) {
           cvar_promise.reject();
-          return print("services.cf:1777", "cvar-all rejected", reject_result);
+          return print("services.cf:1761", "cvar-all rejected", reject_result);
         });
         return cvar_promise.promise;
       },
@@ -1803,7 +1803,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
       },
       set: function(key, value) {
         if (!startswith(key, "cvar_")) {
-          warning("services.cf:1800", "cvar", key, "does not start with cvar_");
+          warning("services.cf:1784", "cvar", key, "does not start with cvar_");
         }
         m_add_commit_items[key] = value;
         memory.critical_set(key, b64_object_safe(value));
@@ -1811,7 +1811,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
       },
       commit_set: function(key, value) {
         if (!startswith(key, "cvar_")) {
-          warning("services.cf:1808", "cvar", key, "does not start with cvar_");
+          warning("services.cf:1792", "cvar", key, "does not start with cvar_");
         }
         memory.critical_set(key, b64_object_safe(value));
         f_cvar_operation("set", key, value);
@@ -1854,7 +1854,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
               return p.reject(rej);
             });
           }, function(err) {
-            return warning("services.cf:1854", err);
+            return warning("services.cf:1839", err);
           });
         }
         return p.promise;
@@ -2197,7 +2197,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
           m_upload_progress = [];
           m_upload_in_progress_now = 0;
           _invalidate();
-          return emit_event("services.cf:2174", $rootScope, "tree_out_of_sync");
+          return emit_event("services.cf:2158", $rootScope, "tree_out_of_sync");
         }
       },
       get_flush_requested: function() {
@@ -2269,7 +2269,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
                   }
                 }
               }, function(e) {
-                return print("services.cf:2241", e);
+                return print("services.cf:2225", e);
               });
               return m_flush_requested = true;
             }
@@ -2283,13 +2283,13 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
         };
         success_cb = function(r) {
           if (memory.debug_mode()) {
-            print("services.cf:2254", "upload_start, success_cb " + r);
+            print("services.cf:2238", "upload_start, success_cb " + r);
           }
           return m_upload_succes(r);
         };
         error_cb = function(r) {
           if (memory.debug_mode()) {
-            print("services.cf:2259", "upload_start, error_cb " + r);
+            print("services.cf:2244", "upload_start, error_cb " + r);
           }
           return m_upload_failed(r);
         };

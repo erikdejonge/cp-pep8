@@ -786,7 +786,6 @@ class CryptoUser(SaveObjectGoogle):
         try:
             mtx.acquire_lock()
             self.get_serverconfig().event("generating rsa key: " + str(keysize))
-
             rsa_private_key, rsa_public_key = generate_rsa_key_pair(keystore, keysize, try_precalc=True)
         finally:
             mtx.release_lock()
@@ -1494,7 +1493,7 @@ def callback_funcion(progress):
     @param progress:
     @type progress:
     """
-    print "crypto_api/__init__.py:1497", progress
+    print "crypto_api/__init__.py:1496", progress
 
 
 class EmptyFile(Exception):

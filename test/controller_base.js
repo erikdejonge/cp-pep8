@@ -476,7 +476,7 @@ SecuredController = (function() {
           if (item.isFile) {
             error_read = function(e) {
               $scope.drop_error = e;
-              warning("controller_base.cf:477", "Read file error code", e);
+              warning("controller_base.cf:476", "Read file error code", e);
               $scope.drop_error_occurred = true;
               return utils.force_digest($scope);
             };
@@ -491,7 +491,7 @@ SecuredController = (function() {
             dirReader = item.createReader();
             error_read = function(e) {
               $scope.drop_error = e;
-              warning("controller_base.cf:493", "Directory FileError code", e);
+              warning("controller_base.cf:492", "Directory FileError code", e);
               $scope.drop_error_occurred = true;
               return utils.force_digest($scope);
             };
@@ -545,7 +545,7 @@ SecuredController = (function() {
           last_check_cnt = 0;
           check_queue_start_download = function() {
             if (uploader.files_selected_for_upload() > 0) {
-              print("controller_base.cf:546", "last_check_cnt", last_check_cnt);
+              print("controller_base.cf:545", "last_check_cnt", last_check_cnt);
               if (uploader.files_selected_for_upload() === last_check) {
                 last_check_cnt += 1;
               } else {
@@ -558,13 +558,13 @@ SecuredController = (function() {
                   var upload_error, upload_succes;
                   $scope.parent = tree.get_node($routeParams.doc_id, treenodes);
                   upload_succes = function(r) {
-                    print("controller_base.cf:560", "upload_succes", r);
+                    print("controller_base.cf:559", "upload_succes", r);
                     uploader.reset();
                     tree.invalidate();
-                    return emit_event("controller_base.cf:563", $rootScope, "tree_out_of_sync");
+                    return emit_event("controller_base.cf:562", $rootScope, "tree_out_of_sync");
                   };
                   upload_error = function(r) {
-                    return print("controller_base.cf:566", "upload_error", r);
+                    return print("controller_base.cf:565", "upload_error", r);
                   };
                   uploader.upload_start(upload_succes, upload_error);
                   return $scope.drop_detected = false;
@@ -669,9 +669,9 @@ SecuredController = (function() {
           }
         };
         if (utils.ie8()) {
-          second_interval = utils.set_interval("controller_base.cf:670", f_interval, 1000, "f_interval");
+          second_interval = utils.set_interval("controller_base.cf:669", f_interval, 1000, "f_interval");
         } else {
-          second_interval = utils.set_interval("controller_base.cf:672", f_interval, 250, "f_interval");
+          second_interval = utils.set_interval("controller_base.cf:671", f_interval, 250, "f_interval");
         }
         memory.set(service_id, second_interval);
         delete_service_interval_memory = function(service) {
@@ -687,15 +687,15 @@ SecuredController = (function() {
           $scope.logged_minutes = result;
           return memory.set("g_prev_logged_minutes", result);
         }, function(e) {
-          return warning("controller_base.cf:690", e);
+          return warning("controller_base.cf:689", e);
         });
       };
     })(this), function(reject_result) {
       if (reject_result.status === 403) {
-        print("controller_base.cf:695", "not authorized, route to login");
+        print("controller_base.cf:694", "not authorized, route to login");
         return authorization.to_login();
       } else {
-        return print("controller_base.cf:698", "could not load cvars, or not authorized", reject_result);
+        return print("controller_base.cf:697", "could not load cvars, or not authorized", reject_result);
       }
     });
   };

@@ -954,14 +954,16 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                             debuginfo += " scope change"
                     else:
                         test_items = ["@staticmethod", "catch", "print", "with", "when", "_.keys", "finally", "except", '"""', "->", "=>"]
-                        if in_test(test_items, prev_line):
+                        if in_test(test_items, prev_line) and scoped == 0:
                             debuginfo += " after " + str(in_test_result(test_items, prev_line)).replace("print", "pr1nt")
                         else:
                             if comment(prev_line):
                                 debuginfo += " after comment"
                             else:
-                                debuginfo += " not after comment"
-                                add_enter = True
+                                debuginfo += " not after comment "
+                                if scoped > 0:
+                                    add_enter = True
+                                    debuginfo += " scope change "
                                 if assignment(line):
                                     if not fname.endswith(".py"):
                                         debuginfo += " and assigned in coffee "
@@ -1564,7 +1566,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                         add_enter = False
                         debuginfo += " some closing tag"
 
-    debuginfo += " " + str(if_cnt) + str(add_double_enter)
+    #debuginfo += " ifcnt:" + str(if_cnt) + " double_enter:" + str(add_double_enter)
     return add_double_enter, add_enter, debuginfo, line
 
 

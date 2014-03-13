@@ -345,7 +345,6 @@ def start_profile():
     @rtype: Profile
     """
     from cProfile import Profile
-
     pr = Profile()
     pr.enable()
     return pr
@@ -355,7 +354,7 @@ def emit_event(f):
     """
     @type f: str
     """
-    print "couchdb_api.py:358", f
+    print "couchdb_api.py:357", f
 
 
 def end_profile(pr, items=10, printstats=True):
@@ -365,16 +364,15 @@ def end_profile(pr, items=10, printstats=True):
     @type printstats: bool
     """
     from pstats import Stats
-
     p = Stats(pr)
     p.strip_dirs()
     emit_event("foo")
-    print "couchdb_api.py:372", "hello"
+    print "couchdb_api.py:370", "hello"
     if printstats:
-        print "couchdb_api.py:374"
-        print "couchdb_api.py:375", "total time"
+        print "couchdb_api.py:372"
+        print "couchdb_api.py:373", "total time"
         p.print_stats(items)
-        print "couchdb_api.py:377", "cumulative time"
+        print "couchdb_api.py:375", "cumulative time"
         p.sort_stats('cumtime')
         p.print_stats(items)
 
@@ -396,7 +394,7 @@ def format_and_print_large_string(largestring):
                     s += c
 
         s += "\\\n"
-    print "couchdb_api.py:399", s
+    print "couchdb_api.py:397", s
 
 
 def slugify_unicode(value):
@@ -708,7 +706,6 @@ def run_unit_test(class_name, methodname, myglobals):
     @type myglobals: dict
     """
     import unittest
-
     suite = unittest.TestSuite()
     cls = myglobals[class_name]
 
@@ -983,7 +980,6 @@ def consoledict(*args):
     @return: @rtype:
     """
     import sys
-
     dbs = "\033[92m" + log_date_time_string() + "\033[96m "
     dbs += stack_trace(line_num_only=True)
 
@@ -1042,7 +1038,6 @@ def console(*args, **kwargs):
     #    return
     global g_start_time
     import sys
-
     runtime = "%0.2f" % float(time.time() - g_start_time)
     dbs = "\033[92m" + str(runtime) + "\033[96m"
     toggle = True
@@ -1450,7 +1445,6 @@ def resetterminal():
     resetterminal():
     """
     import sys
-
     sys.stdout.write('\033[0m')
     return
 
@@ -1464,7 +1458,6 @@ def handle_ex(exc, again=True, give_string=False):
     #noinspection PyUnresolvedReferences
     import sys
     import traceback
-
     exc_type, exc_value, exc_traceback = sys.exc_info()
     error_msg = "\n\033[95m" + log_date_time_string() + " ---------------------------\n"
     error_msg += "\033[95m" + log_date_time_string() + "   !!! EXCEPTION !!!\n"
@@ -1503,8 +1496,8 @@ def handle_ex(exc, again=True, give_string=False):
 
             error_msg += fname_number + " | " + tabs + val + "\n"
     except Exception, e:
-        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1506", e, '\033[m'
-        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1507", exc, '\033[m'
+        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1499", e, '\033[m'
+        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1500", exc, '\033[m'
 
     error_msg += "\033[95m" + log_date_time_string() + " ---------------------------\n"
 
@@ -1512,7 +1505,6 @@ def handle_ex(exc, again=True, give_string=False):
         return error_msg.replace("\033[95m", "")
     else:
         import sys
-
         sys.stdout.write(str(error_msg) + '\033[0m')
 
     if again:
@@ -1653,7 +1645,6 @@ def b64_encode_safe(s):
         s = urllib.quote(s, safe='~()*!.\'')
     except KeyError:
         console("b64_encode_safe: using key_ascii", s, warning=True, line_num_only=4)
-
         s = key_ascii(s)
 
     s = base64.encodestring(s).replace("=", "-").replace("\n", "")
@@ -1875,7 +1866,6 @@ class RedisServer(object):
                 return
             except ResponseError:
                 console("flush_all: sleeping")
-
                 time.sleep(float("0." + str(i)))
 
     def delete_prefix(self, prefix):
@@ -1943,7 +1933,6 @@ class RedisServer(object):
             return self.rediscon.set(str(key), data, ex=time_to_live)
         except ResponseError, ex:
             console_warning("set:", str(ex))
-
             self.flush_all()
 
     def make_safe_key(self, key):
@@ -4900,15 +4889,15 @@ class SaveObjectCouch(object):
         @type newest_doc: dict
         """
         if debug:
-            print "couchdb_api.py:4903", "---------------------------------------------------------------------------"
-            print "couchdb_api.py:4904", key
-            print "couchdb_api.py:4905", newest_doc[key]
-            print "couchdb_api.py:4906", getattr(self, key)
-            print "couchdb_api.py:4907", newermember_timestamp
-            print "couchdb_api.py:4908", "mymember_timestamp", mymember_timestamp
+            print "couchdb_api.py:4892", "---------------------------------------------------------------------------"
+            print "couchdb_api.py:4893", key
+            print "couchdb_api.py:4894", newest_doc[key]
+            print "couchdb_api.py:4895", getattr(self, key)
+            print "couchdb_api.py:4896", newermember_timestamp
+            print "couchdb_api.py:4897", "mymember_timestamp", mymember_timestamp
             nwt = newermember_timestamp >= mymember_timestamp
-            print "couchdb_api.py:4910", "newermember_timestamp >= mymember_timestamp", nwt
-            print "couchdb_api.py:4911", "---------------------------------------------------------------------------"
+            print "couchdb_api.py:4899", "newermember_timestamp >= mymember_timestamp", nwt
+            print "couchdb_api.py:4900", "---------------------------------------------------------------------------"
 
     def handleconflict(self, newest_doc):
         """
@@ -5783,7 +5772,6 @@ class SaveObjectCouch(object):
         """
         sdict = self.__dict__
         del sdict["dbase"]
-
         return object_to_pickled_base64(sdict)
 
     def as_dict(self):
@@ -6975,7 +6963,6 @@ class SaveObjectGoogle(object):
         """
         sdict = self.__dict__
         del sdict["serverconfig"]
-
         return object_to_pickled_base64(sdict)
 
     def as_dict(self):

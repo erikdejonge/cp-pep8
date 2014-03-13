@@ -73,12 +73,15 @@ class CPTest(unittest.TestCase):
         """
         test_some_files
         """
-
         testfiles = ["app_basic.coffee", "controller_base.coffee", "services.coffee", "couchdb_api.py"]
 
         for tf in testfiles:
             self.get_file(tf)
             oc, nc = self.run_cp(tf)
+
+            if not oc == nc:
+                print "tests.py:83", tf
+
             self.assertEqual(oc, nc)
             self.rmfile(tf)
 
@@ -89,7 +92,6 @@ class CPTest(unittest.TestCase):
         #os.system("rm -Rf ./crypto_api")
         os.system("cp -r ./test/crypto_api .")
         os.system("cp cp.py ./crypto_api")
-
         fname = "./crypto_api/__init__.py"
         oc = open(fname).read()
         cmd = "cd crypto_api; python cp.py -f __init__.py"
