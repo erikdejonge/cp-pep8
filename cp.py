@@ -21,6 +21,7 @@ def replace_variables():
     @return: @rtype:
     """
     variables = ["print", "warning", "emit_event"]
+    variables = ["utils.print_once", "print", "warning", "emit_event", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
     undo_variables = []
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
@@ -1135,9 +1136,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                             pass
                                 if "kwargs" in typeitem or "args" in typeitem:
                                     if "kwargs" in typeitem:
-                                        typeitem = "@param kwargs:"
+                                        typeitem = "@type kwargs: dict"
                                     elif "args" in typeitem:
-                                        typeitem = "@param args:"
+                                        typeitem = "@type args: tuple"
                                 else:
                                     typeitem = "@type " + typeitem + ": " + mytype
                                 docstring += next_line.count(" ") * " " + typeitem + "\n"
