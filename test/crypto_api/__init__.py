@@ -201,7 +201,6 @@ def encrypt(key, data, data_is_list=False, salt_secret=None, base64data=False, i
 
     if base64data:
         initialization_vector = base64.encodestring(initialization_vector)
-
     encrypted_data_dict = {"salt": salt,
                            "hash": data_hash,
                            "initialization_vector": initialization_vector,
@@ -455,7 +454,6 @@ class CryptoUserPassword(SaveObjectGoogle):
             passwords = serverconfig.gds_run_view(self.get_object_type(), "m_user_object_id", user_object_id, "")
         elif data_object_id:
             passwords = serverconfig.gds_run_view(self.get_object_type(), "m_data_object_id", data_object_id, "")
-
         loaded = False
 
         for pw in passwords:
@@ -466,7 +464,6 @@ class CryptoUserPassword(SaveObjectGoogle):
 
         if not loaded:
             super(CryptoUserPassword, self).__init__(serverconfig)
-
         self.m_user_object_id = user_object_id
         self.m_data_object_id = data_object_id
         self.m_password_p64s = password
@@ -676,14 +673,12 @@ class CryptoUser(SaveObjectGoogle):
             self.get_serverconfig().rs_del(self.object_id + cup_dict["m_data_object_id"])
             cup = CryptoUserPassword(self.get_serverconfig())
             cup.delete(object_id=cup_dict["object_id"])
-
         self.passwords_to_delete = []
 
         for cup in self.passwords_to_save:
             self.get_serverconfig().rs_set(self.object_id + cup.m_data_object_id, cup.m_password_p64s)
             cup.m_password_p64s = self.encrypt_with_public_key(cup.m_password_p64s)
             cup.save(force_consistency=True, force_save=True)
-
         self.passwords_to_save = []
         super(CryptoUser, self).save(object_id, serverconfig, force_consistency=force_consistency, force_save=force_save, transaction=transaction, store_in_datastore=store_in_datastore)
 
@@ -789,7 +784,6 @@ class CryptoUser(SaveObjectGoogle):
             rsa_private_key, rsa_public_key = generate_rsa_key_pair(keystore, keysize, try_precalc=True)
         finally:
             mtx.release_lock()
-
         self.rsa_private_key = rsa_private_key
         self.m_rsa_public_key = rsa_public_key
         self.m_aes_encrypted_rsa_private_key_p64s = encrypt(key=self.password, data=self.rsa_private_key)
@@ -1112,7 +1106,6 @@ class CryptoUser(SaveObjectGoogle):
         """
         if not isinstance(self.m_cvars, dict):
             self.m_cvars = {}
-
         d = {}
 
         for k in self.m_cvars:
@@ -1311,7 +1304,6 @@ def make_chunklist(fpath):
 
     if chunksize == 0:
         chunksize = 1
-
     num_chunks = fsize / chunksize
     chunk_remainder = fsize % chunksize
     chunklist = [chunksize] * num_chunks
@@ -1493,7 +1485,7 @@ def callback_funcion(progress):
     @param progress:
     @type progress:
     """
-    print "crypto_api/__init__.py:1496", progress
+    print "crypto_api/__init__.py:1488", progress
 
 
 class EmptyFile(Exception):
@@ -1581,7 +1573,6 @@ def slugify_path(path):
 
         if cnt < lenps - 1:
             spath += "/"
-
         cnt += 1
 
     return spath
@@ -1836,7 +1827,6 @@ class CryptoDoc(SaveObjectGoogle):
 
         if self.object_id is None:
             return
-
         cnt = 0
         chunks_param = []
 

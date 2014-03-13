@@ -84,7 +84,7 @@ SecuredController = (function() {
         return p.resolve(minutes + " " + minstring + ", " + seconds + " seconden");
       }
     }, function(error) {
-      print("controller_base.cf:75", error);
+      print("controller_base.cf:74", error);
       return p.reject(error);
     });
     return p.promise;
@@ -104,7 +104,7 @@ SecuredController = (function() {
     return this.set_logged_minutes($scope, cvar, $q).then(function(result) {
       return $scope.logged_minutes = result;
     }, function() {
-      return print("controller_base.cf:106");
+      return print("controller_base.cf:105");
     });
   };
 
@@ -116,7 +116,7 @@ SecuredController = (function() {
       return memory.bool_test("g_loading");
     };
     $scope.ctrl_change_route = function(url) {
-      print("controller_base.cf:120", "scope change route", url);
+      print("controller_base.cf:119", "scope change route", url);
       return urls.change_route($location, url);
     };
     cvar.get("cvar_username").then(function(cvar_username) {
@@ -127,10 +127,10 @@ SecuredController = (function() {
         return $scope.is_rabshakeh = false;
       }
     }, function() {
-      return warning("controller_base.cf:132", "could not fetch cvar_username");
+      return warning("controller_base.cf:131", "could not fetch cvar_username");
     });
     cryptobox_name = clientcookies.get("c_persist_cryptobox_name_" + utils.get_cryptobox_slug());
-    utils.print_once("controller_base.cf:135", cryptobox_name);
+    utils.print_once("controller_base.cf:134", cryptobox_name);
     cryptobox_slug = utils.get_cryptobox_slug();
     if (exist(cryptobox_name) && exist(cryptobox_slug)) {
       $scope.cryptobox_name = cryptobox_name;
@@ -176,14 +176,14 @@ SecuredController = (function() {
         return obj;
       };
     }, function(e) {
-      return warning("controller_base.cf:184", e);
+      return warning("controller_base.cf:183", e);
     });
     $rootScope.show_debug_info = false;
     cvar.get("cvar_show_debug_info").then(function(cvar_show_debug_info) {
       $rootScope.show_debug_info = cvar_show_debug_info;
       return window.cvar_show_debug_info = cvar_show_debug_info;
     }, function(e) {
-      return warning("controller_base.cf:193", e);
+      return warning("controller_base.cf:192", e);
     });
     $scope.get_logfile = function() {
       var res;
@@ -316,17 +316,17 @@ SecuredController = (function() {
       $scope.device_type = new_type;
       if (memory.has("g_device_type")) {
         if (memory.get("g_device_type") !== new_type) {
-          print("controller_base.cf:322", "running on");
-          print("controller_base.cf:323", "phone", utils.is_phone());
-          print("controller_base.cf:324", "tablet", utils.is_tablet());
-          print("controller_base.cf:325", "desktop", utils.is_desktop());
+          print("controller_base.cf:320", "running on");
+          print("controller_base.cf:321", "phone", utils.is_phone());
+          print("controller_base.cf:322", "tablet", utils.is_tablet());
+          print("controller_base.cf:323", "desktop", utils.is_desktop());
         }
       } else {
-        print("controller_base.cf:327", "running on", new_type);
+        print("controller_base.cf:325", "running on", new_type);
       }
       if (memory.has("g_window_width")) {
         if (w !== memory.get("g_window_width")) {
-          emit_event("controller_base.cf:331", $scope, "resize_window");
+          emit_event("controller_base.cf:329", $scope, "resize_window");
           utils.force_digest($scope);
         }
       }
@@ -476,7 +476,7 @@ SecuredController = (function() {
           if (item.isFile) {
             error_read = function(e) {
               $scope.drop_error = e;
-              warning("controller_base.cf:476", "Read file error code", e);
+              warning("controller_base.cf:470", "Read file error code", e);
               $scope.drop_error_occurred = true;
               return utils.force_digest($scope);
             };
@@ -491,7 +491,7 @@ SecuredController = (function() {
             dirReader = item.createReader();
             error_read = function(e) {
               $scope.drop_error = e;
-              warning("controller_base.cf:492", "Directory FileError code", e);
+              warning("controller_base.cf:486", "Directory FileError code", e);
               $scope.drop_error_occurred = true;
               return utils.force_digest($scope);
             };
@@ -545,7 +545,7 @@ SecuredController = (function() {
           last_check_cnt = 0;
           check_queue_start_download = function() {
             if (uploader.files_selected_for_upload() > 0) {
-              print("controller_base.cf:545", "last_check_cnt", last_check_cnt);
+              print("controller_base.cf:536", "last_check_cnt", last_check_cnt);
               if (uploader.files_selected_for_upload() === last_check) {
                 last_check_cnt += 1;
               } else {
@@ -558,18 +558,18 @@ SecuredController = (function() {
                   var upload_error, upload_succes;
                   $scope.parent = tree.get_node($routeParams.doc_id, treenodes);
                   upload_succes = function(r) {
-                    print("controller_base.cf:559", "upload_succes", r);
+                    print("controller_base.cf:550", "upload_succes", r);
                     uploader.reset();
                     tree.invalidate();
-                    return emit_event("controller_base.cf:562", $rootScope, "tree_out_of_sync");
+                    return emit_event("controller_base.cf:553", $rootScope, "tree_out_of_sync");
                   };
                   upload_error = function(r) {
-                    return print("controller_base.cf:565", "upload_error", r);
+                    return print("controller_base.cf:556", "upload_error", r);
                   };
                   uploader.upload_start(upload_succes, upload_error);
                   return $scope.drop_detected = false;
                 }, function(err) {
-                  return print("controller_base.cf:571", err);
+                  return print("controller_base.cf:562", err);
                 });
                 return true;
               }
@@ -613,7 +613,7 @@ SecuredController = (function() {
           authorization.get_current_user().then(function(user) {
             return $rootScope.current_user = user;
           }, function(error) {
-            warning("controller_base.cf:609", error);
+            warning("controller_base.cf:599", error);
           });
         }
         $scope.get_debug_mode = function() {
@@ -624,7 +624,7 @@ SecuredController = (function() {
             return utils.remove_cache();
           }
         }, function(error_result) {
-          return warning("controller_base.cf:622", "could not fetch cvar_disable_caching", error_result);
+          return warning("controller_base.cf:612", "could not fetch cvar_disable_caching", error_result);
         });
         clientcookies.ensure_memory();
         _this.baseprerender($rootScope, $scope, cvar, authorization, $location, cryptobox, tree, $routeParams, memory, clientcookies, utils, urls, $q, serverclock, saveobject, uploader);
@@ -669,9 +669,9 @@ SecuredController = (function() {
           }
         };
         if (utils.ie8()) {
-          second_interval = utils.set_interval("controller_base.cf:669", f_interval, 1000, "f_interval");
+          second_interval = utils.set_interval("controller_base.cf:659", f_interval, 1000, "f_interval");
         } else {
-          second_interval = utils.set_interval("controller_base.cf:671", f_interval, 250, "f_interval");
+          second_interval = utils.set_interval("controller_base.cf:661", f_interval, 250, "f_interval");
         }
         memory.set(service_id, second_interval);
         delete_service_interval_memory = function(service) {
@@ -687,15 +687,15 @@ SecuredController = (function() {
           $scope.logged_minutes = result;
           return memory.set("g_prev_logged_minutes", result);
         }, function(e) {
-          return warning("controller_base.cf:689", e);
+          return warning("controller_base.cf:679", e);
         });
       };
     })(this), function(reject_result) {
       if (reject_result.status === 403) {
-        print("controller_base.cf:694", "not authorized, route to login");
+        print("controller_base.cf:684", "not authorized, route to login");
         return authorization.to_login();
       } else {
-        return print("controller_base.cf:697", "could not load cvars, or not authorized", reject_result);
+        return print("controller_base.cf:687", "could not load cvars, or not authorized", reject_result);
       }
     });
   };

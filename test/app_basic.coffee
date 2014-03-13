@@ -733,12 +733,10 @@ print = (msg, others...) ->
 
         while shortdate.length < 6
             shortdate += " "
-
         shortdate += " "
 
         while msg.length < 22
             msg += " "
-
         msg = shortdate + msg
         coffee2cf = (obj) ->
             if obj?
@@ -777,7 +775,6 @@ print = (msg, others...) ->
                     c += 1
 
                 return s
-
             found_object = -1
             num_objects = 0
             create_print_string = (s) ->
@@ -835,11 +832,11 @@ async_call_retries = (msg, func, retries, max_retries) ->
 
     if retries > max_retries
         if retries % 20 == 0
-            print "app_basic.cf:838", "giving up", msg, "async_call_retries", retries
+            print "app_basic.cf:835", "giving up", msg, "async_call_retries", retries
         return
 
     if retries > 150
-        print "app_basic.cf:842", msg, "async_call_retries", retries
+        print "app_basic.cf:839", msg, "async_call_retries", retries
 
     if retries > 150
         _.delay(func, directive_check_slow_timeout)
@@ -852,7 +849,7 @@ running_local = ->
         path_split = document.location.hostname
 
         if path_split == "127.0.0.1" || path_split == "192.168.14.107"
-            print "app_basic.cf:855", "running local"
+            print "app_basic.cf:852", "running local"
             window.g_running_local = true
         else
             window.g_running_local = false
@@ -869,7 +866,7 @@ g_http_error = (data) ->
     if not data.indexOf?
         traceback = data
         window.g_logfile.push(traceback)
-        print "app_basic.cf:872", data
+        print "app_basic.cf:869", data
     else
         tracebacks = String(data[data.indexOf('<div id="pastebinTraceback" class="pastebin">') ...  _.size(data)])
         tracebacks = String(tracebacks[tracebacks.indexOf('Traceback:') ...  _.size(tracebacks)])
@@ -878,7 +875,7 @@ g_http_error = (data) ->
         tracebacks = g_replace_all(tracebacks, "&#39;", " * ")
 
         if exist(tracebacks)
-            warning "app_basic.cf:881", " **  django error  ** ", tracebacks
+            warning "app_basic.cf:878", " **  django error  ** ", tracebacks
             window.g_logfile.push(tracebacks)
 
     return traceback
@@ -926,7 +923,6 @@ BrowserDetect =
                 return data[i].identity  unless dataString.indexOf(data[i].subString) == -1
             else
                 return data[i].identity  if dataProp
-
             i += 1
 
 
@@ -1026,7 +1022,7 @@ emit_event = (msg, scope, event) ->
 
 
 init_cryptobox = (cryptobox, utils, serverclock, memory, clientcookies) =>
-    print "app_basic.cf:1029", "init cryptobox"
+    print "app_basic.cf:1025", "init cryptobox"
     memory.set("g_first_tree_render", true)
     cryptobox.init()
     utils.uinit()
@@ -1052,9 +1048,8 @@ angular.module("cryptoboxApp.base", [])
             if key.indexOf("g_") == 0
                 window.globals[key] = value
                 return
-
             error = "memory._set you have to supply a key starting with g_, c_, or cvar_, key was: " + key
-            warning "app_basic.cf:1057", error
+            warning "app_basic.cf:1052", error
 
         get_debug_mode: ->
             g_debugmode = @get("g_debugmode")
@@ -1080,20 +1075,19 @@ angular.module("cryptoboxApp.base", [])
 
         set: (key, value) ->
             if not exist(key)
-                warning "app_basic.cf:1083", "no key given"
+                warning "app_basic.cf:1078", "no key given"
 
             if key.indexOf("g_ls_") == 0
                 if exist(localStorage)
                     if not @has("g_print_once_" + key, true)
-                        print "app_basic.cf:1088", "set localstorage", key
+                        print "app_basic.cf:1083", "set localstorage", key
                         @set("g_print_once_" + key, true)
-
                     localStorage[key] = value
 
             if key.indexOf("g_f_") == 0
                 if  _.size(_.filter(_.keys(window.globals), (k) -> strcmp(k, key))) > 0
                     if not string_contains(document.location.pathname, "context.html")
-                        warning "app_basic.cf:1096", key, "already exist as functional value"
+                        warning "app_basic.cf:1090", key, "already exist as functional value"
 
                     if string_contains(document.location.pathname, "context.html")
                         throw "already exist"
@@ -1119,7 +1113,7 @@ angular.module("cryptoboxApp.base", [])
 
         critical_set: (key, value) ->
             if not exist(key)
-                warning "app_basic.cf:1122", "no key given"
+                warning "app_basic.cf:1116", "no key given"
 
             if not exist(value)
                 throw new Error("critical set undefined value for key " + key)
@@ -1170,7 +1164,7 @@ angular.module("cryptoboxApp.base", [])
 
         has: (key) ->
             if not exist(key)
-                warning "app_basic.cf:1173", "no key given"
+                warning "app_basic.cf:1167", "no key given"
 
             if key.indexOf("cvar_") == 0
                 key = key.replace("cvar_", "g_cvar_")
@@ -1183,7 +1177,7 @@ angular.module("cryptoboxApp.base", [])
         get: (key) ->
             val = null
             if not exist(key)
-                warning "app_basic.cf:1186", "no key given"
+                warning "app_basic.cf:1180", "no key given"
 
             if key.indexOf("cvar_") == 0
                 key = key.replace("cvar_", "g_cvar_")
@@ -1198,7 +1192,7 @@ angular.module("cryptoboxApp.base", [])
             if not exist(val)
                 if key.indexOf("g_ls_") == 0
                     if exist(localStorage)
-                        print "app_basic.cf:1201", "get localstorage", key
+                        print "app_basic.cf:1195", "get localstorage", key
                         if exist(localStorage[key])
                             val = localStorage[key]
                             window.globals[key] = val
@@ -1207,13 +1201,12 @@ angular.module("cryptoboxApp.base", [])
                 return val
 
             error = "globals g_ ->" + key
-            print "app_basic.cf:1210", error
+            print "app_basic.cf:1204", error
             throw error
 
         event: (name, done) ->
             if not exist(done)
                 done = false
-
             ek = "g_event_" + name
             lek = "g_last_event_" + name
             ec = "g_event_count_"+name
@@ -1245,7 +1238,7 @@ angular.module("cryptoboxApp.base", [])
                     cnt = @get(ec)
                 else
                     cnt = 0
-                print "app_basic.cf:1248", "event", cnt, name
+                print "app_basic.cf:1241", "event", cnt, name
 
         get_event_duration: (name) ->
             @event(name, true)
@@ -1313,16 +1306,15 @@ angular.module("cryptoboxApp.base", [])
                 delete window.globals[key]
                 return
             error = "globals should start with g_ (global) - " + key
-            print "app_basic.cf:1316", key, "no g_ prefix"
-            warning "app_basic.cf:1317", error
+            print "app_basic.cf:1309", key, "no g_ prefix"
+            warning "app_basic.cf:1310", error
 
         reset: ->
             for key in _.keys window.globals
                 keep = false
                 if key.indexOf("g_service") == 0
-                    print "app_basic.cf:1323", "stopping", key
+                    print "app_basic.cf:1316", "stopping", key
                     clearInterval(window.globals[key])
-
                 cookie_key = key
                 if cookie_key.indexOf("g_c_") == 0
                     cookie_key = cookie_key.replace("g_c_", "c_")
@@ -1558,18 +1550,17 @@ angular.module("cryptoboxApp.base", [])
         loaded = false
         _set = (key, value) ->
             if key == "c_token"
-                warning "app_basic.cf:1561", "c_token not allowed"
+                warning "app_basic.cf:1553", "c_token not allowed"
 
             if key == "c_username"
-                warning "app_basic.cf:1564", "c_username not allowed"
+                warning "app_basic.cf:1556", "c_username not allowed"
 
             if key.indexOf("c_") == 0
                 Store.set key, value
                 return
-
             error = "cookies should start with c_"
-            print "app_basic.cf:1571", error
-            warning "app_basic.cf:1572", error
+            print "app_basic.cf:1562", error
+            warning "app_basic.cf:1563", error
 
         set_memory = (cookie) ->
             if cookie.key.indexOf("c_") == 0
@@ -1579,7 +1570,6 @@ angular.module("cryptoboxApp.base", [])
             if not loaded
                 cookie_data = Store.all()
                 _.each(cookie_data, set_memory)
-
             loaded = true
 
         reset: ->
@@ -1608,7 +1598,7 @@ angular.module("cryptoboxApp.base", [])
         set: (key, value) ->
             if key.indexOf("c_const_") == 0
                 if utils.exist(memory.get(key))
-                    print "app_basic.cf:1611", key + "is const", value, "ignored"
+                    print "app_basic.cf:1601", key + "is const", value, "ignored"
                     return
             memory.set(key, value)
             _set(key, value)
@@ -1619,13 +1609,13 @@ angular.module("cryptoboxApp.base", [])
 
         get: (key) ->
             if key == "c_token"
-                warning "app_basic.cf:1622", "c_token not allowed"
+                warning "app_basic.cf:1612", "c_token not allowed"
 
             if key == "c_username"
-                warning "app_basic.cf:1625", "c_username not allowed"
+                warning "app_basic.cf:1615", "c_username not allowed"
             if key.indexOf("c_") != 0
                 error = "cookies should start with c_"
-                warning "app_basic.cf:1628", error
+                warning "app_basic.cf:1618", error
             value = memory.get(key)
             value = bool_parse(value)
 
@@ -1702,13 +1692,11 @@ angular.module("cryptoboxApp.base", [])
 
             while text.indexOf("__") > 0
                 text = text.replace("__", "_")
-
             slug = ""
             checksafechar = (c) ->
                 if c not in safe_chars
                     c = encode_utf8_b64(c)
                     c = _rtrim(c, "=").toLowerCase()
-
                 slug += c
 
             _.each(text, checksafechar)
@@ -1745,7 +1733,7 @@ angular.module("cryptoboxApp.base", [])
         _print_once = (msg, themsg) ->
             if not memory.has("g_print_once_" + themsg)
                 memory.set("g_print_once_" + themsg, true)
-                print "app_basic.cf:1748", msg, themsg
+                print "app_basic.cf:1736", msg, themsg
 
         _get_cryptobox_slug = ->
             cryptobox_slug = memory.get("g_cryptobox_slug")
@@ -1845,7 +1833,6 @@ angular.module("cryptoboxApp.base", [])
             while i < options.length
                 optTemp = optTemp | OPTS[options[i]]  if OPTS[options[i]]
                 i++
-
             options = optTemp
             __getExt = (path) ->
                 dotP = undefined
@@ -1986,7 +1973,7 @@ angular.module("cryptoboxApp.base", [])
                 when "chtml"
                     return "application"
                 else
-                    print "app_basic.cf:1989", "unknown mimetype", name
+                    print "app_basic.cf:1976", "unknown mimetype", name
                     return "default"
 
         get_mini_mime: (mime, name) ->
@@ -2122,7 +2109,7 @@ angular.module("cryptoboxApp.base", [])
             # exclude([arie, jan, piet], [piet, arie], ["leeftijd]) -> [jan]
 
             if not _.isArray(source)
-                print "app_basic.cf:2125", source
+                print "app_basic.cf:2112", source
                 throw "exclude source must be an array"
 
             if not exist(excludes)
@@ -2156,7 +2143,6 @@ angular.module("cryptoboxApp.base", [])
 
                                         for ck in check_keys
                                             item2[ck.k] = item
-
                                         item = item2
 
                                     excludes2.push(item)
@@ -2172,7 +2158,6 @@ angular.module("cryptoboxApp.base", [])
 
                         for ck in check_keys
                             obj2[ck.k] = obj
-
                         obj = obj2
 
                     if _.isObject(obj)
@@ -2266,7 +2251,7 @@ angular.module("cryptoboxApp.base", [])
             new_array = []
             check = (item) =>
                 if _.isObject(item[key])
-                    print "app_basic.cf:2269", @map_to_values(item, key)
+                    print "app_basic.cf:2254", @map_to_values(item, key)
                 else
                     if exist(item[[key]])
                         new_array.push(item[key])
@@ -2337,7 +2322,7 @@ angular.module("cryptoboxApp.base", [])
 
         b642obj: (b64) ->
             if not String(b64).contains("b64:safe")
-                warning "app_basic.cf:2340", "b642obj"
+                warning "app_basic.cf:2325", "b642obj"
                 return b64
 
             return @json2obj(@b64_decode_safe(b64))
@@ -2428,8 +2413,8 @@ angular.module("cryptoboxApp.base", [])
                     p.resolve()
 
                 (e) ->
-                    print "app_basic.cf:2431", "error mailing admins"
-                    print "app_basic.cf:2432", e
+                    print "app_basic.cf:2416", "error mailing admins"
+                    print "app_basic.cf:2417", e
                     p.resolve()
             )
             p.promise
@@ -2442,7 +2427,7 @@ angular.module("cryptoboxApp.base", [])
                 warnings.push(String(i))
 
             _.each(others, add_error)
-            warning "app_basic.cf:2445", msg, others
+            warning "app_basic.cf:2430", msg, others
             warning_str = ""
             spaces = ""
             add_errors = (i) ->
@@ -2457,7 +2442,7 @@ angular.module("cryptoboxApp.base", [])
 
         force_digest: (scope) ->
             if not exist(scope)
-                warning "app_basic.cf:2460", "force_digest needs a scope parameter"
+                warning "app_basic.cf:2445", "force_digest needs a scope parameter"
 
             digest = ->
                 if not scope.$$phase
@@ -2497,7 +2482,6 @@ angular.module("cryptoboxApp.base", [])
 
             if v == ""
                 return v
-
             s = ""
 
             for i in v
@@ -2524,7 +2508,6 @@ angular.module("cryptoboxApp.base", [])
                 extension = split_name[split_name.length - 1]
                 if extension.indexOf(" ") != -1
                     return String(fname).trim()
-
                 split_name = split_name[0...split_name.length - 1]
                 new_name = ""
                 join_name = (i) ->
@@ -2557,7 +2540,7 @@ angular.module("cryptoboxApp.base", [])
 
         assert: (key, value) ->
             if not @exist(value)
-                warning "app_basic.cf:2560", "value named " + key + " does not exist"
+                warning "app_basic.cf:2543", "value named " + key + " does not exist"
 
         exist_truth: (value) ->
             return exist_truth(value)
@@ -2588,7 +2571,7 @@ angular.module("cryptoboxApp.base", [])
 
         format_datetime_long: (datestr) ->
             str = String(dateFilter(datestr, 'EEEE d MMMM y H:mm:ss'))
-            print "app_basic.cf:2591", datestr, str
+            print "app_basic.cf:2574", datestr, str
             if str.contains("undefined")
                 return datestr
 
@@ -2680,7 +2663,7 @@ angular.module("cryptoboxApp.base", [])
                 memory.increment_counter("g_method_set_time_out" + func_sha3)
 
                 if memory.mod_counter("g_method_set_time_out" + func_sha3, 100)
-                    print "app_basic.cf:2683", memory.get("g_time_out_func_" + func_sha3), "has a set_time_out which is called", memory.get("g_method_set_time_out" + func_sha3), "times"
+                    print "app_basic.cf:2666", memory.get("g_time_out_func_" + func_sha3), "has a set_time_out which is called", memory.get("g_method_set_time_out" + func_sha3), "times"
             _.delay(func, delay)
 
         call_until_sentinal_hits_repeats: (func, param, delay, sentinels, repeats, terminating_sentinel, max_repeats, success_callback, error_callback) =>
@@ -2690,16 +2673,16 @@ angular.module("cryptoboxApp.base", [])
             start = get_local_time()
 
             if memory.get_debug_mode()
-                print "app_basic.cf:2693", "-------------------"
-                print "app_basic.cf:2694", "call_until_sentinal_hits_repeats"
-                print "app_basic.cf:2695", "delay", delay
-                print "app_basic.cf:2696", "repeats", repeats
-                print "app_basic.cf:2697", "max_repeats", max_repeats
-                print "app_basic.cf:2698", "terminating_sentinel", terminating_sentinel
-                print "app_basic.cf:2699", "sentinels", sentinels
-                print "app_basic.cf:2700", "error_callback", exist(error_callback)
-                print "app_basic.cf:2701", "error_callback", exist(error_callback)
-                print "app_basic.cf:2702", "-------------------"
+                print "app_basic.cf:2676", "-------------------"
+                print "app_basic.cf:2677", "call_until_sentinal_hits_repeats"
+                print "app_basic.cf:2678", "delay", delay
+                print "app_basic.cf:2679", "repeats", repeats
+                print "app_basic.cf:2680", "max_repeats", max_repeats
+                print "app_basic.cf:2681", "terminating_sentinel", terminating_sentinel
+                print "app_basic.cf:2682", "sentinels", sentinels
+                print "app_basic.cf:2683", "error_callback", exist(error_callback)
+                print "app_basic.cf:2684", "error_callback", exist(error_callback)
+                print "app_basic.cf:2685", "-------------------"
 
             if not exist(max_repeats)
                 throw "call_until_sentinal_hits_repeats, max_repeats not set"
@@ -2724,7 +2707,6 @@ angular.module("cryptoboxApp.base", [])
                                 memory.increment_counter(key_counter)
                             else
                                 memory.reset_counter(key_counter)
-
                             last_sentinel_matched = sentinel
 
                     _.each(sentinels, check_sentinel)
@@ -2737,7 +2719,7 @@ angular.module("cryptoboxApp.base", [])
                                     _.delay(call_loop, delay, param)
                             else
                                 if memory.get_debug_mode()
-                                    print "app_basic.cf:2740", "error max repeats (" + max_repeats + ") hit for " + result
+                                    print "app_basic.cf:2722", "error max repeats (" + max_repeats + ") hit for " + result
                                 if exist(error_callback)
                                     error_callback("error: max repeats (" + max_repeats + ") hit for " + result)
 
@@ -2745,7 +2727,7 @@ angular.module("cryptoboxApp.base", [])
                             stop = get_local_time()
 
                             if memory.get_debug_mode()
-                                print "app_basic.cf:2748", "success, terminating sentinal "+terminating_sentinel+" reached in " + (stop - start) + " ms."
+                                print "app_basic.cf:2730", "success, terminating sentinal "+terminating_sentinel+" reached in " + (stop - start) + " ms."
 
                             if exist(success_callback)
                                 success_callback("success: terminating sentinal "+terminating_sentinel+" reached in " + (stop - start) + " ms.")
@@ -2753,7 +2735,7 @@ angular.module("cryptoboxApp.base", [])
                             return
                     else
                         if memory.get_debug_mode()
-                            print "app_basic.cf:2756", "error sentinal "+memory.get(key_counter_sentinel)+" reached "+repeats
+                            print "app_basic.cf:2738", "error sentinal "+memory.get(key_counter_sentinel)+" reached "+repeats
 
                         if exist(success_callback)
                             error_callback("error: sentinal "+memory.get(key_counter_sentinel)+" reached "+repeats)
@@ -2766,7 +2748,7 @@ angular.module("cryptoboxApp.base", [])
                     w_error_callback = (ex) ->
                         error_called = true
                         if memory.get_debug_mode()
-                            print "app_basic.cf:2769", "exception encountered " + String(ex)
+                            print "app_basic.cf:2751", "exception encountered " + String(ex)
 
                         error_callback(ex)
 
@@ -2796,7 +2778,7 @@ angular.module("cryptoboxApp.base", [])
 
         set_interval: (msg, func, delay, descr) ->
             if not exist(descr)
-                warning "app_basic.cf:2799", "set_interval needs a descr parameter"
+                warning "app_basic.cf:2781", "set_interval needs a descr parameter"
             _print_once msg, "set_interval_" + descr + "_" + delay
             setInterval(func, delay)
 ]
@@ -2896,8 +2878,8 @@ angular.module("cryptoboxApp.base", [])
             cryptobox_slug = utils.get_cryptobox_slug()
 
             if not cryptobox_slug? or cryptobox_slug == "undefined"
-                print "app_basic.cf:2899", "cryptobox slug == undefined"
+                print "app_basic.cf:2881", "cryptobox slug == undefined"
             url = "/" + cryptobox_slug + "/" + command + "/" + _safe(key) + "/" + _safe(value) + "/" + get_local_time()
-            print "app_basic.cf:2901", "urls.key_value", url
+            print "app_basic.cf:2883", "urls.key_value", url
             return url
 ]

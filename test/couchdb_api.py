@@ -260,7 +260,6 @@ def generate_random_string(size, letters=None):
 
     if not letters:
         letters = get_alphabet()
-
     strl = []
     end = len(letters) - 1
 
@@ -354,7 +353,7 @@ def emit_event(f):
     """
     @type f: str
     """
-    print "couchdb_api.py:357", f
+    print "couchdb_api.py:356", f
 
 
 def end_profile(pr, items=10, printstats=True):
@@ -367,12 +366,12 @@ def end_profile(pr, items=10, printstats=True):
     p = Stats(pr)
     p.strip_dirs()
     emit_event("foo")
-    print "couchdb_api.py:370", "hello"
+    print "couchdb_api.py:369", "hello"
     if printstats:
-        print "couchdb_api.py:372"
-        print "couchdb_api.py:373", "total time"
+        print "couchdb_api.py:371"
+        print "couchdb_api.py:372", "total time"
         p.print_stats(items)
-        print "couchdb_api.py:375", "cumulative time"
+        print "couchdb_api.py:374", "cumulative time"
         p.sort_stats('cumtime')
         p.print_stats(items)
 
@@ -394,7 +393,7 @@ def format_and_print_large_string(largestring):
                     s += c
 
         s += "\\\n"
-    print "couchdb_api.py:397", s
+    print "couchdb_api.py:396", s
 
 
 def slugify_unicode(value):
@@ -472,7 +471,6 @@ def get_cpu_count():
     global __cpu_count
     if __cpu_count is not None:
         return __cpu_count
-
     num_procs = 8
     try:
         num_procs = multiprocessing.cpu_count()
@@ -531,7 +529,6 @@ def smp_apply(method, items, progress_callback=None, progress_callback_param=Non
 
                 for i in param:
                     param2.append(i)
-
                 param = param2
             else:
                 param = [param]
@@ -585,7 +582,6 @@ def smp_apply(method, items, progress_callback=None, progress_callback_param=Non
                         progress_callback(current_percentage, progress_callback_param)
                     else:
                         progress_callback(current_percentage)
-
                     last_update[0] = now
 
         return result_func
@@ -620,7 +616,6 @@ def smp_apply(method, items, progress_callback=None, progress_callback_param=Non
 
     if listener:
         manager = multiprocessing.Manager()
-
     calculation_result = []
 
     if listener and manager:
@@ -630,7 +625,6 @@ def smp_apply(method, items, progress_callback=None, progress_callback_param=Non
         queue = manager.Queue()
     else:
         queue = None
-
     watcher = None
 
     if listener:
@@ -672,7 +666,6 @@ def smp_apply(method, items, progress_callback=None, progress_callback_param=Non
 
     if queue:
         queue.put("kill")
-
     retval_listener = None
 
     if watcher:
@@ -990,7 +983,6 @@ def consoledict(*args):
 
                 for i in s:
                     dbs += " " + str(i) + " : " + str(s[i]) + "\n"
-
                 dbs += "------------\n"
             else:
                 dbs += " " + str(s)
@@ -1078,12 +1070,10 @@ def console(*args, **kwargs):
         while trace != "?":
             if not first:
                 dbs += " " * len(runtime)
-
             dbs += " | " + trace.strip() + "\n"
             trace = stack_trace(line_num_only=line_num_counter)
             line_num_counter += 1
             first = False
-
         dbs += " " * len(runtime)
     else:
         if line_num_only >= 0:
@@ -1145,7 +1135,6 @@ def console_warning(*args, **kwargs):
         print_stack = kwargs["print_stack"]
     else:
         print_stack = False
-
     dbs = ""
 
     for s in args:
@@ -1321,7 +1310,6 @@ class Events(object):
         for event in events:
             if event["name"] == name:
                 return index
-
             index += 1
 
         return -1
@@ -1493,12 +1481,10 @@ def handle_ex(exc, again=True, give_string=False):
 
             if line[3]:
                 val = line[3]
-
             error_msg += fname_number + " | " + tabs + val + "\n"
     except Exception, e:
-        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1499", e, '\033[m'
-        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1500", exc, '\033[m'
-
+        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1486", e, '\033[m'
+        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1487", exc, '\033[m'
     error_msg += "\033[95m" + log_date_time_string() + " ---------------------------\n"
 
     if give_string:
@@ -1602,7 +1588,6 @@ def key_ascii(s):
     """
     if not isinstance(s, str) and not isinstance(s, unicode):
         return s
-
     s2 = ""
 
     for c in s:
@@ -3445,18 +3430,14 @@ class CouchView(object):
         for l in self.map.split("\n"):
             if "return" in l:
                 mapf += "  "
-
             mapf += l.strip() + "\n"
-
         self.map = mapf
         reducef = ""
 
         for l in self.reduce.split("\n"):
             if "return" in l:
                 reducef += "  "
-
             reducef += l.strip() + "\n"
-
         self.reduce = reducef
 
         if view_doc:
@@ -3861,7 +3842,6 @@ class Mutex(object):
 
             if cnt > 50:
                 time.sleep(0.01)
-
             cnt += 1
 
     def exists_lock(self):
@@ -4217,7 +4197,6 @@ class CouchDBServer(ServerConfig):
 
         if self.replicate_change:
             replicate(self.dbname, self.couchdb_server_list)
-
         document["_id"] = doc_id
         doc_id, doc_rev = self.dbase.save(document)
 
@@ -4351,7 +4330,6 @@ class CouchDBServer(ServerConfig):
             methodobject = view_object(self)
         else:
             methodobject = globals()[methodname](self)
-
         use_group = False
 
         if methodobject.reduce:
@@ -4513,11 +4491,9 @@ def make_object_id_string(object_type, guid=None):
             if ord(c) in caps:
                 if prev_caps:
                     ot += "_"
-
                 prev_caps = True
             else:
                 prev_caps = False
-
             ot += c
 
         type_string = inflection.underscore(ot) + "_" + str(guid)
@@ -4579,14 +4555,12 @@ class SaveObjectCouch(object):
 
         if not self.object_type:
             self.object_type = self.get_object_type()
-
         self.object_id = object_id
         self.m_created = time.time()
         self.m_last_changed = time.time()
 
         if not hasattr(self, "required"):
             self.required = []
-
         self.changed_without_property = []
         self.user_editable_order = 0
         self.user_editable = {}
@@ -4654,7 +4628,6 @@ class SaveObjectCouch(object):
 
         if not label:
             label = name.replace("m_", "", 1).replace("_", " ").capitalize()
-
         d = {"member": name,
              "type": obj_type,
              "required": required,
@@ -4666,7 +4639,6 @@ class SaveObjectCouch(object):
 
         if obj_type == "bool":
             d["required"] = False
-
         self.user_editable_order += 1
 
         #noinspection PyUnresolvedReferences
@@ -4889,15 +4861,15 @@ class SaveObjectCouch(object):
         @type newest_doc: dict
         """
         if debug:
-            print "couchdb_api.py:4892", "---------------------------------------------------------------------------"
-            print "couchdb_api.py:4893", key
-            print "couchdb_api.py:4894", newest_doc[key]
-            print "couchdb_api.py:4895", getattr(self, key)
-            print "couchdb_api.py:4896", newermember_timestamp
-            print "couchdb_api.py:4897", "mymember_timestamp", mymember_timestamp
+            print "couchdb_api.py:4864", "---------------------------------------------------------------------------"
+            print "couchdb_api.py:4865", key
+            print "couchdb_api.py:4866", newest_doc[key]
+            print "couchdb_api.py:4867", getattr(self, key)
+            print "couchdb_api.py:4868", newermember_timestamp
+            print "couchdb_api.py:4869", "mymember_timestamp", mymember_timestamp
             nwt = newermember_timestamp >= mymember_timestamp
-            print "couchdb_api.py:4899", "newermember_timestamp >= mymember_timestamp", nwt
-            print "couchdb_api.py:4900", "---------------------------------------------------------------------------"
+            print "couchdb_api.py:4871", "newermember_timestamp >= mymember_timestamp", nwt
+            print "couchdb_api.py:4872", "---------------------------------------------------------------------------"
 
     def handleconflict(self, newest_doc):
         """
@@ -4963,7 +4935,6 @@ class SaveObjectCouch(object):
                 if "_" + key in newest_doc["att_timestamps"]:
                     newermember_timestamp = newest_doc["att_timestamps"]["_" + key]
                     #self.debug_timestamp(debug, key, mymember_timestamp, newermember_timestamp, newest_doc)
-
                 overwrite = True
 
                 if mymember_timestamp:
@@ -4973,7 +4944,6 @@ class SaveObjectCouch(object):
                 if overwrite:
                     if "_" + key not in newest_doc["att_timestamps"]:
                         newest_doc["att_timestamps"]["_" + key] = time.time()
-
                     self.att_timestamps["_" + key] = newest_doc["att_timestamps"]["_" + key]
 
                     if key.endswith("_p64s"):
@@ -5041,7 +5011,6 @@ class SaveObjectCouch(object):
         if store_in_redis:
             rsc = RedisServer(self.get_db().get_namespace())
             rsc.delete(self.object_id)
-
         self.try_counter += 1
         # something is really wrong, old indexes perhaps? try to delete them
         if self.try_counter > 1000:
@@ -5128,7 +5097,6 @@ class SaveObjectCouch(object):
 
         for key in del_keys:
             del self.couchdb_document[key]
-
         self.mutation_counter += 1
         self.couchdb_document["att_timestamps"] = self.att_timestamps.copy()
         self.couchdb_document["required"] = self.required
@@ -5174,10 +5142,8 @@ class SaveObjectCouch(object):
 
             if not object_dicts:
                 return False
-
             self.seq = 0
             self.save(debug=debug)
-
         self._data_changed = False
         return True
 
@@ -5380,7 +5346,6 @@ class SaveObjectCouch(object):
 
             if self.object_id:
                 org_object_id = self.object_id
-
             self.object_id = object_id
 
         if not self.object_id:
@@ -5428,7 +5393,6 @@ class SaveObjectCouch(object):
                 else:
                     seq = seq_rev[0]
                     _rev = seq_rev[1]
-
                 self.couchdb_document["_rev"] = _rev
                 self._rev = self.couchdb_document["_rev"]
                 self.seq = seq
@@ -5463,7 +5427,6 @@ class SaveObjectCouch(object):
         if "mutation_counter" in self.object_dict:
             self.mutation_counter = self.object_dict["mutation_counter"]
             del self.object_dict["mutation_counter"]
-
         self.comment = self.object_dict["comment"]
         del self.object_dict["comment"]
         if "_attachments" in self.object_dict:
@@ -5538,7 +5501,6 @@ class SaveObjectCouch(object):
         """
         if dbase:
             self.dbase = dbase
-
         objs = []
 
         if warning:
@@ -5575,7 +5537,6 @@ class SaveObjectCouch(object):
         """
         if dbase:
             self.dbase = dbase
-
         objs = []
 
         if warning:
@@ -5612,9 +5573,7 @@ class SaveObjectCouch(object):
                 found_list[cnt] = True
             else:
                 found_list[cnt] = False
-
             cnt += 1
-
         found = True
 
         for i in found_list:
@@ -5698,7 +5657,6 @@ class SaveObjectCouch(object):
         for key in object_dict:
             self.set_members(key, object_dict)
             self.couchdb_document[key] = getattr(self, key)
-
         self._data_changed = False
 
     def delete(self, dbase=None, object_id=None, force=False):
@@ -6013,14 +5971,12 @@ class SaveObjectGoogle(object):
 
         if not self.object_type:
             self.object_type = self.get_object_type()
-
         self.object_id = object_id
         self.m_created = time.time()
         self.m_last_changed = time.time()
 
         if not hasattr(self, "required"):
             self.required = []
-
         self.changed_without_property = []
         self.mutation_counter = 0
         self.att_timestamps = {}
@@ -6029,7 +5985,6 @@ class SaveObjectGoogle(object):
 
         if not hasattr(self, "m_extra_indexed_keys"):
             self.m_extra_indexed_keys = []
-
         self.transaction = transaction
 
         def decode_b64(v):
@@ -6107,7 +6062,6 @@ class SaveObjectGoogle(object):
 
         if not label:
             label = name.replace("m_", "", 1).replace("_", " ").capitalize()
-
         d = {"member": name,
              "type": obj_type,
              "required": required,
@@ -6119,7 +6073,6 @@ class SaveObjectGoogle(object):
 
         if obj_type == "bool":
             d["required"] = False
-
         self.user_editable_order += 1
 
         #noinspection PyUnresolvedReferences
@@ -6314,7 +6267,6 @@ class SaveObjectGoogle(object):
                 if "_" + key in newest_doc["att_timestamps"]:
                     newermember_timestamp = newest_doc["att_timestamps"]["_" + key]
                     #self.debug_timestamp(debug, key, mymember_timestamp, newermember_timestamp, newest_doc)
-
                 overwrite = True
 
                 if mymember_timestamp:
@@ -6324,7 +6276,6 @@ class SaveObjectGoogle(object):
                 if overwrite:
                     if "_" + key not in newest_doc["att_timestamps"]:
                         newest_doc["att_timestamps"]["_" + key] = time.time()
-
                     self.att_timestamps["_" + key] = newest_doc["att_timestamps"]["_" + key]
 
                     if key.endswith("_p64s"):
@@ -6442,7 +6393,6 @@ class SaveObjectGoogle(object):
 
         for key in del_keys:
             del self.couchdb_document[key]
-
         self.mutation_counter += 1
         self.couchdb_document["object_id"] = self.object_id
         self.couchdb_document["object_type"] = self.object_type
@@ -6470,7 +6420,6 @@ class SaveObjectGoogle(object):
 
         if "keyval" in self.couchdb_document:
             del self.couchdb_document["keyval"]
-
         indexed_keys = ["object_id", "object_type", "doctype", "mutation_counter", "m_created", "m_last_changed"]
 
         for k in self.couchdb_document:
@@ -6526,7 +6475,6 @@ class SaveObjectGoogle(object):
 
                     if cnt > 10:
                         time.sleep(0.2)
-
                     cnt += 1
 
                     if cnt > 20:
@@ -6556,7 +6504,6 @@ class SaveObjectGoogle(object):
 
             org_object_id = self.object_id
             self.object_id = object_id
-
         exists = False
         rsc = RedisServer(self.get_serverconfig().get_namespace())
 
@@ -6619,7 +6566,6 @@ class SaveObjectGoogle(object):
 
             if self.object_id:
                 org_object_id = self.object_id
-
             self.object_id = object_id
 
         if not self.object_id:
@@ -6735,7 +6681,6 @@ class SaveObjectGoogle(object):
                 id_collection = ids_ot.list()
         else:
             id_collection = self.collection_ids(max_items=max_items)
-
         objs = []
 
         if rsc:
@@ -6774,7 +6719,6 @@ class SaveObjectGoogle(object):
         """
         if serverconfig:
             self.serverconfig = serverconfig
-
         objs = []
 
         if warning:
@@ -6789,7 +6733,6 @@ class SaveObjectGoogle(object):
 
         for obj in objso:
             objs.append(obj.as_dict())
-
         objs = sorted(objs, key=lambda k: k["m_created"])
         return objs
 
@@ -6811,9 +6754,7 @@ class SaveObjectGoogle(object):
                 found_list[cnt] = True
             else:
                 found_list[cnt] = False
-
             cnt += 1
-
         found = True
 
         for i in found_list:
@@ -7077,7 +7018,6 @@ class SaveObjectGoogle(object):
 
                 if cnt > 10:
                     time.sleep(0.2)
-
                 cnt += 1
 
                 if cnt > 20:

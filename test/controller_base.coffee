@@ -58,7 +58,6 @@ class SecuredController
                         seconds_string = "minuut"
                     else
                         seconds_string = "minuten"
-
                     $scope.long_time_login = true
                     p.resolve(hour + " uur en " + mins + " " + seconds_string)
                 else
@@ -72,7 +71,7 @@ class SecuredController
                     p.resolve(minutes + " " + minstring + ", " + seconds + " seconden")
 
             (error) ->
-                print "controller_base.cf:75", error
+                print "controller_base.cf:74", error
                 p.reject(error)
         )
         return p.promise
@@ -103,7 +102,7 @@ class SecuredController
             (result) ->
                 $scope.logged_minutes = result
             ->
-                print "controller_base.cf:106"
+                print "controller_base.cf:105"
         )
 
 
@@ -117,7 +116,7 @@ class SecuredController
             return memory.bool_test("g_loading")
 
         $scope.ctrl_change_route = (url) ->
-            print "controller_base.cf:120", "scope change route", url
+            print "controller_base.cf:119", "scope change route", url
             urls.change_route($location, url)
 
         cvar.get("cvar_username").then(
@@ -129,10 +128,10 @@ class SecuredController
                 else
                     $scope.is_rabshakeh = false
             ->
-                warning "controller_base.cf:132", "could not fetch cvar_username"
+                warning "controller_base.cf:131", "could not fetch cvar_username"
         )
         cryptobox_name = clientcookies.get("c_persist_cryptobox_name_" + utils.get_cryptobox_slug())
-        utils.print_once "controller_base.cf:135", cryptobox_name
+        utils.print_once "controller_base.cf:134", cryptobox_name
         cryptobox_slug = utils.get_cryptobox_slug()
 
         if exist(cryptobox_name) and exist(cryptobox_slug)
@@ -181,7 +180,7 @@ class SecuredController
                     return obj
 
             (e) ->
-                warning "controller_base.cf:184", e
+                warning "controller_base.cf:183", e
         )
         $rootScope.show_debug_info = false
         cvar.get("cvar_show_debug_info").then(
@@ -190,7 +189,7 @@ class SecuredController
                 window.cvar_show_debug_info = cvar_show_debug_info
 
             (e) ->
-                warning "controller_base.cf:193", e
+                warning "controller_base.cf:192", e
         )
 
         $scope.get_logfile = ->
@@ -315,20 +314,19 @@ class SecuredController
             else
                 new_type = "desktop"
                 $rootScope.is_desktop = true
-
             $scope.device_type = new_type
             if memory.has("g_device_type")
                 if memory.get("g_device_type") != new_type
-                    print "controller_base.cf:322", "running on"
-                    print "controller_base.cf:323", "phone", utils.is_phone()
-                    print "controller_base.cf:324", "tablet", utils.is_tablet()
-                    print "controller_base.cf:325", "desktop", utils.is_desktop()
+                    print "controller_base.cf:320", "running on"
+                    print "controller_base.cf:321", "phone", utils.is_phone()
+                    print "controller_base.cf:322", "tablet", utils.is_tablet()
+                    print "controller_base.cf:323", "desktop", utils.is_desktop()
             else
-                print "controller_base.cf:327", "running on", new_type
+                print "controller_base.cf:325", "running on", new_type
 
             if memory.has("g_window_width")
                 if w != memory.get("g_window_width")
-                    emit_event("controller_base.cf:331", $scope, "resize_window")
+                    emit_event("controller_base.cf:329", $scope, "resize_window")
                     utils.force_digest($scope)
 
             memory.set("g_device_type", new_type)
@@ -420,7 +418,6 @@ class SecuredController
 
                 $scope.get_upload_progress = ->
                     parseInt(uploader.get_upload_progress(), 10)
-
                 $scope.droperror_rootlevel = false
                 $scope.drop_detected = false
 
@@ -435,12 +432,10 @@ class SecuredController
 
                 $scope.get_dropsuggestion = ->
                     return $scope.dropsuggestion
-
                 $scope.file_drop_root_warning = false
 
                 $scope.get_file_drop_root_warning = ->
                     return $scope.file_drop_root_warning
-
                 $scope.drop_error_occurred = false
 
                 $scope.get_drop_error_occurred = ->
@@ -449,7 +444,6 @@ class SecuredController
                 $scope.reset_drop_error = ->
                     $scope.drop_error_occurred = false
                     utils.force_digest($scope)
-
                 $scope.drop_error_other_file_occurred = false
 
                 $scope.get_drop_error_other_file_occurred = ->
@@ -473,7 +467,7 @@ class SecuredController
                     if item.isFile
                         error_read = (e) ->
                             $scope.drop_error = e
-                            warning "controller_base.cf:476", "Read file error code", e
+                            warning "controller_base.cf:470", "Read file error code", e
                             $scope.drop_error_occurred = true
                             utils.force_digest($scope)
 
@@ -489,7 +483,7 @@ class SecuredController
 
                         error_read = (e) ->
                             $scope.drop_error = e
-                            warning "controller_base.cf:492", "Directory FileError code", e
+                            warning "controller_base.cf:486", "Directory FileError code", e
                             $scope.drop_error_occurred = true
                             utils.force_digest($scope)
 
@@ -520,13 +514,11 @@ class SecuredController
                         $scope.no_drops = true
                         utils.force_digest($scope)
                         return
-
                     $scope.drop_detected = true
                     items = evt.dataTransfer.items
                     files = evt.dataTransfer.files
                     if _.size(files) == 0
                         return
-
                     i = 0
                     num_items = items.length
 
@@ -536,13 +528,12 @@ class SecuredController
                         if item
                             traverseFileTree item, ""
                         i++
-
                     last_check = 0
                     last_check_cnt = 0
 
                     check_queue_start_download = ->
                         if uploader.files_selected_for_upload() > 0
-                            print "controller_base.cf:545", "last_check_cnt", last_check_cnt
+                            print "controller_base.cf:536", "last_check_cnt", last_check_cnt
                             if uploader.files_selected_for_upload() == last_check
                                 last_check_cnt += 1
                             else
@@ -556,19 +547,19 @@ class SecuredController
                                         $scope.parent = tree.get_node($routeParams.doc_id, treenodes)
 
                                         upload_succes = (r) ->
-                                            print "controller_base.cf:559", "upload_succes", r
+                                            print "controller_base.cf:550", "upload_succes", r
                                             uploader.reset()
                                             tree.invalidate()
-                                            emit_event("controller_base.cf:562", $rootScope, "tree_out_of_sync")
+                                            emit_event("controller_base.cf:553", $rootScope, "tree_out_of_sync")
 
                                         upload_error = (r) ->
-                                            print "controller_base.cf:565", "upload_error", r
+                                            print "controller_base.cf:556", "upload_error", r
 
                                         uploader.upload_start(upload_succes, upload_error)
                                         $scope.drop_detected = false
 
                                     (err) ->
-                                        print "controller_base.cf:571", err
+                                        print "controller_base.cf:562", err
                                 )
                                 return true
                         return false
@@ -596,7 +587,6 @@ class SecuredController
 
                 if g_check_droplist_interval
                     clearInterval(g_check_droplist_interval)
-
                 $scope.username = cvar_username[1]
                 @init($rootScope, $scope, cvar, authorization, $location, cryptobox, tree, $routeParams, memory, clientcookies, utils, urls, $q, serverclock, saveobject, uploader)
 
@@ -606,7 +596,7 @@ class SecuredController
                             $rootScope.current_user = user
 
                         (error) ->
-                            warning "controller_base.cf:609", error
+                            warning "controller_base.cf:599", error
                             return
                     )
 
@@ -619,7 +609,7 @@ class SecuredController
                             utils.remove_cache()
 
                     (error_result) ->
-                        warning "controller_base.cf:622", "could not fetch cvar_disable_caching", error_result
+                        warning "controller_base.cf:612", "could not fetch cvar_disable_caching", error_result
                 )
                 clientcookies.ensure_memory()
                 @baseprerender($rootScope, $scope, cvar, authorization, $location, cryptobox, tree, $routeParams, memory, clientcookies, utils, urls, $q, serverclock, saveobject, uploader)
@@ -666,9 +656,9 @@ class SecuredController
                             memory.set("g_cvar_dirty", false)
 
                 if utils.ie8()
-                    second_interval = utils.set_interval("controller_base.cf:669", f_interval, 1000, "f_interval")
+                    second_interval = utils.set_interval("controller_base.cf:659", f_interval, 1000, "f_interval")
                 else
-                    second_interval = utils.set_interval("controller_base.cf:671", f_interval, 250, "f_interval")
+                    second_interval = utils.set_interval("controller_base.cf:661", f_interval, 250, "f_interval")
 
                 memory.set(service_id, second_interval)
 
@@ -686,15 +676,15 @@ class SecuredController
                         memory.set("g_prev_logged_minutes", result)
 
                     (e) ->
-                        warning "controller_base.cf:689", e
+                        warning "controller_base.cf:679", e
                 )
 
             (reject_result) ->
                 if reject_result.status == 403
-                    print "controller_base.cf:694", "not authorized, route to login"
+                    print "controller_base.cf:684", "not authorized, route to login"
                     authorization.to_login()
                 else
-                    print "controller_base.cf:697", "could not load cvars, or not authorized", reject_result
+                    print "controller_base.cf:687", "could not load cvars, or not authorized", reject_result
         )
 
 
