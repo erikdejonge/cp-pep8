@@ -639,7 +639,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             datastructure_define = True
         else:
             debuginfo = "assignment"
-        if scoped > 0:
+        if scoped > 1:
             debuginfo += " prev scope"
             add_enter = True
 
