@@ -81,5 +81,8 @@ class CPTest(unittest.TestCase):
             self.rmfile(tf)
 
     def test_directory(self):
+        """
+        test_directory
+        """
         os.system("cp -r ./test/crypto_api .")
         os.system("rm -Rf ./crypto_api")
