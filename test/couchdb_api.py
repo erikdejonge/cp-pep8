@@ -370,12 +370,12 @@ def end_profile(pr, items=10, printstats=True):
 
     p = Stats(pr)
     p.strip_dirs()
-
+    print "couchdb_api.py:373", "hello"
     if printstats:
-        print "couchdb_api/__init__.py:375"
-        print "couchdb_api/__init__.py:376", "total time"
+        print "couchdb_api.py:375"
+        print "couchdb_api.py:376", "total time"
         p.print_stats(items)
-        print "couchdb_api/__init__.py:378", "cumulative time"
+        print "couchdb_api.py:378", "cumulative time"
         p.sort_stats('cumtime')
         p.print_stats(items)
 
@@ -397,7 +397,7 @@ def format_and_print_large_string(largestring):
                     s += c
 
         s += "\\\n"
-    print "couchdb_api/__init__.py:400", s
+    print "couchdb_api.py:400", s
 
 
 def slugify_unicode(value):
@@ -418,7 +418,7 @@ def slugify_unicode(value):
             slug += c
         else:
             c64 = base64.encodestring(c).strip().rstrip("=")
-            #print "couchdb_api/__init__.py:258", value, d, c, c64
+            #print "couchdb_api.py:258", value, d, c, c64
             slug += c64
 
     return slug.lower()
@@ -1504,8 +1504,8 @@ def handle_ex(exc, again=True, give_string=False):
 
             error_msg += fname_number + " | " + tabs + val + "\n"
     except Exception, e:
-        print "\033[93m" + log_date_time_string(), "couchdb_api/__init__.py:1507", e, '\033[m'
-        print "\033[93m" + log_date_time_string(), "couchdb_api/__init__.py:1508", exc, '\033[m'
+        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1507", e, '\033[m'
+        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1508", exc, '\033[m'
 
     error_msg += "\033[95m" + log_date_time_string() + " ---------------------------\n"
 
@@ -4901,15 +4901,15 @@ class SaveObjectCouch(object):
         @type newest_doc: dict
         """
         if debug:
-            print "couchdb_api/__init__.py:4898", "---------------------------------------------------------------------------"
-            print "couchdb_api/__init__.py:4899", key
-            print "couchdb_api/__init__.py:4900", newest_doc[key]
-            print "couchdb_api/__init__.py:4901", getattr(self, key)
-            print "couchdb_api/__init__.py:4902", newermember_timestamp
-            print "couchdb_api/__init__.py:4903", "mymember_timestamp", mymember_timestamp
+            print "couchdb_api.py:4904", "---------------------------------------------------------------------------"
+            print "couchdb_api.py:4905", key
+            print "couchdb_api.py:4906", newest_doc[key]
+            print "couchdb_api.py:4907", getattr(self, key)
+            print "couchdb_api.py:4908", newermember_timestamp
+            print "couchdb_api.py:4909", "mymember_timestamp", mymember_timestamp
             nwt = newermember_timestamp >= mymember_timestamp
-            print "couchdb_api/__init__.py:4905", "newermember_timestamp >= mymember_timestamp", nwt
-            print "couchdb_api/__init__.py:4906", "---------------------------------------------------------------------------"
+            print "couchdb_api.py:4911", "newermember_timestamp >= mymember_timestamp", nwt
+            print "couchdb_api.py:4912", "---------------------------------------------------------------------------"
 
     def handleconflict(self, newest_doc):
         """

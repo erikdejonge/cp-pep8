@@ -28,7 +28,7 @@ class CPTest(unittest.TestCase):
         """
         tearDown
         """
-        self.rmfile(self.testfile)
+        #self.rmfile(self.testfile)
 
     def fexists(self, fname):
         """
@@ -45,13 +45,18 @@ class CPTest(unittest.TestCase):
         fname = self.testfile
         self.fexists(fname)
 
+    def run_cp(self, fname):
+        oldcode = open(fname).read()
+        os.system("python cp.py -f " + fname)
+        newcode = open(fname).read()
+        return newcode, oldcode
+
     def test_cp(self):
         """
         test_cp
         """
-        oldcode = open("test.coffee").read()
-        os.system("python cp.py -f test.coffee")
-        newcode = open("test.coffee").read()
+        fname = self.testfile
+        newcode, oldcode = self.run_cp(fname)
         vcode = open("./test/test.result").read()
         self.assertNotEqual(oldcode, newcode)
         self.assertEqual(vcode, newcode)
@@ -60,9 +65,10 @@ class CPTest(unittest.TestCase):
         """
         test_some_files
         """
-        testfiles = ["app_basic.coffee", "controller_base.coffee", "services.coffee", "__init__.py"]
+        testfiles = ["app_basic.coffee", "controller_base.coffee", "services.coffee", "couchdb_api.py"]
 
         for tf in testfiles:
             self.get_file(tf)
-            print "tests.py:67", tf, self.fexists(tf)
+            oc, nc = self.run_cp(tf)
+            self.assertEqual(oc, nc)
             self.rmfile(tf)

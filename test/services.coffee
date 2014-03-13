@@ -7,7 +7,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
         m_tree_loaded = false
         m_getting_version = false
         m_tree_nodes = null
-
         _parse_tree = (tree_nodes) ->
             add_parent = (k) ->
                 tree_nodes[k].slugpath = k
@@ -19,7 +18,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             root_nodes = _.filter(tree_nodes, (n) -> strcmp(n.slugpath, "/"))
 
             if _.size(root_nodes) > 1
-                warning "services.cf:22", "multiple rootnodes"
+                warning "services.cf:21", "multiple rootnodes"
 
             make_node = (node) ->
                 obj = {}
@@ -36,7 +35,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 obj["type"] = node.m_nodetype
                 obj["slugpath"] = node.m_slugpath_p64s
                 obj["content_hash"] = node.content_hash
-
                 if memory.get("g_c_device_pixel_ratio") > 1
                     obj["imageUrl"] = "/st/img/tree-" + node.m_nodetype + "@2x.png"
                 else
@@ -46,7 +44,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             all_knodes = _.map(tree_nodes, make_node)
             root_node = make_node(root_nodes[0])
             items = []
-
             find_knode = (slugpath, searchnodes) ->
                 found_node = null
 
@@ -65,7 +62,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 return found_node
 
             knodes = [root_node]
-
             path_len_sort = (item) ->
                 plen = (1000 * _.size(item.slugpath.split("/"))) + _.size(item.slugpath)
                 return plen
@@ -112,7 +108,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 parent = tree["/"]
 
             parent = parent.slugpath
-
             get_children = (item) ->
                 strcmp(item.slugpath_parent, parent) and not strcmp(item.slugpath, parent)
 
@@ -127,7 +122,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
         _get_icons = (item) ->
             mini_mime = utils.get_mini_mime(item.m_mime, item.m_name_p64s)
             item.mini_mime = mini_mime
-
             if not utils.exist(item.m_mime)
                 item.m_mime = mini_mime
             item.icon = utils.match_mime_small_icon(mini_mime)
@@ -149,12 +143,11 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                             memory.set("g_mimetypes_lut", content)
 
                         (e) ->
-                            warning "services.cf:152", "could not get the mime types", e
+                            warning "services.cf:146", "could not get the mime types", e
                     )
 
-                url2 = urls.command("services.cf:155", "treedict")
+                url2 = urls.command("services.cf:149", "treedict")
                 m_loading = true
-
                 $http.post(url2).then(
                     (databack) ->
                         m_loading = false
@@ -201,8 +194,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 data = {}
                 data["object_id"] = object_id
                 data = object_b64_safe(data)
-                url = urls.postcommand("services.cf:204", "docinfo", "get")
-
+                url = urls.postcommand("services.cf:197", "docinfo", "get")
                 $http.post(url, data).then(
                     (databack) ->
                         databack = b64_object_safe(databack)
@@ -257,11 +249,10 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                             np = null
 
                         cnt = 0
-
                         while utils.exist(np)
                             if utils.exist(np.doc)
                                 np.doc.m_size_p64s += folder.doc.m_size_p64s
-                                print "services.cf:264", np.doc.m_size_p64s
+                                print "services.cf:255", np.doc.m_size_p64s
 
                             if exitst(np.parent)
                                 np = utils.filter_key_value(tree_nodes, "_id", np.parent)
@@ -284,7 +275,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 folder_size = (node) ->
                     if node.m_nodetype == "folder"
                         total = 0
-
                         get_size = (node) ->
                             total += node.m_size_p64s
 
@@ -301,12 +291,11 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             mimetypes = memory.get("g_mimetypes_lut")
 
             if not utils.exist(mimetypes)
-                warning "services.cf:304", "get extension mime types not loaded"
+                warning "services.cf:294", "get extension mime types not loaded"
                 return ""
 
             exts = mimetypes[mimetype]
             ext = ""
-
             check_mimetype = (i) ->
                 if ext == ""
                     ext = i
@@ -341,7 +330,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     treedocs = _.filter(doclist, format_file_size)
 
                 doclist = []
-
                 folders_first = (item) ->
                     return item.m_nodetype
 
@@ -356,7 +344,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
                 sortitems = (method, reverse) ->
                     groups = null
-
                     if utils.exist_truth(cvar_sort_folders_top)
                         groups = _.groupBy(treedocs, folders_first)
 
@@ -407,7 +394,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                         when "up_date"
                             doclist = sortitems(date_sort, true)
                         else
-                            warning "services.cf:410", "sortstring unknown - " + sortstring
+                            warning "services.cf:397", "sortstring unknown - " + sortstring
 
                 else
                     doclist = sortitems(null, false)
@@ -423,7 +410,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
                 doclist = _.map(doclist, backupname_get_icons)
                 root_short_id = null
-
                 find_root = (node) ->
                     not utils.exist(node.slugpath_parent)
 
@@ -456,7 +442,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                         new_name = ""
                         charcnt = 0
                         break_point = 80
-
                         if memory.get("g_device_type") == "phone"
                             break_point = 30
 
@@ -493,7 +478,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
         make_routing: (node, tree) ->
             nodes = []
-
             make_r_node = (sourcenode) ->
                 r_node =
                     route: urls.make_route("/docs/" + sourcenode.m_short_id)
@@ -572,8 +556,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             data["parent"] = parent
             data["foldername"] = folder_name
             data = object_b64_safe(data)
-            url = urls.command("services.cf:575", "docs/makefolder")
-
+            url = urls.command("services.cf:559", "docs/makefolder")
             $http.post(url, data).then(
                 (success) ->
                     p.resolve(success)
@@ -591,8 +574,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             data["user_object_id"] = user_id
             data["operation"] = operation
             data = object_b64_safe(data)
-            url = urls.command("services.cf:594", "assignreadright")
-
+            url = urls.command("services.cf:577", "assignreadright")
             $http.post(url, data).then(
                 (success) ->
                     p.resolve(success)
@@ -607,11 +589,10 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
         delete_tree_items: (item_list) ->
             p = $q.defer()
-            url = urls.command("services.cf:610", "docs/delete")
+            url = urls.command("services.cf:592", "docs/delete")
             data = {}
             data["json_data"] = true
             data["tree_item_list"] = item_list
-
             $http.post(url, data).then(
                 () ->
                     memory.del("g_tree")
@@ -636,8 +617,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
         get_parent: ->
             tree_promise = $q.defer()
-            url = urls.command("services.cf:639", "tree")
-
+            url = urls.command("services.cf:620", "tree")
             $http.post(url).then(
                 (databack) ->
                     tree_nodes = databack.data[1]
@@ -656,14 +636,12 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             nodes = memory.get("g_tree")
 
             if not utils.exist(nodes)
-                warning "services.cf:659", "cannot search not tree loaded"
+                warning "services.cf:639", "cannot search not tree loaded"
                 return []
 
             results = []
-
             check_name = (node) ->
                 selected = true
-
                 check_nodes = (term) ->
                     if node.doc.m_name_p64s.toLowerCase().indexOf(term.toLowerCase()) < 0
                         selected = false
@@ -681,7 +659,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             get_all_children_recursive = (allnodes, parent) ->
                 children = []
                 parents = []
-
                 get_all_children = (item) ->
                     if item.parent == parent
                         children.push(item)
@@ -704,8 +681,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             data["node_short_id"] = node_short_id
             data["nodename"] = nodename.trim()
             data = object_b64_safe(data)
-            url = urls.command("services.cf:707", "docs/changename")
-
+            url = urls.command("services.cf:684", "docs/changename")
             $http.post(url, data).then(
                 (success) ->
                     p.resolve(success)
@@ -722,8 +698,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             data["nodes"] = nodes
             data["parent"] = parent
             data = object_b64_safe(data)
-            url = urls.command("services.cf:725", "docs/move")
-
+            url = urls.command("services.cf:701", "docs/move")
             $http.post(url, data).then(vhRXiUm9KY2g39rjoz
                 (success) ->
                     _invalidate()
@@ -761,7 +736,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
         ls: (path, recursive, include_parent) ->
             if not utils.exist(m_tree_nodes)
-                print "services.cf:764", "m_tree_nodes not loaded (tree.parse_json)"
+                print "services.cf:739", "m_tree_nodes not loaded (tree.parse_json)"
                 return []
 
             if not utils.exist(recursive)
@@ -850,8 +825,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 memory.set("g_corrected_servertime", new_corrected_servertime)
             #print "services.cf:786", time_since_check, local_time, memory.get("g_corrected_servertime"), local_time-memory.get("g_corrected_servertime")
             if time_since_check > 30000
-                url = urls.command("services.cf:853", "clock")
-
+                url = urls.command("services.cf:828", "clock")
                 $http.post(url).then(
                     (databack) ->
                         last_check = new Date().getTime()
@@ -866,21 +840,21 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
                         #            tree.get().then(
                         #                () ->
-                        #                    emit_event("services.cf:869", $rootScope, "tree_out_of_sync")
+                        #                    emit_event("services.cf:843", $rootScope, "tree_out_of_sync")
 
                         #                (err) ->
-                        #                    print "services.cf:872", "error getting tree", err
+                        #                    print "services.cf:846", "error getting tree", err
                         #            )
 
                     (errordata) ->
-                        print "services.cf:876", "get_time_interval", errordata
+                        print "services.cf:850", "get_time_interval", errordata
                         if errordata.status == 403
                             authorization.logout()
                 )
 
         init: ->
-            print "services.cf:882", "init serverclock"
-            service_get_time_interval = utils.set_interval("services.cf:883", _get_time_interval, 1000, "_get_time_interval")
+            print "services.cf:856", "init serverclock"
+            service_get_time_interval = utils.set_interval("services.cf:857", _get_time_interval, 1000, "_get_time_interval")
             memory.set("g_service_get_time_interval", service_get_time_interval)
 
         get_time: ->
@@ -894,11 +868,11 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
         lastfetch = null
         last_result = null
 
+
         f_fetch = ->
             cryptobox_promise = $q.defer();
-            url = urls.command("services.cf:899", "config")
+            url = urls.command("services.cf:874", "config")
             loading = true
-
             $http.post(url).then(
                 (result) ->
                     if result.data[0]
@@ -926,12 +900,12 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 cvar.get(key).then(
                     (resolve_result) ->
                         if not utils.exist(resolve_result)
-                            print "services.cf:929", "init-cvar", key
+                            print "services.cf:903", "init-cvar", key
                             if utils.exist(value)
                                 cvar.set(key, value)
 
                     (reject_result) ->
-                        warning "services.cf:934", "init cvar rejected", reject_result
+                        warning "services.cf:908", "init cvar rejected", reject_result
                 )
 
             init_cvar("cvar_docs_sort_string", "")
@@ -946,11 +920,11 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
             cvar.commit_retrieve_all().then(
                 (cvars) ->
-                    print "services.cf:949", _.size(cvars) + " cvars"
+                    print "services.cf:923", _.size(cvars) + " cvars"
                     p.resolve()
 
                 (error) ->
-                    print "services.cf:953", "error", "init cryptobox", error
+                    print "services.cf:927", "error", "init cryptobox", error
                     p.reject()
             )
             return p.promise
@@ -996,12 +970,12 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             login_promise = $q.defer();
 
             if not utils.exist(username)
-                warning "services.cf:999", "username doesn not exist"
+                warning "services.cf:973", "username doesn not exist"
 
             if not utils.exist(password)
-                warning "services.cf:1002", "password does not exist"
+                warning "services.cf:976", "password does not exist"
 
-            url = urls.command("services.cf:1004", "authorize")
+            url = urls.command("services.cf:978", "authorize")
             data = {}
             data.username = username
             data.password = password
@@ -1022,19 +996,19 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             )
             return login_promise.promise
 
+
         f_server_logout = ->
             p = $q.defer()
-            url = urls.command("services.cf:1027", "logoutserver")
-
+            url = urls.command("services.cf:1002", "logoutserver")
             $http.post(url).then(
                 (success_result) ->
-                    print "services.cf:1031", "server", "loggedout"
+                    print "services.cf:1005", "server", "loggedout"
                     memory.reset()
                     urls.change_route($location, "/logout")
                     p.resolve(success_result)
 
                 (error) ->
-                    print "services.cf:1037", "could not logout"
+                    print "services.cf:1011", "could not logout"
                     memory.reset()
                     urls.change_route($location, "/logout")
                     urls.http_error(error.data)
@@ -1044,8 +1018,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
         get_current_user: ->
             login_promise = $q.defer();
-            url = urls.command("services.cf:1047", "currentuser")
-
+            url = urls.command("services.cf:1021", "currentuser")
             $http.post(url).then(
                 (success_result) ->
                     if utils.exist_truth(success_result.data[0])
@@ -1066,10 +1039,10 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             p = $q.defer()
 
             if not utils.exist(username)
-                warning "services.cf:1069", "username does not exist"
+                warning "services.cf:1042", "username does not exist"
 
             if not utils.exist(password)
-                warning "services.cf:1072", "password does not exist"
+                warning "services.cf:1045", "password does not exist"
 
             if running_local()
                 clientcookies.set("c_persist_password_debug", password)
@@ -1081,7 +1054,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(success)
 
                 (error) ->
-                    print "services.cf:1084", "logincheck failed", error
+                    print "services.cf:1057", "logincheck failed", error
                     p.reject(error)
             )
             return p.promise
@@ -1091,7 +1064,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             utils.assert("username", username)
             utils.assert("old_password", old_password)
             utils.assert("new_password", new_password)
-            url = urls.command("services.cf:1094", "changepassword")
+            url = urls.command("services.cf:1067", "changepassword")
             data = {}
             data.json_data = true
             data.username = username
@@ -1102,7 +1075,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             $http.post(url, data).then(
                 (success_result) ->
                     if utils.exist_truth(success_result.data[0])
-                        print "services.cf:1105", "password changed"
+                        print "services.cf:1078", "password changed"
                         p.resolve()
                     else
                         if success_result.data[1] == "password_mismatch"
@@ -1120,7 +1093,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             p = $q.defer()
             utils.assert("object_id", object_id)
             utils.assert("new_password", new_password)
-            url = urls.command("services.cf:1123", "resetpassword")
+            url = urls.command("services.cf:1096", "resetpassword")
             data = {}
             data.object_id = object_id
             data.new_password = new_password
@@ -1141,7 +1114,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
         check_otp: (otp, trust_computer, trused_location_name) ->
             p = $q.defer()
-            url = urls.command("services.cf:1144", "checkotp")
+            url = urls.command("services.cf:1117", "checkotp")
             data = {}
             data.otp = otp
             data.trust_computer = trust_computer
@@ -1179,7 +1152,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
         loading = false
         loaded = false
         window.saveobject_cache = {}
-
         http_operation = (operation, saveobject_type, object_id, member, value) ->
             p = $q.defer()
 
@@ -1197,7 +1169,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 loading = true
 
                 if operation == "set"
-                    window.saveobject_cache =
+                    window.saveobject_cache = 
                     {}
 
                 if operation == "get" or operation == "get_members"
@@ -1231,8 +1203,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                         utils.digest()
 
                 if loading
-                    url = urls.postcommand("services.cf:1234", "saveobject", operation)
-
+                    url = urls.postcommand("services.cf:1206", "saveobject", operation)
                     $http.post(url, data).then(
                         (databack) ->
                             databack = b64_object_safe(databack)
@@ -1299,10 +1270,8 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             http_operation("collection", saveobject_type, "", "", "").then(
                 (collection) ->
                     window.saveobject_cache[saveobject_type + "_collection"] = collection
-
                     cache_item = (item) ->
                         window.saveobject_cache[item.object_id] = item
-
                         cache_fields = (f) ->
                             if utils.strcmp(f, "fields")
                                 cache_form_fields = (kf) ->
@@ -1318,7 +1287,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     _.each(collection, cache_item)
 
                 (err) ->
-                    warning "services.cf:1321", err
+                    warning "services.cf:1290", err
             )
 
         set: (saveobject_type, object_id, member, value) ->
@@ -1331,7 +1300,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1334"
+                    warning "services.cf:1303"
 
                     p.reject(e)
             )
@@ -1348,7 +1317,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1351"
+                    warning "services.cf:1320"
 
                     p.reject(e)
             )
@@ -1362,7 +1331,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1365"
+                    warning "services.cf:1334"
 
                     p.reject(e)
             )
@@ -1376,7 +1345,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1379"
+                    warning "services.cf:1348"
 
                     p.reject(e)
             )
@@ -1390,7 +1359,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1393"
+                    warning "services.cf:1362"
 
                     p.reject(e)
             )
@@ -1405,7 +1374,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1408"
+                    warning "services.cf:1377"
 
                     p.reject(e)
             )
@@ -1419,7 +1388,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1422"
+                    warning "services.cf:1391"
 
                     p.reject(e)
             )
@@ -1433,7 +1402,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1436"
+                    warning "services.cf:1405"
 
                     p.reject(e)
             )
@@ -1446,11 +1415,11 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
             http_operation("new_object", saveobject_type, "", keys, value).then(
                 (v) ->
-                    print "services.cf:1449", "new object", saveobject_type, "stored"
+                    print "services.cf:1418", "new object", saveobject_type, "stored"
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1453"
+                    warning "services.cf:1422"
 
                     p.reject(e)
             )
@@ -1464,7 +1433,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1467"
+                    warning "services.cf:1436"
 
                     p.reject(e)
             )
@@ -1478,7 +1447,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1481"
+                    warning "services.cf:1450"
 
                     p.reject(e)
             )
@@ -1489,11 +1458,11 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
             http_operation("collection_ids", save_object_type, "", "", "").then(
                 (v) ->
-                    print "services.cf:1492", v
+                    print "services.cf:1461", v
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1496"
+                    warning "services.cf:1465"
 
                     p.reject(e)
             )
@@ -1507,7 +1476,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1510"
+                    warning "services.cf:1479"
 
                     p.reject(e)
             )
@@ -1521,7 +1490,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1524"
+                    warning "services.cf:1493"
 
                     p.reject(e)
             )
@@ -1535,7 +1504,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1538", e
+                    warning "services.cf:1507", e
 
                     p.reject(e)
             )
@@ -1549,7 +1518,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1552"
+                    warning "services.cf:1521"
 
                     p.reject(e)
             )
@@ -1563,7 +1532,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     p.resolve(v)
 
                 (e) ->
-                    warning "services.cf:1566"
+                    warning "services.cf:1535"
 
                     p.reject(e)
             )
@@ -1593,7 +1562,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             data["operation"] = operation
             data["key"] = key
             data["value"] = value
-            url = urls.command("services.cf:1596", "cvar")
+            url = urls.command("services.cf:1565", "cvar")
 
             if first and operation != "get_encrypt"
                 loading = true
@@ -1627,14 +1596,13 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             return cvar_opp_promise.promise
 
         counter = 0
-
         f_cvar_operation = (operation, key, value) ->
             p = $q.defer()
 
             check_operation_in_progress = ->
                 if operation_in_progress
                     counter += 1
-                    async_call_retries("services.cf:1637", check_operation_in_progress, counter)
+                    async_call_retries("services.cf:1605", check_operation_in_progress, counter)
                     return
                 else
                     do_cvar_operation(operation, key, value).then(
@@ -1655,9 +1623,11 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 cvar_promise.resolve()
             else
                 if loading
+
+
                     f_cvar_loaded = ->
                         if _get_cvar_loaded()
-                            print "services.cf:1660", "cvars", "loaded"
+                            print "services.cf:1630", "cvars", "loaded"
                             cvar_promise.resolve()
 
                     $rootScope.$watch(_get_cvar_loaded, f_cvar_loaded)
@@ -1677,7 +1647,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                             cvar_promise.reject(reject_result)
 
                             if reject_result.status != 403
-                                print "services.cf:1680", "cvar-all rejected", reject_result
+                                print "services.cf:1650", "cvar-all rejected", reject_result
                     )
 
             return cvar_promise.promise
@@ -1693,6 +1663,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 if not loading
                     _all()
 
+
                 f_cvar_loaded = ->
                     if _get_cvar_loaded()
                         val = memory.get(key)
@@ -1701,7 +1672,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                         if utils.exist(val)
                             p.resolve(val)
                         else
-                            print "services.cf:1704", "no cvar", key
+                            print "services.cf:1675", "no cvar", key
                             p.resolve(null)
 
                 $rootScope.$watch(_get_cvar_loaded, f_cvar_loaded)
@@ -1731,7 +1702,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             commit_data["add"] = m_add_commit_items
             commit_data["del"] = m_del_commit_items
             commit_data["ignore"] = []
-
             f_cvar_operation("commit", "data", commit_data).then(
                 (resolve_result) ->
                     for key in dirty_add_keys
@@ -1745,7 +1715,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                             resolve_result[key] = b64_object_safe(resolve_result[key])
 
                             if not String(key).startsWith("cvar_")
-                                print "services.cf:1748", "invalid cvar received", key, "deleting it"
+                                print "services.cf:1718", "invalid cvar received", key, "deleting it"
                                 _del(key)
 
                             memory.critical_set(key, resolve_result[key])
@@ -1757,7 +1727,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
                 (reject_result) ->
                     if reject_result.status != 403
-                        print "services.cf:1760", reject_result
+                        print "services.cf:1730", reject_result
                     cvar_promise.reject(reject_result.data)
             )
             return cvar_promise.promise
@@ -1774,14 +1744,13 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 (lt) ->
                     now = serverclock.get_time()
                     tm = now - lt
-
                     if not utils.exist(tm)
                         tm = 0
 
                     p.resolve(tm)
 
                 (reject) ->
-                    print "services.cf:1784", "could not get cvar_logon_time", reject
+                    print "services.cf:1753", "could not get cvar_logon_time", reject
                     p.reject("logontime error")
             )
             return p.promise
@@ -1805,7 +1774,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
                 (reject_result) ->
                     cvar_promise.reject()
-                    print "services.cf:1808", "cvar-all rejected", reject_result
+                    print "services.cf:1777", "cvar-all rejected", reject_result
             )
             return cvar_promise.promise
 
@@ -1818,6 +1787,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             if not loading
                 _all()
 
+
             f_cvar_loaded = ->
                 if _get_cvar_loaded()
                     p.resolve()
@@ -1827,7 +1797,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
         set: (key, value) ->
             if not startswith(key, "cvar_")
-                warning "services.cf:1830", "cvar", key, "does not start with cvar_"
+                warning "services.cf:1800", "cvar", key, "does not start with cvar_"
 
             m_add_commit_items[key] = value
             memory.critical_set(key, b64_object_safe(value))
@@ -1835,7 +1805,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
         commit_set: (key, value) ->
             if not startswith(key, "cvar_")
-                warning "services.cf:1838", "cvar", key, "does not start with cvar_"
+                warning "services.cf:1808", "cvar", key, "does not start with cvar_"
             memory.critical_set(key, b64_object_safe(value))
             f_cvar_operation("set", key, value)
             _commit_retrieve_all()
@@ -1881,7 +1851,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                         )
 
                     (err) ->
-                        warning "services.cf:1884", err
+                        warning "services.cf:1854", err
                 )
 
             return p.promise
@@ -1911,10 +1881,8 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
         m_upload_succes = null
         m_upload_failed = null
         m_initial_uploads_to_start = 0
-
         _file_hash = (af) ->
             hashvalue = ""
-
             if utils.exist(af.name)
                 hashvalue += af.name
 
@@ -1941,7 +1909,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 return
 
             filedata = {}
-
             if not utils.exist(uuid)
                 filedata.uuid = _get_guid()
             else
@@ -1951,7 +1918,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             addfile = !utils.reg_test(f.name, /(^\.)/) and !utils.reg_test(f.webkitRelativePath, /(^\.)/)
             filedata.human_size = utils.format_file_size(f.size)
             filedata.size = f.size
-
             if not exist(f.test_size)
                 f.test_size = f.size
 
@@ -1961,7 +1927,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 addfile = false
                 filedata.error = "file_too_large_for_upload"
                 m_file_not_good_for_upload.push({"file": f, "filedata": filedata})
-            addfile =
+            addfile = 
             if addfile
                 if not utils.list_contains(m_upload_files_selected, fhash)
                     m_upload_files_selected.push({"file": f, "filedata": filedata})
@@ -1978,7 +1944,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
         _update_items_for_display_core = ->
             _get_items_for_display = (displayfiles) ->
                 displayitems = []
-
                 make_report_item = (displayfile) ->
                     report_item = {}
                     report_item["uuid"] = displayfile.filedata.uuid
@@ -1986,7 +1951,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     report_item["human_size"] = displayfile.filedata.human_size
                     report_item["name"] = displayfile.file.name
                     report_item["path"] = displayfile.file.webkitRelativePath
-
                     if exist(displayfile.file.name)
                         mini_mime = utils.get_mini_mime(displayfile.file.type, displayfile.file.name)
 
@@ -1997,12 +1961,10 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                         report_item["name"] = ""
 
                     report_item["progress"] = m_upload_progress[displayfile.filedata.uuid]
-
                     if not exist(report_item["progress"])
                         report_item["progress"] = 0
 
                     report_item["encryption"] = m_upload_encryption_progress[displayfile.filedata.uuid]
-
                     if not exist(report_item["encryption"])
                         report_item["encryption"] = 0
 
@@ -2017,7 +1979,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                     return item.size
                 displayitems = _.sortBy(displayitems, size_sort)
                 cnt = 0
-
                 add_cnt = (item) ->
                     cnt += 1
                     item["cnt"] = cnt
@@ -2038,7 +1999,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             m_upload_encryption_progress[file_data.uuid] = 0
             purl = "/" + utils.get_cryptobox_slug() + "/docs/upload"
             relpath = currentfile.webkitRelativePath
-
             if utils.exist(relpath)
                 relpath = utils.replace_all(relpath, currentfile.name, "")
 
@@ -2053,7 +2013,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
             if not utils.exist(relpath)
                 relpath = ""
-            fheaders =
+            fheaders = 
                 'Content-Type': file_data.type
             fdata =
                 'basepath': safe_b64(parent.m_path_p64s)
@@ -2096,6 +2056,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
                 (err) =>
                     try
+
                         if exist(file_data)
                             m_upload_in_progress_now -= 1
                             m_upload_encryption_progress[err.data] = 0
@@ -2135,7 +2096,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
             total_enc_progress = 0
             total_upload_proc = 0
-
             if utils.exist(m_upload_encryption_progress)
                 sum_enc_progress = (uuid) ->
                     total_enc_progress += m_upload_encryption_progress[uuid]
@@ -2152,7 +2112,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
             total_enc_progress = total_enc_progress / m_initial_uploads_to_start
             proc = total_enc_progress + total_upload_proc
             proc = proc / 2
-
             if not exist(proc)
                 return 0
             return proc
@@ -2212,7 +2171,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 m_upload_progress = []
                 m_upload_in_progress_now = 0
                 _invalidate()
-                emit_event("services.cf:2215", $rootScope, "tree_out_of_sync")
+                emit_event("services.cf:2174", $rootScope, "tree_out_of_sync")
 
         get_flush_requested: ->
             return m_flush_requested
@@ -2236,7 +2195,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
             m_initial_uploads_to_start = _.size(m_upload_files_selected)
             ucnt = 0
-
             upload_starter_thread = (p, error_callback) ->
                 ucnt += 1
                 uploads_to_start = utils.exclude(m_upload_files_selected, m_uploads_started, ["uuid"])
@@ -2272,7 +2230,6 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
                                 if m_upload_encryption_progress[progress.uuid] >= 100
                                     m_upload_encryption_progress[progress.uuid] = 100
-
                                     if not utils.list_contains(m_uploads_done, progress.uuid)
                                         m_uploads_done.push(progress.uuid)
                                         m_upload_in_progress_now -= 1
@@ -2281,7 +2238,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                                             m_upload_in_progress_now = 0
 
                             (e) ->
-                                print "services.cf:2284", e
+                                print "services.cf:2241", e
                         )
                         m_flush_requested = true
 
@@ -2294,12 +2251,12 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
             success_cb = (r) ->
                 if memory.debug_mode()
-                     print "services.cf:2297", "upload_start, success_cb " + r
+                     print "services.cf:2254", "upload_start, success_cb " + r
                 m_upload_succes(r)
 
             error_cb = (r) ->
                 if memory.debug_mode()
-                    print "services.cf:2302", "upload_start, error_cb " + r
+                    print "services.cf:2259", "upload_start, error_cb " + r
                 m_upload_failed(r)
 
             utils.call_until_sentinal_hits_repeats(upload_starter_thread, 2000, m_loop_speed, [0..100], m_initial_uploads_to_start + 10, 100, 200, success_cb, error_cb)
