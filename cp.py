@@ -1441,7 +1441,6 @@ def init_file(args):
         if "__init__" in fname:
             fname = os.path.basename(os.getcwd())
             fname = fname + "/" + (str(orgfname))
-
             #fname = fname.replace("__init__.py", "")
             #fname = fname.replace("/:", ":")
     return buffer_string, fname, myfile, num, orgfname

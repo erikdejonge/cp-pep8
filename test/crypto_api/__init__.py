@@ -22,14 +22,12 @@ import unicodedata
 import random
 import multiprocessing
 from cStringIO import StringIO
-
 from Crypto import Random
 from Crypto.Cipher import AES
 from Crypto.Protocol.KDF import PBKDF2
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Hash import HMAC, SHA512, SHA
-
 import couchdb_api
 from couchdb_api import pickled_base64_to_object, object_b64_safe, ServerConfig, b64_object_safe, get_named_temporary_file, cleanup_tempfiles
 from couchdb_api import console_warning, Mutex, console, smp_apply, gibberish, SaveObjectGoogle
@@ -41,6 +39,7 @@ def get_random_data(size):
     """
     @type size: int
     """
+    print "crypto_api/__init__.py:42", "hello"
     return Random.new().read(size)
 
 
@@ -63,7 +62,6 @@ def mix_match(s, reverse=False):
 
     if len(r) > len(s):
         r = r[:len(s)]
-
         return "".join([x[0] + x[1] for x in zip(r, s)])
     else:
         raise Exception("not enough random")
@@ -86,6 +84,7 @@ def generate_password(size):
                 npwd += c
 
         return npwd
+
     pwd = filter_chars(base64.encodestring(get_random_data(size)))
 
     while len(pwd) < size:
@@ -128,9 +127,9 @@ def log(msg):
 
     for i in spl:
         if i != spl[len(spl) - 1]:
-            print "crypto_api/__init__.py:131", "\t"
+            print "crypto_api/__init__.py:130", "\t"
         else:
-            print "crypto_api/__init__.py:133", i, "\t"
+            print "crypto_api/__init__.py:132", i, "\t"
     return
 
 
@@ -282,6 +281,7 @@ def make_hash_hmac(data, secret):
 
     if len(secret) < 6:
         raise PasswordException("make_hash_hmac: secret less then 6")
+
     hmac = HMAC.new(str(secret), digestmod=SHA512)
     hmac.update(data)
     return hmac.hexdigest()
@@ -297,6 +297,7 @@ def make_hash_hmac_lowercase(data, secret):
 
     if len(secret) < 6:
         raise PasswordException("make_hash_hmac_lowercase: secret less then 6")
+
     data = str(data).lower()
     hmac = HMAC.new(secret, digestmod=SHA512)
     hmac.update(data)
@@ -576,7 +577,6 @@ def make_rsa_keys(key_store_folder, keysize, numkeys, num_procs=None):
                 console_warning(str(e))
                 numkeys = 0
         else:
-
             try:
                 numkeys = int(str(numkeys))
             except Exception, e:
@@ -747,7 +747,6 @@ class CryptoUser(SaveObjectGoogle):
 
         mtx = Mutex(self.get_serverconfig().get_namespace(), self.object_id + "_reset_password")
         mtx.acquire_lock()
-
         try:
             self._check_password(new_password)
             self.rsa_private_key = self.get_rsa_private_key()
@@ -784,10 +783,10 @@ class CryptoUser(SaveObjectGoogle):
         self.m_password_hash_p64s = password_derivation(self.password, self.m_salt_p64s)
         # make key pair for user
         mtx = Mutex(self.get_serverconfig().get_namespace(), self.object_id + "_generate_rsa")
-
         try:
             mtx.acquire_lock()
             self.get_serverconfig().event("generating rsa key: " + str(keysize))
+
             rsa_private_key, rsa_public_key = generate_rsa_key_pair(keystore, keysize, try_precalc=True)
         finally:
             mtx.release_lock()
@@ -923,6 +922,7 @@ class CryptoUser(SaveObjectGoogle):
         for pw in self.passwords_to_save:
             if strcmp(pw.m_data_object_id, pwd_id):
                 return True
+
         passwords = self.serverconfig.gds_run_view("CryptoUserPassword", "m_user_object_id", self.object_id, "m_data_object_id")
 
         for pw in passwords:
@@ -946,6 +946,7 @@ class CryptoUser(SaveObjectGoogle):
                     if strcmp(pw.m_data_object_id, pwd_id):
                         pw.m_password_p64s = password
                         return True
+
                 passwords = self.serverconfig.gds_run_view_fields_values("CryptoUserPassword", [("m_user_object_id", self.object_id), ("m_data_object_id", pwd_id)], member="object_id")
 
                 if len(passwords) > 1:
@@ -1003,6 +1004,7 @@ class CryptoUser(SaveObjectGoogle):
         for pw in self.passwords_to_save:
             if strcmp(pw.m_data_object_id, pwd_id):
                 return pw.m_password_p64s
+
         passwords = self.serverconfig.gds_run_view_fields_values("CryptoUserPassword", [("m_user_object_id", self.object_id), ("m_data_object_id", pwd_id)], "")
         enc_key = None
 
@@ -1127,6 +1129,7 @@ class CryptoUser(SaveObjectGoogle):
         """
         if not self.authorized:
             raise PasswordException("new_client_mandate: user must be authorized")
+
         mks = name.split("||")
 
         if len(mks) > 1:
@@ -1287,6 +1290,7 @@ def make_chunklist(fpath):
     """
     if not os.path.exists(fpath):
         raise Exception("make_chunklist: file does not exist")
+
     fstats = os.stat(fpath)
     fsize = fstats.st_size
 
@@ -1490,7 +1494,7 @@ def callback_funcion(progress):
     @param progress:
     @type progress:
     """
-    print "crypto_api/__init__.py:1493", progress
+    print "crypto_api/__init__.py:1497", progress
 
 
 class EmptyFile(Exception):
@@ -1739,7 +1743,6 @@ class CryptoDoc(SaveObjectGoogle):
         self.m_num_chunks = len(enc_chunks)
         bucket_name = self.get_bucket_name()
         name = self.object_id
-
         write_chunks_param = [(bucket_name, name + "_" + str(fpath[0]), fpath[1], self.cloudstorage) for fpath in enumerate(enc_chunks)]
         num_procs = len(write_chunks_param)
         smp_apply(gcs_write_to_gcloud, write_chunks_param, num_procs_param=num_procs, debug_method=debug_method)
@@ -1783,7 +1786,6 @@ class CryptoDoc(SaveObjectGoogle):
 
         bucket_name = self.get_bucket_name()
         name = self.object_id
-
         read_chunks_param = [(bucket_name, name + "_" + str(cnt), self.cloudstorage) for cnt in range(0, self.m_num_chunks)]
         num_procs = len(read_chunks_param)
         dec_chunks = smp_apply(gcs_read_from_gcloud, read_chunks_param, num_procs_param=num_procs, debug_method=debug_method)
@@ -1845,4 +1847,3 @@ class CryptoDoc(SaveObjectGoogle):
 
         smp_apply(gcs_delete_from_gcloud, chunks_param)
         super(CryptoDoc, self).delete(serverconfig, self.object_id, force, transaction=transaction, delete_from_datastore=delete_from_datastore)
-

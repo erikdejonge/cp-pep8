@@ -139,15 +139,6 @@ class FastList(object):
         return len(self.dictlist.keys())
 
 
-def memoryuse(obj):
-    """
-    @type obj: object
-    """
-    from memory_usage import asizeof
-
-    return asizeof(obj)
-
-
 def get_hostname():
     """
     get_hostname
@@ -360,6 +351,13 @@ def start_profile():
     return pr
 
 
+def emit_event(f):
+    """
+    @type f: str
+    """
+    print "couchdb_api.py:358", f
+
+
 def end_profile(pr, items=10, printstats=True):
     """
     @type pr: Profile
@@ -370,12 +368,13 @@ def end_profile(pr, items=10, printstats=True):
 
     p = Stats(pr)
     p.strip_dirs()
-    print "couchdb_api.py:373", "hello"
+    emit_event("foo")
+    print "couchdb_api.py:372", "hello"
     if printstats:
-        print "couchdb_api.py:375"
-        print "couchdb_api.py:376", "total time"
+        print "couchdb_api.py:374"
+        print "couchdb_api.py:375", "total time"
         p.print_stats(items)
-        print "couchdb_api.py:378", "cumulative time"
+        print "couchdb_api.py:377", "cumulative time"
         p.sort_stats('cumtime')
         p.print_stats(items)
 
@@ -397,7 +396,7 @@ def format_and_print_large_string(largestring):
                     s += c
 
         s += "\\\n"
-    print "couchdb_api.py:400", s
+    print "couchdb_api.py:399", s
 
 
 def slugify_unicode(value):
@@ -1504,8 +1503,8 @@ def handle_ex(exc, again=True, give_string=False):
 
             error_msg += fname_number + " | " + tabs + val + "\n"
     except Exception, e:
-        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1507", e, '\033[m'
-        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1508", exc, '\033[m'
+        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1506", e, '\033[m'
+        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1507", exc, '\033[m'
 
     error_msg += "\033[95m" + log_date_time_string() + " ---------------------------\n"
 
@@ -4901,15 +4900,15 @@ class SaveObjectCouch(object):
         @type newest_doc: dict
         """
         if debug:
-            print "couchdb_api.py:4904", "---------------------------------------------------------------------------"
-            print "couchdb_api.py:4905", key
-            print "couchdb_api.py:4906", newest_doc[key]
-            print "couchdb_api.py:4907", getattr(self, key)
-            print "couchdb_api.py:4908", newermember_timestamp
-            print "couchdb_api.py:4909", "mymember_timestamp", mymember_timestamp
+            print "couchdb_api.py:4903", "---------------------------------------------------------------------------"
+            print "couchdb_api.py:4904", key
+            print "couchdb_api.py:4905", newest_doc[key]
+            print "couchdb_api.py:4906", getattr(self, key)
+            print "couchdb_api.py:4907", newermember_timestamp
+            print "couchdb_api.py:4908", "mymember_timestamp", mymember_timestamp
             nwt = newermember_timestamp >= mymember_timestamp
-            print "couchdb_api.py:4911", "newermember_timestamp >= mymember_timestamp", nwt
-            print "couchdb_api.py:4912", "---------------------------------------------------------------------------"
+            print "couchdb_api.py:4910", "newermember_timestamp >= mymember_timestamp", nwt
+            print "couchdb_api.py:4911", "---------------------------------------------------------------------------"
 
     def handleconflict(self, newest_doc):
         """
