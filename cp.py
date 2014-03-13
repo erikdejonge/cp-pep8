@@ -122,7 +122,6 @@ def func_def(line):
     if in_test(["+=", "-=", "++", "--", "*="], line):
         return False
 
-
     if ", ->" in line.strip():
         return True
     if ", ->" in line.strip():
@@ -260,7 +259,7 @@ def keyword(line):
     if line.strip() == "":
         return True
     kws = ["class", "print", "with", "require", "#noinspection", "except", "pass", "del", "return", "with", "super", "catch", " pass", "switch", "raise", "for", "when", "if", "elif", "else", "while", "finally", "try", "unless", "catch"]
-    kws = [x+" " for x in kws]
+    kws = [x + " " for x in kws]
     kws.extend(["$on", "$(", '"""'])
     if in_test(kws, line):
         return True
@@ -964,7 +963,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                 debuginfo += " not after comment"
                                 add_enter = True
                                 if assignment(line):
-
                                     if not fname.endswith(".py"):
                                         debuginfo += " and assigned in coffee "
                                         add_enter = False
@@ -1165,11 +1163,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             if not next_line.strip().startswith("@type"):
                 line_redone += "\n" + org_line.split("@param")[0] + "@type " + line.strip().split("@param")[1].split(":")[0].strip() + ": "
     if add_docstring and fname.endswith(".py") and not in_python_comment:
-
         line_redone += "\n"
-        line_redone += " " * (whitespace(line)+4)
+        line_redone += " " * (whitespace(line) + 4)
         line_redone += '"""\n'
-        line_redone += " " * (whitespace(line)+4)
+        line_redone += " " * (whitespace(line) + 4)
         line_redone += '"""\n'
 
     debuginfo = debuginfo.replace("  ", " ")
@@ -1275,6 +1272,7 @@ def coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_
             resolve_func -= 1
     return add_enter, debuginfo, resolve_func
 
+
 #noinspection PyUnusedLocal
 def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, orgfname, undo_variables, variables):
     """
@@ -1319,10 +1317,22 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         """ lnr
                         @param code_line:
                         """
-                        for i in range(0, 10):
-                            code_line = code_line.replace("print  ", "print ")
 
-                        if 'print ":' not in code_line and 'warning ":' not in code_line and 'print_once ":' not in code_line:
+                        for i in range(0, 10):
+                            for var in variables:
+                                code_line = code_line.replace(var + "  ", var + " ")
+                        var_not_in_codeline = False
+
+                        true_list = set()
+                        for var in variables:
+                            ts1 = var + ' ":'
+                            ts2 = var + '(":'
+                            true_list.add(ts1 in code_line or ts2 in code_line)
+
+                        if len(true_list) == 1:
+                            var_not_in_codeline = True
+
+                        if var_not_in_codeline:
                             return code_line
 
                     lines = [i.strip() for i in lines if lnr(i)]
@@ -1331,12 +1341,10 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
 
                     line += replace_variable + " "
                     for linet in lines:
-
                         line += linet
                         line += ", "
 
                 if replace_variable + "(msg" not in line and "do " not in line:
-
                     line = line.replace(replace_variable + "(", replace_variable)
 
                     location = fname + ":" + "@@@@"
@@ -1401,7 +1409,7 @@ def arg_parse():
     """
     parser = ArgumentParser()
     parser.add_argument("-f", dest="myfile")
-    parser.add_argument("-r", dest="release")
+    parser.add_argument("-t", dest="test")
     args = parser.parse_args()
     return args
 
@@ -1419,7 +1427,8 @@ def init_file(args):
         for i in myfile:
             if str(i).strip() != "":
                 content += i
-        open(args.myfile, "w").write(content)
+        if args.test is None:
+            open(args.myfile, "w").write(content)
         myfile = open(args.myfile)
     else:
         print "no -f (file) given as argument"
@@ -1431,11 +1440,12 @@ def init_file(args):
         fname = "/".join(str(args.myfile).split("/")[-2:])
         if "__init__" in fname:
             fname = os.path.basename(os.getcwd())
-            fname = fname+"/"+(str(orgfname))
+            fname = fname + "/" + (str(orgfname))
 
-        #fname = fname.replace("__init__.py", "")
-        #fname = fname.replace("/:", ":")
+            #fname = fname.replace("__init__.py", "")
+            #fname = fname.replace("/:", ":")
     return buffer_string, fname, myfile, num, orgfname
+
 
 #noinspection PyPep8Naming
 def init_cp(args, fname, myfile):
@@ -1558,6 +1568,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
     debuginfo += " " + str(if_cnt) + str(add_double_enter)
     return add_double_enter, add_enter, debuginfo, line
 
+
 #noinspection PyPep8Naming
 def main(args):
     """
@@ -1568,7 +1579,7 @@ def main(args):
         print "can't cp myself"
         return
 
-    print "cp.py -f", os.path.basename(os.path.dirname(args.myfile)) + "/" + os.path.basename(args.myfile)
+    #print "cp.py -f", os.path.basename(os.path.dirname(args.myfile)) + "/" + os.path.basename(args.myfile)
 
     buffer_string, fname, myfile, num, orgfname = init_file(args)
 
@@ -1641,12 +1652,14 @@ def main(args):
         if line.strip() != "#":
             buffer_string += line
 
-    if str(args.myfile).endswith(".coffee"):
-        finalbuf = "\n" + buffer_string.strip() + "\n"
-        open(args.myfile, "w").write(finalbuf)
+    if not args.test:
+        if str(args.myfile).endswith(".coffee"):
+            finalbuf = "\n" + buffer_string.strip() + "\n"
+            open(args.myfile, "w").write(finalbuf)
+        else:
+            open(args.myfile, "w").write(buffer_string.strip() + "\n")
     else:
-        open(args.myfile, "w").write(buffer_string.strip() + "\n")
-
+        print "file not written (test run)"
 
 
 def lock_acquire(key):
@@ -1684,7 +1697,7 @@ def lock_release(key):
 
 if __name__ == "__main__":
     args = arg_parse()
-    lock = os.path.dirname(os.path.join(os.getcwd(), args.myfile))+"/cp"
+    lock = os.path.dirname(os.path.join(os.getcwd(), args.myfile)) + "/cp"
     try:
         lock_acquire(lock)
         main(args)
