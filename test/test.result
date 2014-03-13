@@ -1,24 +1,29 @@
 
 # helloo
 print "test.cf:3", "world"
-utils.print_once "test.cf:4", 1
-print "test.cf:5", 2
-warning "test.cf:6", 3
+
+utils.print_once "test.cf:5", 1
 
 
-emit_event("test.cf:9", 2)
+print "test.cf:8", 2
 
 
-urls.command("test.cf:12", 3)
+warning "test.cf:11", 3
 
 
-urls.postcommand("test.cf:15", 3)
+emit_event("test.cf:14", 2)
 
 
-async_call_retries("test.cf:18", 4)
+urls.command("test.cf:17", 3)
 
 
-utils.set_time_out("test.cf:21", 4)
+urls.postcommand("test.cf:20", 3)
 
 
-utils.set_interval("test.cf:24", 2)
+async_call_retries("test.cf:23", 4)
+
+
+utils.set_time_out("test.cf:26", 4)
+
+
+utils.set_interval("test.cf:29", 2)
