@@ -15,6 +15,10 @@ urls.postcommand(3);
 
 async_call_retries(4);
 
+if (4) {
+  self.foo();
+}
+
 utils.set_time_out(4);
 
 utils.set_interval(2);

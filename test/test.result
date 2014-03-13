@@ -22,8 +22,11 @@ urls.postcommand("test.cf:20", 3)
 
 async_call_retries("test.cf:23", 4)
 
+if 4
+    self.foo()
 
-utils.set_time_out("test.cf:26", 4)
+
+utils.set_time_out("test.cf:29", 4)
 
 
-utils.set_interval("test.cf:29", 2)
+utils.set_interval("test.cf:32", 2)
