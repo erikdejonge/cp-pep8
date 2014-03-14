@@ -15,13 +15,14 @@ ADDCOMMENT_WITH_FOUND_TYPE = False
 
 datastructure_define = False
 
+is_python = True
 
 def replace_variables():
     """
     @return: @rtype:
     """
     #variables = ["print", "warning", "emit_event"]
-    variables = ["utils.print_once", "print", "warning", "emit_event", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
+    variables = ["utils.print_once", "print", "warning", "self.emit_event", "self.rs.emit_event", "rs.emit_event", "emit_event_angular", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
     undo_variables = []
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
@@ -136,7 +137,11 @@ def func_def(line):
     if in_test(["warning", "print "], line):
         return False
 
-    is_func = ("->" in line or "=>" in line) and "= " in line
+    global is_python
+    if not is_python:
+        is_func = ("->" in line or "=>" in line) and "= " in line
+    else:
+        is_func = False
 
     if not is_func:
         if "def " in line and ":" in line:
@@ -515,6 +520,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     @param in_python_comment:
     @return: @rtype:
     """
+    global is_python
+    is_python = fname.endswith(".py")
     add_docstring = False
     line_redone = org_line = line
 
@@ -770,7 +777,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 elif keyword(prev_line):
                     debuginfo += " after keyword"
                     add_enter = True
-                elif anon_func(prev_line):
+                elif anon_func(prev_line) and not fname.endswith(".py"):
                     debuginfo += " after anon func"
                     add_enter = False
                 elif not class_method(prev_line) and not keyword(prev_line) and not assignment(prev_line):
@@ -839,7 +846,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                         add_enter = True
                 else:
                     debuginfo += " not on globalscope"
-    elif anon_func(line) and not in_test([".directive", "$watch", ".bind"], line):
+    elif anon_func(line) and not in_test([".directive", "$watch", ".bind"], line) and not fname.endswith(".py"):
         debuginfo = "anonymousfunction"
         if not resolve_func:
             if line.count("    ") is 1 and not assignment(prev_line) and not func_def(prev_line):
@@ -1301,6 +1308,7 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
         check_split = [x.strip() for x in check_split2]
 
         found_color = False
+
         if replace_variable in check_split and len(line.strip()) > 0:
             if replace_variable + " = " not in line:
                 if fname.endswith(".py"):
@@ -1462,8 +1470,8 @@ def init_cp(args, fname, myfile):
     color_vals_to_keep, undo_variables, variables, watch_vars = replace_variables()
     mylines = []
     fname = fname.replace("coffee", "cf")
-    if fname.endswith(".py"):
-        variables.remove("emit_event")
+    #if fname.endswith(".py"):
+    #    variables.remove("emit_event")
     import cStringIO
     data = myfile.read()
     if "ADDTYPES" in data or "addtypes" in data:
