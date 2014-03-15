@@ -930,7 +930,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     add_enter = True
         if line.find(" ") is not 0:
             debuginfo += "method call global scope"
-            if "# noins" not in prev_line and "import " not in prev_line:
+            if "# noins" not in prev_line and "import " not in prev_line and "#noins" not in prev_line:
                 add_enter = False
                 add_double_enter = True
             if ")()" in line.strip():
