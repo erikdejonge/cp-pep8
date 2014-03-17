@@ -902,7 +902,7 @@ ismobile = ->
 
     return navigator.userAgent.match(/Windows Phone/i)
 
-BrowserDetect = 
+BrowserDetect =
     init: ->
         @browser = @searchString(@dataBrowser) or "An unknown browser"
         @version = @searchVersion(navigator.userAgent) or @searchVersion(navigator.appVersion) or "an unknown version"
@@ -1016,7 +1016,7 @@ bool_parse = (bs) ->
         return bs
 
 
-emit_event = (msg, scope, event) ->
+event_emit = (msg, scope, event) ->
     scope.$emit(event)
     scope.$broadcast(event)
 
@@ -1817,7 +1817,7 @@ angular.module("cryptoboxApp.base", [])
             return false  unless path
 
             options = "PATHINFO_ALL"  unless options
-            OPTS = 
+            OPTS =
                 PATHINFO_DIRNAME: 1
                 PATHINFO_BASENAME: 2
                 PATHINFO_EXTENSION: 4

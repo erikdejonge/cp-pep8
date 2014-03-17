@@ -326,7 +326,7 @@ class SecuredController
 
             if memory.has("g_window_width")
                 if w != memory.get("g_window_width")
-                    emit_event("controller_base.cf:329", $scope, "resize_window")
+                    event_emit("controller_base.cf:329", $scope, "resize_window")
                     utils.force_digest($scope)
 
             memory.set("g_device_type", new_type)
@@ -550,7 +550,7 @@ class SecuredController
                                             print "controller_base.cf:550", "upload_succes", r
                                             uploader.reset()
                                             tree.invalidate()
-                                            emit_event("controller_base.cf:553", $rootScope, "tree_out_of_sync")
+                                            event_emit("controller_base.cf:553", $rootScope, "tree_out_of_sync")
 
                                         upload_error = (r) ->
                                             print "controller_base.cf:556", "upload_error", r

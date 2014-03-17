@@ -326,7 +326,7 @@ SecuredController = (function() {
       }
       if (memory.has("g_window_width")) {
         if (w !== memory.get("g_window_width")) {
-          emit_event("controller_base.cf:329", $scope, "resize_window");
+          event_emit("controller_base.cf:329", $scope, "resize_window");
           utils.force_digest($scope);
         }
       }
@@ -561,7 +561,7 @@ SecuredController = (function() {
                     print("controller_base.cf:550", "upload_succes", r);
                     uploader.reset();
                     tree.invalidate();
-                    return emit_event("controller_base.cf:553", $rootScope, "tree_out_of_sync");
+                    return event_emit("controller_base.cf:553", $rootScope, "tree_out_of_sync");
                   };
                   upload_error = function(r) {
                     return print("controller_base.cf:556", "upload_error", r);

@@ -828,7 +828,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
                         #            tree.get().then(
                         #                () ->
-                        #                    emit_event("services.cf:831", $rootScope, "tree_out_of_sync")
+                        #                    event_emit("services.cf:831", $rootScope, "tree_out_of_sync")
 
                         #                (err) ->
                         #                    print "services.cf:834", "error getting tree", err
@@ -1154,7 +1154,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 loading = true
 
                 if operation == "set"
-                    window.saveobject_cache = 
+                    window.saveobject_cache =
                     {}
 
                 if operation == "get" or operation == "get_members"
@@ -1888,7 +1888,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 addfile = false
                 filedata.error = "file_too_large_for_upload"
                 m_file_not_good_for_upload.push({"file": f, "filedata": filedata})
-            addfile = 
+            addfile =
             if addfile
                 if not utils.list_contains(m_upload_files_selected, fhash)
                     m_upload_files_selected.push({"file": f, "filedata": filedata})
@@ -1970,7 +1970,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
             if not utils.exist(relpath)
                 relpath = ""
-            fheaders = 
+            fheaders =
                 'Content-Type': file_data.type
             fdata =
                 'basepath': safe_b64(parent.m_path_p64s)
@@ -2123,7 +2123,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 m_upload_progress = []
                 m_upload_in_progress_now = 0
                 _invalidate()
-                emit_event("services.cf:2126", $rootScope, "tree_out_of_sync")
+                event_emit("services.cf:2126", $rootScope, "tree_out_of_sync")
 
         get_flush_requested: ->
             return m_flush_requested

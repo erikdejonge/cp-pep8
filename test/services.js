@@ -2197,7 +2197,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"]).factory("tree", [
           m_upload_progress = [];
           m_upload_in_progress_now = 0;
           _invalidate();
-          return emit_event("services.cf:2126", $rootScope, "tree_out_of_sync");
+          return event_emit("services.cf:2126", $rootScope, "tree_out_of_sync");
         }
       },
       get_flush_requested: function() {

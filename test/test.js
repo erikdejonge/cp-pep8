@@ -7,7 +7,7 @@ print(2);
 
 warning(3);
 
-emit_event(2);
+event_emit(2);
 
 urls.command(3);
 

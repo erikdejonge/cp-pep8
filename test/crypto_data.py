@@ -347,7 +347,7 @@ def start_profile():
     return pr
 
 
-def emit_event(f):
+def event_emit(f):
     """
     @type f: str
     """
@@ -363,7 +363,7 @@ def end_profile(pr, items=10, printstats=True):
     from pstats import Stats
     p = Stats(pr)
     p.strip_dirs()
-    emit_event("foo")
+    event_emit("foo")
     print "crypto_data.py:367", "hello"
     if printstats:
         print "crypto_data.py:369"
@@ -1947,7 +1947,7 @@ class RedisServer(object):
 
         return self.rediscon.delete(str(key))
 
-    def subscribe_on_event(self, event, callback, *args):
+    def event_subscribe(self, event, callback, *args):
         """
         @type event: str
         @type callback: function
@@ -1985,7 +1985,7 @@ class RedisServer(object):
 
                             return
                     else:
-                        self.emit_event("crypto_data.py:1988", "subscribed_on_event", cevent["channel"])
+                        self.event_emit("crypto_data.py:1988", "subscribed_on_event", cevent["channel"])
                         self.set("event_" + str(cevent["channel"]), True)
 
             except Exception, e:
@@ -2003,7 +2003,7 @@ class RedisServer(object):
         self.delete("event_" + str(event))
         return events_subscriber
 
-    def wait_for_event(self, event, callback=None, wait_time=None):
+    def event_wait(self, event, callback=None, wait_time=None):
         """
         @type event: str
         @type callback: function, none
@@ -2026,7 +2026,7 @@ class RedisServer(object):
             # always return False, a wait is a one time block
             return False
 
-        listener = self.subscribe_on_event(event, wrapped_callback)
+        listener = self.event_subscribe(event, wrapped_callback)
 
         if wait_time is None:
             listener.join()
@@ -2048,14 +2048,14 @@ class RedisServer(object):
                     time.sleep(0.05)
 
                     if self._verbose:
-                        console("wait_for_event: timeleft, ", timeleft)
+                        console("event_wait: timeleft, ", timeleft)
 
                 if timeleft <= -0.05:
                     if self._verbose:
-                        raise RedisException("wait_for_event:wait_time exceeded:" + str(timeleft)[:6] + " [" + event + "]")
-                    raise RedisException("wait_for_event:wait_time exceeded")
+                        raise RedisException("event_wait:wait_time exceeded:" + str(timeleft)[:6] + " [" + event + "]")
+                    raise RedisException("event_wait:wait_time exceeded")
 
-    def emit_event(self, event, data=None):
+    def event_emit(self, event, data=None):
         """
         @type event: str
         @type data: object
@@ -2064,9 +2064,9 @@ class RedisServer(object):
 
         if self._verbose:
             if data is None:
-                console("emit_event", event)
+                console("event_emit", event)
             else:
-                console("emit_event", event, str(data)[0:50])
+                console("event_emit", event, str(data)[0:50])
 
         return self.rediscon.publish(event, cPickle.dumps(data))
 

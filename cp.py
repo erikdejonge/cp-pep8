@@ -21,8 +21,8 @@ def replace_variables():
     """
     @return: @rtype:
     """
-    #variables = ["print", "warning", "emit_event"]
-    variables = ["utils.print_once", "print", "warning", "self.emit_event", "self.rs.emit_event", "rs.emit_event", "emit_event_angular", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
+    #variables = ["print", "warning", "event_emit"]
+    variables = ["utils.print_once", "print", "warning", "emit_event_angular", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
     undo_variables = []
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
@@ -1471,7 +1471,7 @@ def init_cp(args, fname, myfile):
     mylines = []
     fname = fname.replace("coffee", "cf")
     #if fname.endswith(".py"):
-    #    variables.remove("emit_event")
+    #    variables.remove("event_emit")
     import cStringIO
     data = myfile.read()
     if "ADDTYPES" in data or "addtypes" in data:
