@@ -28,11 +28,11 @@ from Crypto.Protocol.KDF import PBKDF2
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.Hash import HMAC, SHA512, SHA
-import couchdb_api
-from couchdb_api import pickled_base64_to_object, object_b64_safe, ServerConfig, b64_object_safe, get_named_temporary_file, cleanup_tempfiles
-from couchdb_api import console_warning, Mutex, console, smp_apply, gibberish, SaveObjectGoogle
-from couchdb_api import gcs_delete_from_gcloud, gcs_read_from_gcloud, gcs_write_to_gcloud
-from couchdb_api import gds_get_dict_list, strcmp, get_file_size, gds_get_ids, gds_delete_items_on_fieldvalue
+import crypto_data
+from crypto_data import pickled_base64_to_object, object_b64_safe, ServerConfig, b64_object_safe, get_named_temporary_file, cleanup_tempfiles
+from crypto_data import console_warning, Mutex, console, smp_apply, gibberish, SaveObjectGoogle
+from crypto_data import gcs_delete_from_gcloud, gcs_read_from_gcloud, gcs_write_to_gcloud
+from crypto_data import gds_get_dict_list, strcmp, get_file_size, gds_get_ids, gds_delete_items_on_fieldvalue
 
 
 def get_random_data(size):
@@ -1642,17 +1642,17 @@ class CryptoDoc(SaveObjectGoogle):
         self.m_extra_indexed_keys = ["m_hmac_sha1_hash", "m_doc_last_modified", "m_created_by"]
         self.size = None
 
-        if "lycia" in couchdb_api.GLOBAL_HOSTNAME:
+        if "lycia" in crypto_data.GLOBAL_HOSTNAME:
             self.cloudstorage = False
 
-        if "cryptoboxtestserver" in couchdb_api.GLOBAL_HOSTNAME:
+        if "cryptoboxtestserver" in crypto_data.GLOBAL_HOSTNAME:
             self.cloudstorage = False
 
     def get_bucket_name(self):
         """
         get_bucket_name
         """
-        bucket_name = self.get_serverconfig().identifcation() + "_" + couchdb_api.CRYPTODOCFOLDERGOOGLE
+        bucket_name = self.get_serverconfig().identifcation() + "_" + crypto_data.CRYPTODOCFOLDERGOOGLE
         return bucket_name
 
     def find_doc_same_hash(self, key, ufile=None):
@@ -1831,7 +1831,7 @@ class CryptoDoc(SaveObjectGoogle):
         chunks_param = []
 
         while cnt < self.m_num_chunks:
-            chunks_param.append((self.get_serverconfig().identifcation() + "_" + couchdb_api.CRYPTODOCFOLDERGOOGLE, self.object_id + "_" + str(cnt), self.cloudstorage))
+            chunks_param.append((self.get_serverconfig().identifcation() + "_" + crypto_data.CRYPTODOCFOLDERGOOGLE, self.object_id + "_" + str(cnt), self.cloudstorage))
             cnt += 1
 
         smp_apply(gcs_delete_from_gcloud, chunks_param)

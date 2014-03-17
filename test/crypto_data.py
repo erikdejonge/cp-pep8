@@ -353,7 +353,7 @@ def emit_event(f):
     """
     @type f: str
     """
-    print "couchdb_api.py:356", f
+    print "crypto_data.py:356", f
 
 
 def end_profile(pr, items=10, printstats=True):
@@ -366,12 +366,12 @@ def end_profile(pr, items=10, printstats=True):
     p = Stats(pr)
     p.strip_dirs()
     emit_event("foo")
-    print "couchdb_api.py:369", "hello"
+    print "crypto_data.py:369", "hello"
     if printstats:
-        print "couchdb_api.py:371"
-        print "couchdb_api.py:372", "total time"
+        print "crypto_data.py:371"
+        print "crypto_data.py:372", "total time"
         p.print_stats(items)
-        print "couchdb_api.py:374", "cumulative time"
+        print "crypto_data.py:374", "cumulative time"
         p.sort_stats('cumtime')
         p.print_stats(items)
 
@@ -393,7 +393,7 @@ def format_and_print_large_string(largestring):
                     s += c
 
         s += "\\\n"
-    print "couchdb_api.py:396", s
+    print "crypto_data.py:396", s
 
 
 def slugify_unicode(value):
@@ -414,7 +414,7 @@ def slugify_unicode(value):
             slug += c
         else:
             c64 = base64.encodestring(c).strip().rstrip("=")
-            #print "couchdb_api.py:258", value, d, c, c64
+            #print "crypto_data.py:258", value, d, c, c64
             slug += c64
 
     return slug.lower()
@@ -1483,8 +1483,8 @@ def handle_ex(exc, again=True, give_string=False):
                 val = line[3]
             error_msg += fname_number + " | " + tabs + val + "\n"
     except Exception, e:
-        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1486", e, '\033[m'
-        print "\033[93m" + log_date_time_string(), "couchdb_api.py:1487", exc, '\033[m'
+        print "\033[93m" + log_date_time_string(), "crypto_data.py:1486", e, '\033[m'
+        print "\033[93m" + log_date_time_string(), "crypto_data.py:1487", exc, '\033[m'
     error_msg += "\033[95m" + log_date_time_string() + " ---------------------------\n"
 
     if give_string:
@@ -3416,7 +3416,7 @@ class CouchView(object):
         """
         insert = False
         try:
-            view_doc = self.dbase.get_document("_design/couchdb_api")
+            view_doc = self.dbase.get_document("_design/crypto_data")
         except DocNotFoundException:
             view_doc = None
         except Exception, ex:
@@ -3457,7 +3457,7 @@ class CouchView(object):
             insert = True
 
         if not view_doc:
-            view_doc = {"_id": "_design/couchdb_api", "views": {self.__class__.__name__: {"map": self.map.strip(), }},
+            view_doc = {"_id": "_design/crypto_data", "views": {self.__class__.__name__: {"map": self.map.strip(), }},
                         "language": "javascript"}
 
             if len(self.reduce.strip()) > 0:
@@ -3894,7 +3894,7 @@ class Compacter(threading.Thread):
             if self.name + "." in str(shard):
                 dbase = bserver[shard]
                 dbase.compact()
-                dbase.compact("couchdb_api")
+                dbase.compact("crypto_data")
 
 
 class ScalarResultContainsMultipleItems(Exception):
@@ -4150,7 +4150,7 @@ class CouchDBServer(ServerConfig):
             raise Exception("database not set")
 
         self.dbase.compact()
-        self.dbase.compact("couchdb_api")
+        self.dbase.compact("crypto_data")
 
     def get_couchdbdbase(self):
         """
@@ -4296,19 +4296,19 @@ class CouchDBServer(ServerConfig):
         """
         if key:
             if use_group:
-                results = self.dbase.view("_design/couchdb_api/_view/" + methodname, keys=[key], group=True)
+                results = self.dbase.view("_design/crypto_data/_view/" + methodname, keys=[key], group=True)
             else:
-                results = self.dbase.view("_design/couchdb_api/_view/" + methodname, keys=[key])
+                results = self.dbase.view("_design/crypto_data/_view/" + methodname, keys=[key])
         elif keys:
             if use_group:
-                results = self.dbase.view("_design/couchdb_api/_view/" + methodname, keys=keys, group=True)
+                results = self.dbase.view("_design/crypto_data/_view/" + methodname, keys=keys, group=True)
             else:
-                results = self.dbase.view("_design/couchdb_api/_view/" + methodname, keys=keys)
+                results = self.dbase.view("_design/crypto_data/_view/" + methodname, keys=keys)
         else:
             if use_group:
-                results = self.dbase.view("_design/couchdb_api/_view/" + methodname, group=True)
+                results = self.dbase.view("_design/crypto_data/_view/" + methodname, group=True)
             else:
-                results = self.dbase.view("_design/couchdb_api/_view/" + methodname)
+                results = self.dbase.view("_design/crypto_data/_view/" + methodname)
 
         return results
 
@@ -4861,15 +4861,15 @@ class SaveObjectCouch(object):
         @type newest_doc: dict
         """
         if debug:
-            print "couchdb_api.py:4864", "---------------------------------------------------------------------------"
-            print "couchdb_api.py:4865", key
-            print "couchdb_api.py:4866", newest_doc[key]
-            print "couchdb_api.py:4867", getattr(self, key)
-            print "couchdb_api.py:4868", newermember_timestamp
-            print "couchdb_api.py:4869", "mymember_timestamp", mymember_timestamp
+            print "crypto_data.py:4864", "---------------------------------------------------------------------------"
+            print "crypto_data.py:4865", key
+            print "crypto_data.py:4866", newest_doc[key]
+            print "crypto_data.py:4867", getattr(self, key)
+            print "crypto_data.py:4868", newermember_timestamp
+            print "crypto_data.py:4869", "mymember_timestamp", mymember_timestamp
             nwt = newermember_timestamp >= mymember_timestamp
-            print "couchdb_api.py:4871", "newermember_timestamp >= mymember_timestamp", nwt
-            print "couchdb_api.py:4872", "---------------------------------------------------------------------------"
+            print "crypto_data.py:4871", "newermember_timestamp >= mymember_timestamp", nwt
+            print "crypto_data.py:4872", "---------------------------------------------------------------------------"
 
     def handleconflict(self, newest_doc):
         """
@@ -5017,7 +5017,7 @@ class SaveObjectCouch(object):
             sync_mutex = Mutex(self.dbase, "view_sync", self.dbase.dbname)
             try:
                 sync_mutex.acquire_lock()
-                self.dbase.delete_document("_design/couchdb_api")
+                self.dbase.delete_document("_design/crypto_data")
             finally:
                 sync_mutex.release_lock()
 

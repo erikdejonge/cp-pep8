@@ -73,7 +73,7 @@ class CPTest(unittest.TestCase):
         """
         test_some_files
         """
-        testfiles = ["app_basic.coffee", "controller_base.coffee", "services.coffee", "couchdb_api.py"]
+        testfiles = ["app_basic.coffee", "controller_base.coffee", "services.coffee", "crypto_data.py"]
 
         for tf in testfiles:
             self.get_file(tf)
