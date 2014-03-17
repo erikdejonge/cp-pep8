@@ -468,7 +468,7 @@ class CryptoUserPassword(SaveObjectGoogle):
         self.m_data_object_id = data_object_id
         self.m_password_p64s = password
 
-    def save(self, object_id=None, serverconfig=None, force_consistency=False, store_in_memcached=True, force_save=True, transaction=None, store_in_datastore=True):
+    def save(self, object_id=None, serverconfig=None, force_consistency=False, store_in_memcached=True, force_save=True, transaction=None, use_datastore=True):
         """
         @type object_id: str, None
         @type serverconfig: ServerConfig, None
@@ -476,12 +476,12 @@ class CryptoUserPassword(SaveObjectGoogle):
         @type store_in_memcached: bool
         @type force_save: bool
         @type transaction: str, None
-        @type store_in_datastore: bool
+        @type use_datastore: bool
         """
         if object_id:
             self.object_id = object_id
 
-        super(CryptoUserPassword, self).save(self.object_id, serverconfig, force_consistency=force_consistency, force_save=force_save, transaction=transaction, store_in_datastore=store_in_datastore)
+        super(CryptoUserPassword, self).save(self.object_id, serverconfig, force_consistency=force_consistency, force_save=force_save, transaction=transaction, use_datastore=use_datastore)
         self._remove_obsolete_passwords(300)
 
     def _remove_obsolete_passwords(self, wait_since_last_update):
@@ -654,7 +654,7 @@ class CryptoUser(SaveObjectGoogle):
             if self.m_username not in self.object_id:
                 self.object_id += ":" + self.m_username.replace("_", "")
 
-    def save(self, object_id=None, serverconfig=None, force_consistency=False, store_in_memcached=True, force_save=True, transaction=None, store_in_datastore=True):
+    def save(self, object_id=None, serverconfig=None, force_consistency=False, store_in_memcached=True, force_save=True, transaction=None, use_datastore=True):
         """
         @type object_id: str, None
         @type serverconfig: ServerConfig, None
@@ -662,7 +662,7 @@ class CryptoUser(SaveObjectGoogle):
         @type store_in_memcached: bool
         @type force_save: bool
         @type transaction: str, None
-        @type store_in_datastore: bool
+        @type use_datastore: bool
         """
         for user in self.collection():
             if user.m_username == self.m_username:
@@ -680,7 +680,7 @@ class CryptoUser(SaveObjectGoogle):
             cup.m_password_p64s = self.encrypt_with_public_key(cup.m_password_p64s)
             cup.save(force_consistency=True, force_save=True)
         self.passwords_to_save = []
-        super(CryptoUser, self).save(object_id, serverconfig, force_consistency=force_consistency, force_save=force_save, transaction=transaction, store_in_datastore=store_in_datastore)
+        super(CryptoUser, self).save(object_id, serverconfig, force_consistency=force_consistency, force_save=force_save, transaction=transaction, use_datastore=use_datastore)
 
     def get_option_fields(self):
         """
@@ -695,12 +695,12 @@ class CryptoUser(SaveObjectGoogle):
         """
         return self.m_username
 
-    def load(self, object_id=None, serverconfig=None, force_load=False, load_from_datastore=True):
+    def load(self, object_id=None, serverconfig=None, force_load=False, use_datastore=True):
         """
         @type object_id: str, None
         @type serverconfig: ServerConfig, None
         @type force_load: bool
-        @type load_from_datastore: bool
+        @type use_datastore: bool
         """
         if object_id:
             self.object_id = object_id
@@ -708,7 +708,7 @@ class CryptoUser(SaveObjectGoogle):
         if serverconfig:
             self.serverconfig = serverconfig
 
-        return super(CryptoUser, self).load(object_id=self.object_id, force_load=force_load, load_from_datastore=load_from_datastore)
+        return super(CryptoUser, self).load(object_id=self.object_id, force_load=force_load, use_datastore=use_datastore)
 
     def _check_password(self, password):
         """

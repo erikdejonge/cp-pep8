@@ -6300,7 +6300,7 @@ class SaveObjectGoogle(object):
                         else:
                             setattr(self, "_" + key, None)
 
-    def save(self, object_id=None, serverconfig=None, force_consistency=False, store_in_redis=True, force_save=True, transaction=None, store_in_datastore=True):
+    def save(self, object_id=None, serverconfig=None, force_consistency=False, store_in_redis=True, force_save=True, transaction=None, use_datastore=True):
         """
         @type object_id: str
         @type serverconfig: ServerConfig
@@ -6308,7 +6308,7 @@ class SaveObjectGoogle(object):
         @type store_in_redis: bool
         @type force_save: bool
         @type transaction: googledatastore.Transaction
-        @type store_in_datastore: bool
+        @type use_datastore: bool
         """
         if transaction is not None:
             self.transaction = transaction
@@ -6349,7 +6349,7 @@ class SaveObjectGoogle(object):
             if item == "":
                 raise ObjectSaveException("required item missing -> " + str(req_item), self)
 
-        if store_in_datastore:
+        if use_datastore:
             current_mutation_counter = gds_get_scalar_value(self.get_serverconfig().get_namespace(), unicode(self.object_type), unicode("object_id"), unicode(self.object_id), "mutation_counter")
 
             if current_mutation_counter > self.mutation_counter:
@@ -6402,7 +6402,7 @@ class SaveObjectGoogle(object):
         rsc = RedisServer(self.get_serverconfig().get_namespace())
         rsc.set(self.object_id, self.couchdb_document)
 
-        if not store_in_datastore:
+        if not use_datastore:
             sync_mutex = Mutex("store_id_saveobject", self.serverconfig.get_namespace())
             try:
                 sync_mutex.acquire_lock()
@@ -6456,7 +6456,7 @@ class SaveObjectGoogle(object):
             if len(str(self.couchdb_document[k])) > 500:
                 console_warning("indexed key bigger then 500", k, len(str(self.couchdb_document[k])))
 
-        if store_in_datastore:
+        if use_datastore:
             self.entity_key = gds_add_saveobject(self.serverconfig.get_namespace(), self.object_type, self.object_id, self.couchdb_document, indexed_keys=indexed_keys, commit=self.transaction, rsc=rsc)
 
             if force_consistency:
@@ -6484,11 +6484,11 @@ class SaveObjectGoogle(object):
         self._data_changed = False
         return True
 
-    def exists(self, object_id=None, serverconfig=None, check_datastore=True):
+    def exists(self, object_id=None, serverconfig=None, use_datastore=True):
         """
         @type object_id: str, None
         @type serverconfig: ServerConfig, None
-        @type check_datastore: bool
+        @type use_datastore: bool
         """
         if serverconfig:
             self.serverconfig = serverconfig
@@ -6510,7 +6510,7 @@ class SaveObjectGoogle(object):
         if rsc.get(self.object_id):
             exists = True
 
-        if check_datastore:
+        if use_datastore:
             try:
                 kind = self.object_type
                 filterfield = "object_id"
@@ -6543,12 +6543,12 @@ class SaveObjectGoogle(object):
 
         return results_couchdb
 
-    def load(self, object_id=None, serverconfig=None, force_load=False, load_from_datastore=True):
+    def load(self, object_id=None, serverconfig=None, force_load=False, use_datastore=True):
         """
         @type object_id: str, None
         @type serverconfig: ServerConfig, None
         @type force_load: bool
-        @type load_from_datastore: bool
+        @type use_datastore: bool
         """
         self.dataloaded = True
 
@@ -6575,7 +6575,7 @@ class SaveObjectGoogle(object):
         results_couchdb = rsc.get(self.object_id)
 
         if not results_couchdb:
-            if load_from_datastore:
+            if use_datastore:
                 kind = self.object_type
                 filterfield = "object_id"
                 filterfieldval = self.object_id
@@ -6652,13 +6652,13 @@ class SaveObjectGoogle(object):
             return set(list(id_list)[:max_items])
         return id_list
 
-    def collection(self, serverconfig=None, warning=True, max_items=-1, cls_params=None, load_from_datastore=True):
+    def collection(self, serverconfig=None, warning=True, max_items=-1, cls_params=None, use_datastore=True):
         """
         @type serverconfig: ServerConfig, None
         @type warning: bool
         @type max_items: int
         @type cls_params: None, list
-        @type load_from_datastore: bool
+        @type use_datastore: bool
         """
         if serverconfig:
             self.serverconfig = serverconfig
@@ -6674,7 +6674,7 @@ class SaveObjectGoogle(object):
         rsc = RedisServer(self.get_serverconfig().get_namespace())
         id_collection = []
 
-        if not load_from_datastore and rsc:
+        if not use_datastore and rsc:
             ids_ot = self.get_serverconfig().rs_get("saveobject_ids_" + self.object_type)
 
             if ids_ot:
