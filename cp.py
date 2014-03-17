@@ -1308,7 +1308,7 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
         check_split = [x.strip() for x in check_split2]
 
         found_color = False
-
+        fname = fname.replace("/__init__.py", "")
         if replace_variable in check_split and len(line.strip()) > 0:
             if replace_variable + " = " not in line:
                 if fname.endswith(".py"):

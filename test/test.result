@@ -11,7 +11,7 @@ print "test.cf:8", 2
 warning "test.cf:11", 3
 
 
-emit_event("test.cf:14", 2)
+emit_event(2)
 
 
 urls.command("test.cf:17", 3)

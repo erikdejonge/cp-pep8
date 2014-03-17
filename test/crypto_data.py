@@ -58,8 +58,6 @@ from googledatastore.helper import *
 reload(sys)
 
 #noinspection PyUnresolvedReferences
-
-
 sys.setdefaultencoding("utf-8")
 
 
@@ -353,7 +351,7 @@ def emit_event(f):
     """
     @type f: str
     """
-    print "crypto_data.py:356", f
+    print "crypto_data.py:354", f
 
 
 def end_profile(pr, items=10, printstats=True):
@@ -366,12 +364,12 @@ def end_profile(pr, items=10, printstats=True):
     p = Stats(pr)
     p.strip_dirs()
     emit_event("foo")
-    print "crypto_data.py:369", "hello"
+    print "crypto_data.py:367", "hello"
     if printstats:
-        print "crypto_data.py:371"
-        print "crypto_data.py:372", "total time"
+        print "crypto_data.py:369"
+        print "crypto_data.py:370", "total time"
         p.print_stats(items)
-        print "crypto_data.py:374", "cumulative time"
+        print "crypto_data.py:372", "cumulative time"
         p.sort_stats('cumtime')
         p.print_stats(items)
 
@@ -393,7 +391,7 @@ def format_and_print_large_string(largestring):
                     s += c
 
         s += "\\\n"
-    print "crypto_data.py:396", s
+    print "crypto_data.py:394", s
 
 
 def slugify_unicode(value):
@@ -1042,7 +1040,7 @@ def console(*args, **kwargs):
         @return: @rtype:
         """
         santize_string = str(santize_string)
-        santize_string = santize_string.replace("/__init__.py", "")
+        santize_string = santize_string.replace("", "")
         return santize_string
 
     arguments = [sanitize(x) for x in arguments if x is not None]
@@ -1483,8 +1481,8 @@ def handle_ex(exc, again=True, give_string=False):
                 val = line[3]
             error_msg += fname_number + " | " + tabs + val + "\n"
     except Exception, e:
-        print "\033[93m" + log_date_time_string(), "crypto_data.py:1486", e, '\033[m'
-        print "\033[93m" + log_date_time_string(), "crypto_data.py:1487", exc, '\033[m'
+        print "\033[93m" + log_date_time_string(), "crypto_data.py:1484", e, '\033[m'
+        print "\033[93m" + log_date_time_string(), "crypto_data.py:1485", exc, '\033[m'
     error_msg += "\033[95m" + log_date_time_string() + " ---------------------------\n"
 
     if give_string:
@@ -1987,7 +1985,7 @@ class RedisServer(object):
 
                             return
                     else:
-                        self.emit_event("subscribed_on_event", cevent["channel"])
+                        self.emit_event("crypto_data.py:1988", "subscribed_on_event", cevent["channel"])
                         self.set("event_" + str(cevent["channel"]), True)
 
             except Exception, e:
@@ -2603,7 +2601,6 @@ def standard_progress(p=0):
     """
     @type p: int
     """
-
     sys.stdout.write(" -> " + str(int(p)) + " %\r")
     sys.stdout.flush()
 
@@ -4861,15 +4858,15 @@ class SaveObjectCouch(object):
         @type newest_doc: dict
         """
         if debug:
-            print "crypto_data.py:4864", "---------------------------------------------------------------------------"
-            print "crypto_data.py:4865", key
-            print "crypto_data.py:4866", newest_doc[key]
-            print "crypto_data.py:4867", getattr(self, key)
-            print "crypto_data.py:4868", newermember_timestamp
-            print "crypto_data.py:4869", "mymember_timestamp", mymember_timestamp
+            print "crypto_data.py:4861", "---------------------------------------------------------------------------"
+            print "crypto_data.py:4862", key
+            print "crypto_data.py:4863", newest_doc[key]
+            print "crypto_data.py:4864", getattr(self, key)
+            print "crypto_data.py:4865", newermember_timestamp
+            print "crypto_data.py:4866", "mymember_timestamp", mymember_timestamp
             nwt = newermember_timestamp >= mymember_timestamp
-            print "crypto_data.py:4871", "newermember_timestamp >= mymember_timestamp", nwt
-            print "crypto_data.py:4872", "---------------------------------------------------------------------------"
+            print "crypto_data.py:4868", "newermember_timestamp >= mymember_timestamp", nwt
+            print "crypto_data.py:4869", "---------------------------------------------------------------------------"
 
     def handleconflict(self, newest_doc):
         """

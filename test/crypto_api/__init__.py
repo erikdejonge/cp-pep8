@@ -39,7 +39,7 @@ def get_random_data(size):
     """
     @type size: int
     """
-    print "crypto_api/__init__.py:42", "hello"
+    print "crypto_api:42", "hello"
     return Random.new().read(size)
 
 
@@ -127,9 +127,9 @@ def log(msg):
 
     for i in spl:
         if i != spl[len(spl) - 1]:
-            print "crypto_api/__init__.py:130", "\t"
+            print "crypto_api:130", "\t"
         else:
-            print "crypto_api/__init__.py:132", i, "\t"
+            print "crypto_api:132", i, "\t"
     return
 
 
@@ -1485,7 +1485,7 @@ def callback_funcion(progress):
     @param progress:
     @type progress:
     """
-    print "crypto_api/__init__.py:1488", progress
+    print "crypto_api:1488", progress
 
 
 class EmptyFile(Exception):

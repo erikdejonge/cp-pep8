@@ -63,6 +63,7 @@ class CPTest(unittest.TestCase):
         """
         test_cp
         """
+
         fname = self.testfile
         newcode, oldcode = self.run_cp(fname)
         vcode = open("./test/test.result").read()
@@ -73,6 +74,7 @@ class CPTest(unittest.TestCase):
         """
         test_some_files
         """
+
         testfiles = ["app_basic.coffee", "controller_base.coffee", "services.coffee", "crypto_data.py"]
 
         for tf in testfiles:
@@ -89,13 +91,16 @@ class CPTest(unittest.TestCase):
         """
         test_directory
         """
-        #os.system("rm -Rf ./crypto_api")
+
+        os.system("rm -Rf ./crypto_api")
         os.system("cp -r ./test/crypto_api .")
         os.system("cp cp.py ./crypto_api")
         fname = "./crypto_api/__init__.py"
         oc = open(fname).read()
-        cmd = "cd crypto_api; python cp.py -f __init__.py"
-        os.system(cmd)
-        nc = open(fname).read()
-        self.assertEqual(oc, nc)
+
+        for i in range(0, 3):
+            cmd = "cd crypto_api; python cp.py -f __init__.py"
+            os.system(cmd)
+            nc = open(fname).read()
+            self.assertEqual(oc, nc)
         os.system("rm -Rf ./crypto_api")
