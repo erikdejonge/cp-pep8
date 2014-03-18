@@ -920,7 +920,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if line.strip().startswith("with") and fname.endswith(".py"):
         debuginfo = "with statement"
         add_enter = True
-    elif method_call(line):
+    elif method_call(line) and not "raise" in line:
         debuginfo = "methodcall"
         if assignment(line):
             debuginfo += " and assigned "
