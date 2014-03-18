@@ -830,7 +830,6 @@ class CryptoUser(SaveObjectGoogle):
             if password_hash == self.m_password_hash_p64s:
                 self.authorized = True
                 return True
-
             raise PasswordException(self.object_id + " is not authorized")
         else:
             if not password:
@@ -1485,7 +1484,7 @@ def callback_funcion(progress):
     @param progress:
     @type progress:
     """
-    print "crypto_api:1488", progress
+    print "crypto_api:1487", progress
 
 
 class EmptyFile(Exception):

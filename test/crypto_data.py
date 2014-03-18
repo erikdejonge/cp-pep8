@@ -2760,7 +2760,6 @@ def gds_get_key_name(key):
 
     if retval:
         return retval
-
     raise Exception("no name found in key")
 
 
@@ -2771,7 +2770,6 @@ def gds_get_key_kind(key):
     for pe in key.path_element:
         if hasattr(pe, "kind"):
             return pe.kind
-
     raise Exception("no kind found in key")
 
 
@@ -3306,7 +3304,6 @@ class Memory(object):
                 del self.data[key]
                 if key in self.timestamps:
                     del self.timestamps[key]
-
                 raise MemoryExpired(key)
 
         return key in self.data
@@ -3732,7 +3729,6 @@ def local_lock_starttime(key):
     global g_lock_times
     if key in g_lock_times:
         return g_lock_times[key]
-
     raise LockNoTime(key)
 
 
@@ -4858,15 +4854,15 @@ class SaveObjectCouch(object):
         @type newest_doc: dict
         """
         if debug:
-            print "crypto_data.py:4861", "---------------------------------------------------------------------------"
-            print "crypto_data.py:4862", key
-            print "crypto_data.py:4863", newest_doc[key]
-            print "crypto_data.py:4864", getattr(self, key)
-            print "crypto_data.py:4865", newermember_timestamp
-            print "crypto_data.py:4866", "mymember_timestamp", mymember_timestamp
+            print "crypto_data.py:4857", "---------------------------------------------------------------------------"
+            print "crypto_data.py:4858", key
+            print "crypto_data.py:4859", newest_doc[key]
+            print "crypto_data.py:4860", getattr(self, key)
+            print "crypto_data.py:4861", newermember_timestamp
+            print "crypto_data.py:4862", "mymember_timestamp", mymember_timestamp
             nwt = newermember_timestamp >= mymember_timestamp
-            print "crypto_data.py:4868", "newermember_timestamp >= mymember_timestamp", nwt
-            print "crypto_data.py:4869", "---------------------------------------------------------------------------"
+            print "crypto_data.py:4864", "newermember_timestamp >= mymember_timestamp", nwt
+            print "crypto_data.py:4865", "---------------------------------------------------------------------------"
 
     def handleconflict(self, newest_doc):
         """

@@ -1154,7 +1154,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 loading = true
 
                 if operation == "set"
-                    window.saveobject_cache =
+                    window.saveobject_cache = 
                     {}
 
                 if operation == "get" or operation == "get_members"
@@ -1888,7 +1888,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
                 addfile = false
                 filedata.error = "file_too_large_for_upload"
                 m_file_not_good_for_upload.push({"file": f, "filedata": filedata})
-            addfile =
+            addfile = 
             if addfile
                 if not utils.list_contains(m_upload_files_selected, fhash)
                     m_upload_files_selected.push({"file": f, "filedata": filedata})
@@ -1970,7 +1970,7 @@ angular.module("cryptoboxApp.services", ["ngResource", "ng"])
 
             if not utils.exist(relpath)
                 relpath = ""
-            fheaders =
+            fheaders = 
                 'Content-Type': file_data.type
             fdata =
                 'basepath': safe_b64(parent.m_path_p64s)
