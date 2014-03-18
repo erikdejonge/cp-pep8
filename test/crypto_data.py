@@ -2003,7 +2003,7 @@ class RedisServer(object):
         self.delete("event_" + str(event))
         return events_subscriber
 
-    def event_wait(self, event, callback=None, wait_time=None):
+    def event_subscribe_wait(self, event, callback=None, wait_time=None):
         """
         @type event: str
         @type callback: function, none
@@ -2048,12 +2048,12 @@ class RedisServer(object):
                     time.sleep(0.05)
 
                     if self._verbose:
-                        console("event_wait: timeleft, ", timeleft)
+                        console("event_subscribe_wait: timeleft, ", timeleft)
 
                 if timeleft <= -0.05:
                     if self._verbose:
-                        raise RedisException("event_wait:wait_time exceeded:" + str(timeleft)[:6] + " [" + event + "]")
-                    raise RedisException("event_wait:wait_time exceeded")
+                        raise RedisException("event_subscribe_wait:wait_time exceeded:" + str(timeleft)[:6] + " [" + event + "]")
+                    raise RedisException("event_subscribe_wait:wait_time exceeded")
 
     def event_emit(self, event, data=None):
         """
