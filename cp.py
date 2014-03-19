@@ -1118,9 +1118,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                     mytype = "CouchDBServer"
 
                                 elif typeitem == "cryptobox":
-                                    mytype = "CryptoboxDB"
+                                    mytype = "CryptoboxMetaData"
                                 elif typeitem == "cryptobox_db":
-                                    mytype = "CryptoboxDB"
+                                    mytype = "CryptoboxMetaData"
                                 elif typeitem == "login_token":
                                     mytype = "LoginToken"
 
