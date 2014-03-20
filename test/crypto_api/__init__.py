@@ -1355,7 +1355,7 @@ def encrypt_file_smp(secret, fname, progress_callback=None, progress_callback_pa
 
         for efpath, data_hash in enc_files:
             data_hashes.append(data_hash)
-            enc_file.write(str(os.stat(efpath).st_size) + "\n")
+            enc_file.write(str(os.stat(efpath).st_size) + "\n") 
             fdata = open(efpath).read()
             enc_file.write(fdata)
             os.remove(efpath)
