@@ -1324,14 +1324,13 @@ def make_chunklist(fpath):
     return chunklist_abs
 
 
-def encrypt_file_smp(secret, fname, progress_callback=None, progress_callback_param=None, single_file=False, use_dummy_thread_pool=False, num_procs_param=None):
+def encrypt_file_smp(secret, fname, progress_callback=None, progress_callback_param=None, single_file=False, num_procs_param=None):
     """
     @type secret: str
     @type fname: str
     @type progress_callback: str, None
     @type progress_callback_param: list, dict, int, str, unicode, tuple
     @type single_file: bool
-    @type use_dummy_thread_pool: bool
     @type num_procs_param: None, int
     """
     Random.atfork()
@@ -1347,7 +1346,7 @@ def encrypt_file_smp(secret, fname, progress_callback=None, progress_callback_pa
         if progress_callback:
             progress_callback(100)
     else:
-        enc_files = smp_apply(encrypt_chunk, chunklist, progress_callback=progress_callback, progress_callback_param=progress_callback_param, use_dummy_thread_pool=use_dummy_thread_pool, num_procs_param=num_procs_param)
+        enc_files = smp_apply(encrypt_chunk, chunklist, progress_callback=progress_callback, progress_callback_param=progress_callback_param, use_dummy_thread_pool=False, num_procs_param=num_procs_param)
 
     cleanup_tempfiles()
 
@@ -1424,14 +1423,13 @@ def decrypt_chunk(secret, fpath, queue):
     return calculated_hash
 
 
-def decrypt_file_smp(secret, enc_file=None, enc_files=tuple(), progress_callback=None, delete_enc_files=False, use_dummy_thread_pool=False, auto_delete_tempfile=True):
+def decrypt_file_smp(secret, enc_file=None, enc_files=tuple(), progress_callback=None, delete_enc_files=False, auto_delete_tempfile=True):
     """
     @type secret: str, unicode
     @type enc_file: file, None
     @type enc_files: tuple
     @type progress_callback: function
     @type delete_enc_files: bool
-    @type use_dummy_thread_pool: bool
     @type auto_delete_tempfile: bool
     """
     try:
@@ -1463,7 +1461,7 @@ def decrypt_file_smp(secret, enc_file=None, enc_files=tuple(), progress_callback
         dec_file = get_named_temporary_file(auto_delete=auto_delete_tempfile)
 
         chunks_param_sorted = [(secret, file_path) for file_path in enc_files]
-        hashes = smp_apply(decrypt_chunk, chunks_param_sorted, progress_callback, listener=listener_file_writer, listener_param=tuple([dec_file.name]), use_dummy_thread_pool=use_dummy_thread_pool)
+        hashes = smp_apply(decrypt_chunk, chunks_param_sorted, progress_callback, listener=listener_file_writer, listener_param=tuple([dec_file.name]), use_dummy_thread_pool=False)
         dec_file.seek(0)
 
         if enc_file:
@@ -1728,7 +1726,7 @@ class CryptoDoc(SaveObjectGoogle):
                 self.m_mime_type_p64s = "application/octet-stream"
 
         self.m_created_by = user_object_id
-        enc_chunks = encrypt_file_smp(secret, ufile.name, progress_callback=progress_callback_encrypt, progress_callback_param=progress_callback_param_encrypt, use_dummy_thread_pool=use_dummy_thread_pool, num_procs_param=num_procs_param)
+        enc_chunks = encrypt_file_smp(secret, ufile.name, progress_callback=progress_callback_encrypt, progress_callback_param=progress_callback_param_encrypt, num_procs_param=num_procs_param)
         self.m_num_chunks = len(enc_chunks)
         bucket_name = self.get_bucket_name()
         name = self.object_id
@@ -1780,7 +1778,7 @@ class CryptoDoc(SaveObjectGoogle):
         dec_chunks = smp_apply(gcs_read_from_gcloud, read_chunks_param, num_procs_param=num_procs, use_dummy_thread_pool=use_dummy_thread_pool)
 
         if file_data:
-            dec_data = decrypt_file_smp(secret, enc_files=tuple(dec_chunks), progress_callback=progress_callback_decrypt, use_dummy_thread_pool=use_dummy_thread_pool, auto_delete_tempfile=auto_delete_tempfile)
+            dec_data = decrypt_file_smp(secret, enc_files=tuple(dec_chunks), progress_callback=progress_callback_decrypt, auto_delete_tempfile=auto_delete_tempfile)
         else:
             dec_data = None
 
