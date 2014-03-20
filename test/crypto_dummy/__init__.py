@@ -39,7 +39,7 @@ def get_random_data(size):
     """
     @type size: int
     """
-    print "crypto_api:42", "hello"
+    print "crypto_dummy:42", "hello"
     return Random.new().read(size)
 
 
@@ -127,9 +127,9 @@ def log(msg):
 
     for i in spl:
         if i != spl[len(spl) - 1]:
-            print "crypto_api:130", "\t"
+            print "crypto_dummy:130", "\t"
         else:
-            print "crypto_api:132", i, "\t"
+            print "crypto_dummy:132", i, "\t"
     return
 
 
@@ -1355,7 +1355,7 @@ def encrypt_file_smp(secret, fname, progress_callback=None, progress_callback_pa
 
         for efpath, data_hash in enc_files:
             data_hashes.append(data_hash)
-            enc_file.write(str(os.stat(efpath).st_size) + "\n") 
+            enc_file.write(str(os.stat(efpath).st_size) + "\n")
             fdata = open(efpath).read()
             enc_file.write(fdata)
             os.remove(efpath)
@@ -1479,7 +1479,7 @@ def callback_funcion(progress):
     @param progress:
     @type progress:
     """
-    print "crypto_api:1482", progress
+    print "crypto_dummy:1482", progress
 
 
 class EmptyFile(Exception):
