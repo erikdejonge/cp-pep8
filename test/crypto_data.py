@@ -486,7 +486,7 @@ class SMPException(Exception):
     pass
 
 
-def smp_apply(method, items, progress_callback=None, progress_callback_param=None, dummy_pool=False, listener=None, listener_param=None, num_procs_param=None, disable_smp=False, no_smp_from=None):
+def smp_apply(method, items, progress_callback=None, progress_callback_param=None, dummy_pool=False, listener=None, listener_param=None, num_procs_param=None, use_dummy_thread_pool=False, no_smp_from=None):
     """
     @type method: function
     @type items: list, tuple
@@ -496,7 +496,7 @@ def smp_apply(method, items, progress_callback=None, progress_callback_param=Non
     @type listener: function
     @type listener_param: list, tuple
     @type num_procs_param: int
-    @type disable_smp: bool
+    @type use_dummy_thread_pool: bool
     @type no_smp_from: None, list
     @param no_smp_from: list of strings of files or dirs which are checked against the stack for occurrences, for example in a gevent monkeypatched setup
     @type no_smp_from:
@@ -507,8 +507,8 @@ def smp_apply(method, items, progress_callback=None, progress_callback_param=Non
     else:
         no_smp_from.append("www_cryptobox_nl")
 
-    if disable_smp:
-        console_warning("smp_apply: disable_smp on")
+    if use_dummy_thread_pool:
+        console_warning("smp_apply: use_dummy_thread_pool on")
         results = []
         cnt = 0
         maxi = len(items)
