@@ -816,12 +816,10 @@ class Const(object):
         self.__dict__[name] = value
 
 
-def timestamp_to_string(ts, short=False):
-    """Return the current time formatted for logging.
-    @param ts:
-    @type ts:
-    @param short:
-    @type short:
+def timestamp_to_string_gmt(ts, short=False):
+    """
+    @type ts: float
+    @type short: bool
     """
     monthname = [None, 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     year, month, day, hh, mm, ss, x, y, z = time.localtime(ts)
@@ -866,7 +864,7 @@ def log_date_time_string():
     log_date_time_string
     @return: @rtype:
     """
-    ts = "[" + timestamp_to_string(time.time()) + "]"
+    ts = "[" + timestamp_to_string_gmt(time.time()) + "]"
     return ts
 
 
@@ -1481,8 +1479,8 @@ def handle_ex(exc, again=True, give_string=False):
                 val = line[3]
             error_msg += fname_number + " | " + tabs + val + "\n"
     except Exception, e:
-        print "\033[93m" + log_date_time_string(), "crypto_data.py:1484", e, '\033[m'
-        print "\033[93m" + log_date_time_string(), "crypto_data.py:1485", exc, '\033[m'
+        print "\033[93m" + log_date_time_string(), "crypto_data.py:1482", e, '\033[m'
+        print "\033[93m" + log_date_time_string(), "crypto_data.py:1483", exc, '\033[m'
     error_msg += "\033[95m" + log_date_time_string() + " ---------------------------\n"
 
     if give_string:
@@ -4854,15 +4852,15 @@ class SaveObjectCouch(object):
         @type newest_doc: dict
         """
         if debug:
-            print "crypto_data.py:4857", "---------------------------------------------------------------------------"
-            print "crypto_data.py:4858", key
-            print "crypto_data.py:4859", newest_doc[key]
-            print "crypto_data.py:4860", getattr(self, key)
-            print "crypto_data.py:4861", newermember_timestamp
-            print "crypto_data.py:4862", "mymember_timestamp", mymember_timestamp
+            print "crypto_data.py:4855", "---------------------------------------------------------------------------"
+            print "crypto_data.py:4856", key
+            print "crypto_data.py:4857", newest_doc[key]
+            print "crypto_data.py:4858", getattr(self, key)
+            print "crypto_data.py:4859", newermember_timestamp
+            print "crypto_data.py:4860", "mymember_timestamp", mymember_timestamp
             nwt = newermember_timestamp >= mymember_timestamp
-            print "crypto_data.py:4864", "newermember_timestamp >= mymember_timestamp", nwt
-            print "crypto_data.py:4865", "---------------------------------------------------------------------------"
+            print "crypto_data.py:4862", "newermember_timestamp >= mymember_timestamp", nwt
+            print "crypto_data.py:4863", "---------------------------------------------------------------------------"
 
     def handleconflict(self, newest_doc):
         """
