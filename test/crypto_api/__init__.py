@@ -1334,7 +1334,6 @@ def encrypt_file_smp(secret, fname, progress_callback=None, progress_callback_pa
     @type num_procs_param: None, int
     """
     Random.atfork()
-    os.nice(20)
     initialization_vector = get_random_data_aes_blocksize()
     chunklist = make_chunklist(fname)
 
@@ -1433,8 +1432,6 @@ def decrypt_file_smp(secret, enc_file=None, enc_files=tuple(), progress_callback
     @type auto_delete_tempfile: bool
     """
     try:
-        os.nice(20)
-
         if enc_file:
             enc_files = []
             enc_file.seek(0)
@@ -1482,7 +1479,7 @@ def callback_funcion(progress):
     @param progress:
     @type progress:
     """
-    print "crypto_api:1487", progress
+    print "crypto_api:1482", progress
 
 
 class EmptyFile(Exception):
