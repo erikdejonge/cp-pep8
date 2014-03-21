@@ -1345,7 +1345,7 @@ def encrypt_file_smp(secret, fname, progress_callback=None, progress_callback_pa
         if progress_callback:
             progress_callback(100)
     else:
-        enc_files = smp_apply(encrypt_chunk, chunklist, progress_callback=progress_callback, progress_callback_param=progress_callback_param, use_dummy_thread_pool=False, num_procs_param=num_procs_param)
+        enc_files = smp_apply(encrypt_chunk, chunklist, progress_callback=progress_callback, progress_callback_param=progress_callback_param, use_simple_apply_no_async=False, num_procs_param=num_procs_param)
 
     cleanup_tempfiles()
 
@@ -1458,7 +1458,7 @@ def decrypt_file_smp(secret, enc_file=None, enc_files=tuple(), progress_callback
         dec_file = get_named_temporary_file(auto_delete=auto_delete_tempfile)
 
         chunks_param_sorted = [(secret, file_path) for file_path in enc_files]
-        hashes = smp_apply(decrypt_chunk, chunks_param_sorted, progress_callback, listener=listener_file_writer, listener_param=tuple([dec_file.name]), use_dummy_thread_pool=False)
+        hashes = smp_apply(decrypt_chunk, chunks_param_sorted, progress_callback, listener=listener_file_writer, listener_param=tuple([dec_file.name]), use_simple_apply_no_async=False)
         dec_file.seek(0)
 
         if enc_file:
@@ -1672,7 +1672,7 @@ class CryptoDoc(SaveObjectGoogle):
         else:
             return int(self.size)
 
-    def encrypt_save(self, key, user_object_id, ufile, progress_callback_encrypt=None, progress_callback_param_encrypt=None, secret=None, use_dummy_thread_pool=False, num_procs_param=None):
+    def encrypt_save(self, key, user_object_id, ufile, progress_callback_encrypt=None, progress_callback_param_encrypt=None, secret=None, use_simple_apply_no_async=False, num_procs_param=None):
         """
         @type key: str
         @type user_object_id: str
@@ -1680,13 +1680,13 @@ class CryptoDoc(SaveObjectGoogle):
         @type progress_callback_encrypt: str, None
         @type progress_callback_param_encrypt: str, None
         @type secret: str, None
-        @type use_dummy_thread_pool: bool
+        @type use_simple_apply_no_async: bool
         @type num_procs_param: None, int
         """
         if self.encrypted:
             return False
 
-        if not use_dummy_thread_pool:
+        if not use_simple_apply_no_async:
             Random.atfork()
 
         if not secret:
@@ -1729,7 +1729,7 @@ class CryptoDoc(SaveObjectGoogle):
         name = self.object_id
         write_chunks_param = [(bucket_name, name + "_" + str(fpath[0]), fpath[1], self.cloudstorage) for fpath in enumerate(enc_chunks)]
         num_procs = len(write_chunks_param)
-        smp_apply(gcs_write_to_gcloud, write_chunks_param, num_procs_param=num_procs, use_dummy_thread_pool=use_dummy_thread_pool)
+        smp_apply(gcs_write_to_gcloud, write_chunks_param, num_procs_param=num_procs, use_simple_apply_no_async=use_simple_apply_no_async)
 
         for fp in enc_chunks:
             if os.path.exists(fp):
@@ -1750,13 +1750,13 @@ class CryptoDoc(SaveObjectGoogle):
         self.dec_data = None
         return True
 
-    def load_decrypt(self, key, file_data=True, progress_callback_decrypt=None, secret=None, use_dummy_thread_pool=False, auto_delete_tempfile=True):
+    def load_decrypt(self, key, file_data=True, progress_callback_decrypt=None, secret=None, use_simple_apply_no_async=False, auto_delete_tempfile=True):
         """
         @type key: str
         @type file_data: bool
         @type progress_callback_decrypt: function, None
         @type secret: str, None
-        @type use_dummy_thread_pool: bool
+        @type use_simple_apply_no_async: bool
         @type auto_delete_tempfile: bool
         """
         if not self._id:
@@ -1772,7 +1772,7 @@ class CryptoDoc(SaveObjectGoogle):
         name = self.object_id
         read_chunks_param = [(bucket_name, name + "_" + str(cnt), self.cloudstorage) for cnt in range(0, self.m_num_chunks)]
         num_procs = len(read_chunks_param)
-        dec_chunks = smp_apply(gcs_read_from_gcloud, read_chunks_param, num_procs_param=num_procs, use_dummy_thread_pool=use_dummy_thread_pool)
+        dec_chunks = smp_apply(gcs_read_from_gcloud, read_chunks_param, num_procs_param=num_procs, use_simple_apply_no_async=use_simple_apply_no_async)
 
         if file_data:
             dec_data = decrypt_file_smp(secret, enc_files=tuple(dec_chunks), progress_callback=progress_callback_decrypt, auto_delete_tempfile=auto_delete_tempfile)
