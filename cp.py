@@ -1110,6 +1110,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                     mytype = "str"
                                 elif typeitem.startswith("b_"):
                                     mytype = "bool"
+                                elif typeitem.startswith("events"):
+                                    mytype = "Events"
                                 elif typeitem.startswith("request"):
                                     mytype = "HttpRequest, django.core.handlers.wsgi.WSGIRequest"
                                 elif typeitem.startswith("serverconfig"):
