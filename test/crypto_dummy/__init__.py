@@ -35,7 +35,7 @@ from crypto_data import gcs_delete_from_gcloud, gcs_read_from_gcloud, gcs_write_
 from crypto_data import gds_get_dict_list, strcmp, get_file_size, gds_get_ids, gds_delete_items_on_fieldvalue
 
 
-def get_random_data(size):
+def dumy_get_random_data(size):
     """
     @type size: int
     """
@@ -43,14 +43,14 @@ def get_random_data(size):
     return Random.new().read(size)
 
 
-def get_random_data_aes_blocksize():
+def dumy_get_random_data_aes_blocksize():
     """
     get_random_data_aes_blocksize
     """
     return Random.new().read(AES.block_size)
 
 
-def mix_match(s, reverse=False):
+def dumy_mix_match(s, reverse=False):
     """
     @type s: str
     @type reverse: bool
@@ -67,13 +67,13 @@ def mix_match(s, reverse=False):
         raise Exception("not enough random")
 
 
-def generate_password(size):
+def dumy_generate_password(size):
     """
     @type size: int
     """
     Random.atfork()
 
-    def filter_chars(password_string):
+    def dumy_filter_chars(password_string):
         """
         @type password_string: str
         """
@@ -93,7 +93,7 @@ def generate_password(size):
     return pwd[:size]
 
 
-def get_pronounceable_password(wordcount=2, digitcount=2):
+def dumy_get_pronounceable_password(wordcount=2, digitcount=2):
     """
     @type wordcount: int
     @type digitcount: int
@@ -107,7 +107,7 @@ def get_pronounceable_password(wordcount=2, digitcount=2):
     return password
 
 
-def password_derivation(key, salt, size=32):
+def dumy_password_derivation(key, salt, size=32):
     """
     @type key: str
     @type salt: str
@@ -117,7 +117,7 @@ def password_derivation(key, salt, size=32):
     return PBKDF2(key, salt, size, count=iterations)
 
 
-def log(msg):
+def dumy_log(msg):
     """
     log a message in a dict to see all characters
     @param msg: log msg
@@ -133,14 +133,14 @@ def log(msg):
     return
 
 
-class EncryptException(Exception):
+class DumyEncryptException(Exception):
     """
     EncryptException
     """
     pass
 
 
-def encrypt(key, data, data_is_list=False, salt_secret=None, base64data=False, initialization_vector=None):
+def dumy_encrypt(key, data, data_is_list=False, salt_secret=None, base64data=False, initialization_vector=None):
     """
     @type key: str
     @type data: str, list
@@ -214,7 +214,7 @@ def encrypt(key, data, data_is_list=False, salt_secret=None, base64data=False, i
     return encrypted_data_dict
 
 
-class EncryptionHashMismatch(Exception):
+class DumyEncryptionHashMismatch(Exception):
     """
     raised when the hash of the decrypted data doesn't match the hash of the original data
 
@@ -222,7 +222,7 @@ class EncryptionHashMismatch(Exception):
     pass
 
 
-def decrypt(key, encrypted_data_dict, data_is_list=False, secret=None, hashcheck=True):
+def dumy_decrypt(key, encrypted_data_dict, data_is_list=False, secret=None, hashcheck=True):
     """
     @type key: str
     @type encrypted_data_dict: dict
@@ -270,7 +270,7 @@ def decrypt(key, encrypted_data_dict, data_is_list=False, secret=None, hashcheck
     return decoded
 
 
-def make_hash_hmac(data, secret):
+def dumy_make_hash_hmac(data, secret):
     """
     @type data: str
     @type secret: str
@@ -286,7 +286,7 @@ def make_hash_hmac(data, secret):
     return hmac.hexdigest()
 
 
-def make_hash_hmac_lowercase(data, secret):
+def dumy_make_hash_hmac_lowercase(data, secret):
     """
     @type data: str
     @type secret: str
@@ -303,7 +303,7 @@ def make_hash_hmac_lowercase(data, secret):
     return hmac.hexdigest()
 
 
-def make_hash(data):
+def dumy_make_hash(data):
     """
     @type data: str
     """
@@ -311,7 +311,7 @@ def make_hash(data):
     return sha.hexdigest()
 
 
-def make_hash_list(data_list):
+def dumy_make_hash_list(data_list):
     """
     @type data_list: list
     """
@@ -323,7 +323,7 @@ def make_hash_list(data_list):
     return sha.hexdigest()
 
 
-def make_checksum(data):
+def dumy_make_checksum(data):
     """
     @type data: str, dict, list
     """
@@ -340,7 +340,7 @@ def make_checksum(data):
         return base64.encodestring(str(SHA.new(data).hexdigest())).strip().rstrip("=")
 
 
-def make_secure_checksum(data, secret):
+def dumy_make_secure_checksum(data, secret):
     """
     @type secret: str
     @type data: str
@@ -349,7 +349,7 @@ def make_secure_checksum(data, secret):
     return make_hash_hmac(checksum, secret)
 
 
-def sign(private_key, data):
+def dumy_sign(private_key, data):
     """ hash data and sign the hash
     @param private_key:
     @type private_key:
@@ -363,7 +363,7 @@ def sign(private_key, data):
     return private_key.sign(ahash, get_random_data(32))
 
 
-def verify(public_key, data, signature):
+def dumy_verify(public_key, data, signature):
     """ hash data and verify against signature
     @param public_key:
     @type public_key:
@@ -378,17 +378,17 @@ def verify(public_key, data, signature):
     return public_key.verify(ahash, signature)
 
 
-class PasswordException(Exception):
+class DumyPasswordException(Exception):
     """ password has doesn't match the stored hash """
     pass
 
 
-class RSAException(Exception):
+class DumyRSAException(Exception):
     """ password has doesn't match the stored hash """
     pass
 
 
-class TestClassPerson(object):
+class DumyTestClassPerson(object):
     """
     Person
     """
@@ -396,7 +396,7 @@ class TestClassPerson(object):
     m_age = None
 
 
-def encrypt_object(key, obj, salt_secret=None):
+def dumy_encrypt_object(key, obj, salt_secret=None):
     """ convert to base64 and encrypt
     @param key:
     @type key:
@@ -410,7 +410,7 @@ def encrypt_object(key, obj, salt_secret=None):
     return base64.b64encode(cPickle.dumps(base_t))
 
 
-def decrypt_object(key, obj_string, secret=None):
+def dumy_decrypt_object(key, obj_string, secret=None):
     """ encrypted base64 to object
     @param key:
     @type key:
@@ -424,19 +424,19 @@ def decrypt_object(key, obj_string, secret=None):
     return obj
 
 
-class PasswordStoreError(Exception):
+class DumyPasswordStoreError(Exception):
     """
     PasswordStoreError
     """
     pass
 
 
-class CryptoUserPassword(SaveObjectGoogle):
+class DumyCryptoUserPassword(SaveObjectGoogle):
     """
     CryptoUserPassword
     """
 
-    def __init__(self, serverconfig, user_object_id=None, data_object_id=None, password=None):
+    def dumy___init__(self, serverconfig, user_object_id=None, data_object_id=None, password=None):
         """
         @type serverconfig: ServerConfig
         @type user_object_id: str, None
@@ -468,7 +468,7 @@ class CryptoUserPassword(SaveObjectGoogle):
         self.m_data_object_id = data_object_id
         self.m_password_p64s = password
 
-    def save(self, object_id=None, serverconfig=None, force_consistency=False, store_in_memcached=True, force_save=True, transaction=None, use_datastore=True):
+    def dumy_save(self, object_id=None, serverconfig=None, force_consistency=False, store_in_memcached=True, force_save=True, transaction=None, use_datastore=True):
         """
         @type object_id: str, None
         @type serverconfig: ServerConfig, None
@@ -484,7 +484,7 @@ class CryptoUserPassword(SaveObjectGoogle):
         super(CryptoUserPassword, self).save(self.object_id, serverconfig, force_consistency=force_consistency, force_save=force_save, transaction=transaction, use_datastore=use_datastore)
         self._remove_obsolete_passwords(300)
 
-    def _remove_obsolete_passwords(self, wait_since_last_update):
+    def dumy__remove_obsolete_passwords(self, wait_since_last_update):
         """
         remove_obsolete_passwords
         """
@@ -503,14 +503,14 @@ class CryptoUserPassword(SaveObjectGoogle):
         return len(obsolete)
 
 
-class CryptoUserCvarNotFound(Exception):
+class DumyCryptoUserCvarNotFound(Exception):
     """
     CryptoUserCvarNotFound
     """
     pass
 
 
-def generate_rsa_key_pair(key_store_folder, keysize, try_precalc=False):
+def dumy_generate_rsa_key_pair(key_store_folder, keysize, try_precalc=False):
     """
     @type key_store_folder: str
     @type keysize: int
@@ -538,7 +538,7 @@ def generate_rsa_key_pair(key_store_folder, keysize, try_precalc=False):
     return rsa_private_key, rsa_public_key
 
 
-def generate_rsa_key_pair_smp(key_store_folder, keysize=2048):
+def dumy_generate_rsa_key_pair_smp(key_store_folder, keysize=2048):
     """
     @type key_store_folder: str
     @type keysize: int
@@ -548,7 +548,7 @@ def generate_rsa_key_pair_smp(key_store_folder, keysize=2048):
     open(os.path.join(key_store_folder, fname), "w").write(pub + "\n" + pr)
 
 
-def rsa_progress(p=0):
+def dumy_rsa_progress(p=0):
     """
     @type p: int
     """
@@ -556,7 +556,7 @@ def rsa_progress(p=0):
     sys.stdout.flush()
 
 
-def make_rsa_keys(key_store_folder, keysize, numkeys, num_procs=None):
+def dumy_make_rsa_keys(key_store_folder, keysize, numkeys, num_procs=None):
     """
     @type key_store_folder: str
     @type keysize: int
@@ -596,11 +596,11 @@ def make_rsa_keys(key_store_folder, keysize, numkeys, num_procs=None):
         smp_apply(generate_rsa_key_pair_smp, [(key_store_folder, keysize)] * lsize, progress_callback=rsa_progress, num_procs_param=num_procs)
 
 
-class ClientMandate(SaveObjectGoogle):
+class DumyClientMandate(SaveObjectGoogle):
 
     """ a mandate for a device  """
 
-    def __init__(self, serverconfig, object_id=None):
+    def dumy___init__(self, serverconfig, object_id=None):
         """
         @type serverconfig: ServerConfig
         @type object_id: str, None
@@ -612,10 +612,10 @@ class ClientMandate(SaveObjectGoogle):
         super(ClientMandate, self).__init__(serverconfig, object_id=object_id)
 
 
-class CryptoUser(SaveObjectGoogle):
+class DumyCryptoUser(SaveObjectGoogle):
     """ user object with encrypted rsa private key, encrypted salt and PBKDF2 password hash """
 
-    def __init__(self, serverconfig, name=None, object_id=None, overwrite=False):
+    def dumy___init__(self, serverconfig, name=None, object_id=None, overwrite=False):
         """
         @type serverconfig: ServerConfig
         @type name: str, None
@@ -654,7 +654,7 @@ class CryptoUser(SaveObjectGoogle):
             if self.m_username not in self.object_id:
                 self.object_id += ":" + self.m_username.replace("_", "")
 
-    def save(self, object_id=None, serverconfig=None, force_consistency=False, store_in_memcached=True, force_save=True, transaction=None, use_datastore=True):
+    def dumy_save(self, object_id=None, serverconfig=None, force_consistency=False, store_in_memcached=True, force_save=True, transaction=None, use_datastore=True):
         """
         @type object_id: str, None
         @type serverconfig: ServerConfig, None
@@ -682,20 +682,20 @@ class CryptoUser(SaveObjectGoogle):
         self.passwords_to_save = []
         super(CryptoUser, self).save(object_id, serverconfig, force_consistency=force_consistency, force_save=force_save, transaction=transaction, use_datastore=use_datastore)
 
-    def get_option_fields(self):
+    def dumy_get_option_fields(self):
         """
         get_option_fields
         """
         d = {"m_email_p64s": self.m_email_p64s}
         return d
 
-    def get_name(self):
+    def dumy_get_name(self):
         """
         object_id is username
         """
         return self.m_username
 
-    def load(self, object_id=None, serverconfig=None, force_load=False, use_datastore=True):
+    def dumy_load(self, object_id=None, serverconfig=None, force_load=False, use_datastore=True):
         """
         @type object_id: str, None
         @type serverconfig: ServerConfig, None
@@ -710,7 +710,7 @@ class CryptoUser(SaveObjectGoogle):
 
         return super(CryptoUser, self).load(object_id=self.object_id, force_load=force_load, use_datastore=use_datastore)
 
-    def _check_password(self, password):
+    def dumy__check_password(self, password):
         """
         @type password: str
         """
@@ -724,7 +724,7 @@ class CryptoUser(SaveObjectGoogle):
             log("Weak password:" + str(ex))
             return
 
-    def reset_password(self, old_password, new_password):
+    def dumy_reset_password(self, old_password, new_password):
         """
         @type old_password: str
         @type new_password: str
@@ -762,7 +762,7 @@ class CryptoUser(SaveObjectGoogle):
         finally:
             mtx.release_lock()
 
-    def create_user(self, password, keystore, keysize):
+    def dumy_create_user(self, password, keystore, keysize):
         """
         @type password: str
         @type keystore: str
@@ -791,7 +791,7 @@ class CryptoUser(SaveObjectGoogle):
         self.set_store_password(self.object_id, self.m_password_hash_p64s)
         self.save(force_consistency=True)
 
-    def get_rsa_private_key(self):
+    def dumy_get_rsa_private_key(self):
         """ decrypt private key """
         if not self.authorized:
             raise RSAException("not authorized")
@@ -804,13 +804,13 @@ class CryptoUser(SaveObjectGoogle):
 
         return self.rsa_private_key
 
-    def get_password_hash_b64(self):
+    def dumy_get_password_hash_b64(self):
         """
             get the passwordhash base64 encoded
         """
         return base64.encodestring(self.m_password_hash_p64s)
 
-    def authorize(self, password=None, password_hash_b64=None, password_hash=None):
+    def dumy_authorize(self, password=None, password_hash_b64=None, password_hash=None):
         """
         @type password: str, None
         @type password_hash_b64: str, None
@@ -845,13 +845,13 @@ class CryptoUser(SaveObjectGoogle):
 
         return self.authorized
 
-    def is_authorized(self):
+    def dumy_is_authorized(self):
         """
         is_authorized
         """
         return self.authorized
 
-    def encrypt_with_public_key(self, data):
+    def dumy_encrypt_with_public_key(self, data):
         """ RSAES-OAEP encrypt
         @type data: str
         RSA modulus (in bytes) minus 2, minus twice the hash output size.
@@ -870,7 +870,7 @@ class CryptoUser(SaveObjectGoogle):
         enc_data = cipher.encrypt(data)
         return enc_data
 
-    def decrypt_with_private_key(self, enc_data, private_key=None):
+    def dumy_decrypt_with_private_key(self, enc_data, private_key=None):
         """
         @type enc_data: str
         @type private_key: str, None
@@ -893,7 +893,7 @@ class CryptoUser(SaveObjectGoogle):
         cipher = PKCS1_OAEP.new(p_key)
         return cipher.decrypt(enc_data)
 
-    def del_store_password(self, pwd_id):
+    def dumy_del_store_password(self, pwd_id):
         """
         @type pwd_id: str
         """
@@ -903,7 +903,7 @@ class CryptoUser(SaveObjectGoogle):
             if strcmp(pw["m_data_object_id"], pwd_id):
                 self.passwords_to_delete.append({"object_id": pw["object_id"], "m_data_object_id": pwd_id})
 
-    def has_store_password(self, pwd_id):
+    def dumy_has_store_password(self, pwd_id):
         """
         @type pwd_id: str
         """
@@ -922,7 +922,7 @@ class CryptoUser(SaveObjectGoogle):
                 return True
         return False
 
-    def set_store_password(self, pwd_id, password, overwrite=False):
+    def dumy_set_store_password(self, pwd_id, password, overwrite=False):
         """
         @type pwd_id: str
         @type password: str
@@ -958,7 +958,7 @@ class CryptoUser(SaveObjectGoogle):
         self.passwords_to_save.append(cup)
         return True
 
-    def get_password_ids(self):
+    def dumy_get_password_ids(self):
         """
         get_password_ids
         """
@@ -977,7 +977,7 @@ class CryptoUser(SaveObjectGoogle):
 
         return list(pwd_ids)
 
-    def get_store_password(self, pwd_id, private_key=None):
+    def dumy_get_store_password(self, pwd_id, private_key=None):
         """
         @type pwd_id: str
         @type private_key: str, None
@@ -1018,7 +1018,7 @@ class CryptoUser(SaveObjectGoogle):
         data = self.decrypt_with_private_key(enc_key, private_key)
         return data
 
-    def authorize_boolean(self, password):
+    def dumy_authorize_boolean(self, password):
         """
         catch the exception and return a boolean
         @param password:
@@ -1033,7 +1033,7 @@ class CryptoUser(SaveObjectGoogle):
         except:
             return False
 
-    def authorize_boolean_hash(self, password_hash_b64):
+    def dumy_authorize_boolean_hash(self, password_hash_b64):
         """
         catch the exception and return a boolean
         @param password_hash_b64:
@@ -1045,7 +1045,7 @@ class CryptoUser(SaveObjectGoogle):
         except PasswordException:
             return False
 
-    def authorize_private_key(self, private_key):
+    def dumy_authorize_private_key(self, private_key):
         """
         @type private_key:
         """
@@ -1065,7 +1065,7 @@ class CryptoUser(SaveObjectGoogle):
         except PasswordException:
             return False
 
-    def set_cvar(self, key, value):
+    def dumy_set_cvar(self, key, value):
         """
         @type key: str, unicode
         @type value: str, dict
@@ -1073,13 +1073,13 @@ class CryptoUser(SaveObjectGoogle):
         """
         self.m_cvars[key] = object_b64_safe(value)
 
-    def has_cvar(self, key):
+    def dumy_has_cvar(self, key):
         """
         @type key: str
         """
         return key in self.m_cvars
 
-    def get_cvar(self, key, allow_none=False):
+    def dumy_get_cvar(self, key, allow_none=False):
         """
         @type key: str
         @type allow_none: bool
@@ -1092,14 +1092,14 @@ class CryptoUser(SaveObjectGoogle):
             else:
                 raise CryptoUserCvarNotFound(key)
 
-    def del_cvar(self, key):
+    def dumy_del_cvar(self, key):
         """
         @type key: str
         """
         if key in self.m_cvars:
             del self.m_cvars[key]
 
-    def get_cvars(self):
+    def dumy_get_cvars(self):
         """
         get_cvars
         """
@@ -1113,7 +1113,7 @@ class CryptoUser(SaveObjectGoogle):
 
         return d
 
-    def new_client_mandate(self, name, rsa_private_key):
+    def dumy_new_client_mandate(self, name, rsa_private_key):
         """
         @type name: str
         @type rsa_private_key: str
@@ -1142,7 +1142,7 @@ class CryptoUser(SaveObjectGoogle):
         self.save()
         return mkey + "||" + mandate_secret
 
-    def get_client_mandate(self, mandate_key_param):
+    def dumy_get_client_mandate(self, mandate_key_param):
         """
         @type mandate_key_param: str
         """
@@ -1166,13 +1166,13 @@ class CryptoUser(SaveObjectGoogle):
         return mandate.m_name, mandate.private_key
 
     #noinspection PyMethodMayBeStatic
-    def verify_mandate(self, mandate):
+    def dumy_verify_mandate(self, mandate):
         """
         @type mandate: str
         """
         pass
 
-    def delete(self, serverconfig=None, object_id=None, force_consistency=False, force=False, transaction=None, delete_from_datastore=True):
+    def dumy_delete(self, serverconfig=None, object_id=None, force_consistency=False, force=False, transaction=None, delete_from_datastore=True):
         """
         @type serverconfig: ServerConfig, None
         @type object_id: str, None
@@ -1202,28 +1202,28 @@ class CryptoUser(SaveObjectGoogle):
         super(CryptoUser, self).delete(serverconfig, object_id, force, transaction=transaction, delete_from_datastore=delete_from_datastore)
 
 
-class Mandate(Exception):
+class DumyMandate(Exception):
     """
     Mandate
     """
     pass
 
 
-class MandateExists(Exception):
+class DumyMandateExists(Exception):
     """
     MandateExists
     """
     pass
 
 
-class NoMandate(Exception):
+class DumyNoMandate(Exception):
     """
     NoMandate
     """
     pass
 
 
-def encrypt_chunk(secret, fpath, chunksize, initialization_vector):
+def dumy_encrypt_chunk(secret, fpath, chunksize, initialization_vector):
     """
     @type secret: str
     @type fpath: str
@@ -1252,7 +1252,7 @@ def encrypt_chunk(secret, fpath, chunksize, initialization_vector):
         raise e
 
 
-def hash_chunk(secret, fpath, chunksize):
+def dumy_hash_chunk(secret, fpath, chunksize):
     """
     @type secret: str
     @type fpath: str
@@ -1268,14 +1268,14 @@ def hash_chunk(secret, fpath, chunksize):
         raise e
 
 
-class ChunkListException(Exception):
+class DumyChunkListException(Exception):
     """
     ChunkListException
     """
     pass
 
 
-def make_chunklist(fpath):
+def dumy_make_chunklist(fpath):
     """
     @type fpath: str
     """
@@ -1324,7 +1324,7 @@ def make_chunklist(fpath):
     return chunklist_abs
 
 
-def encrypt_file_smp(secret, fname, progress_callback=None, progress_callback_param=None, single_file=False, num_procs_param=None):
+def dumy_encrypt_file_smp(secret, fname, progress_callback=None, progress_callback_param=None, single_file=False, num_procs_param=None):
     """
     @type secret: str
     @type fname: str
@@ -1366,7 +1366,7 @@ def encrypt_file_smp(secret, fname, progress_callback=None, progress_callback_pa
         return [x[0] for x in enc_files]
 
 
-def listener_file_writer(fn, q):
+def dumy_listener_file_writer(fn, q):
     """
     @type fn: str
     @type q: multiprocessing.Queue
@@ -1389,7 +1389,7 @@ def listener_file_writer(fn, q):
     f.close()
 
 
-def decrypt_chunk(secret, fpath, queue):
+def dumy_decrypt_chunk(secret, fpath, queue):
     """
     @type secret: str
     @type fpath: str
@@ -1422,7 +1422,7 @@ def decrypt_chunk(secret, fpath, queue):
     return calculated_hash
 
 
-def decrypt_file_smp(secret, enc_file=None, enc_files=tuple(), progress_callback=None, delete_enc_files=False, auto_delete_tempfile=True):
+def dumy_decrypt_file_smp(secret, enc_file=None, enc_files=tuple(), progress_callback=None, delete_enc_files=False, auto_delete_tempfile=True):
     """
     @type secret: str, unicode
     @type enc_file: file, None
@@ -1474,7 +1474,7 @@ def decrypt_file_smp(secret, enc_file=None, enc_files=tuple(), progress_callback
         cleanup_tempfiles()
 
 
-def callback_funcion(progress):
+def dumy_callback_funcion(progress):
     """
     @param progress:
     @type progress:
@@ -1482,49 +1482,49 @@ def callback_funcion(progress):
     print "crypto_dummy:1482", progress
 
 
-class EmptyFile(Exception):
+class DumyEmptyFile(Exception):
     """
     EmptyFile
     """
     pass
 
 
-class DataStillEncrypted(Exception):
+class DumyDataStillEncrypted(Exception):
     """
     DataStillEncrypted
     """
     pass
 
 
-class PlainDataNotFoundSharedMemory(Exception):
+class DumyPlainDataNotFoundSharedMemory(Exception):
     """
     PlainDataNotFoundSharedMemory
     """
     pass
 
 
-class CryptoDocMetaDataNotFound(Exception):
+class DumyCryptoDocMetaDataNotFound(Exception):
     """
     CryptoDocMetaDataNotFound
     """
     pass
 
 
-class CryptoDocNoNameGivenForFile(Exception):
+class DumyCryptoDocNoNameGivenForFile(Exception):
     """
     CryptDocNoNameGivenForFile
     """
     pass
 
 
-class CryptoDocException(Exception):
+class DumyCryptoDocException(Exception):
     """
     CryptDocNoNameGivenForFile
     """
     pass
 
 
-def get_id_to_content_hash(serverconfig):
+def dumy_get_id_to_content_hash(serverconfig):
     """
     @type serverconfig: ServerConfig
     """
@@ -1541,7 +1541,7 @@ def get_id_to_content_hash(serverconfig):
 
 
 #noinspection PyMethodParameters,PyMethodFirstArgAssignment
-def slugify(value):
+def dumy_slugify(value):
     """
     Normalizes string, converts to lowercase, removes non-alpha characters,
     and converts spaces to hyphens.
@@ -1553,7 +1553,7 @@ def slugify(value):
     return re.sub("[-\s]+", "-", value)
 
 
-def slugify_path(path):
+def dumy_slugify_path(path):
     """
     @type path: str
     """
@@ -1572,7 +1572,7 @@ def slugify_path(path):
     return spath
 
 
-def make_sha1_hash_file(prefix=None, fpath=None, data=None, fpi=None):
+def dumy_make_sha1_hash_file(prefix=None, fpath=None, data=None, fpi=None):
     """ make hash
     @type prefix: str
     @type fpath: str, None
@@ -1607,12 +1607,12 @@ def make_sha1_hash_file(prefix=None, fpath=None, data=None, fpi=None):
     return sha.hexdigest()
 
 
-class CryptoDoc(SaveObjectGoogle):
+class DumyCryptoDoc(SaveObjectGoogle):
     """
     placeholder for encrypted documents
     """
 
-    def __init__(self, serverconfig=None, object_id=None, comment="an encrypted document"):
+    def dumy___init__(self, serverconfig=None, object_id=None, comment="an encrypted document"):
         """
         @type serverconfig: ServerConfig
         @type object_id: str, unicode
@@ -1642,14 +1642,14 @@ class CryptoDoc(SaveObjectGoogle):
         if "cryptoboxtestserver" in crypto_data.GLOBAL_HOSTNAME:
             self.cloudstorage = False
 
-    def get_bucket_name(self):
+    def dumy_get_bucket_name(self):
         """
         get_bucket_name
         """
         bucket_name = self.get_serverconfig().identifcation() + "_" + crypto_data.CRYPTODOCFOLDERGOOGLE
         return bucket_name
 
-    def find_doc_same_hash(self, key, ufile=None):
+    def dumy_find_doc_same_hash(self, key, ufile=None):
         """
         @type key: str
         @type ufile: FileIO
@@ -1663,7 +1663,7 @@ class CryptoDoc(SaveObjectGoogle):
             return hashes["object_id"]
         return None
 
-    def get_size(self):
+    def dumy_get_size(self):
         """
         get_size
         """
@@ -1672,7 +1672,7 @@ class CryptoDoc(SaveObjectGoogle):
         else:
             return int(self.size)
 
-    def encrypt_save(self, key, user_object_id, ufile, progress_callback_encrypt=None, progress_callback_param_encrypt=None, secret=None, use_simple_apply_no_async=False, num_procs_param=None):
+    def dumy_encrypt_save(self, key, user_object_id, ufile, progress_callback_encrypt=None, progress_callback_param_encrypt=None, secret=None, use_simple_apply_no_async=False, num_procs_param=None):
         """
         @type key: str
         @type user_object_id: str
@@ -1750,7 +1750,7 @@ class CryptoDoc(SaveObjectGoogle):
         self.dec_data = None
         return True
 
-    def load_decrypt(self, key, file_data=True, progress_callback_decrypt=None, secret=None, use_simple_apply_no_async=False, auto_delete_tempfile=True):
+    def dumy_load_decrypt(self, key, file_data=True, progress_callback_decrypt=None, secret=None, use_simple_apply_no_async=False, auto_delete_tempfile=True):
         """
         @type key: str
         @type file_data: bool
@@ -1792,7 +1792,7 @@ class CryptoDoc(SaveObjectGoogle):
         self.dec_data = dec_data
         return dec_data
 
-    def get_data(self):
+    def dumy_get_data(self):
         """
         get_data\#
         """
@@ -1802,7 +1802,7 @@ class CryptoDoc(SaveObjectGoogle):
         self.dec_data.seek(0)
         return self.dec_data.read()
 
-    def delete(self, serverconfig=None, object_id=None, force_consistency=False, force=False, transaction=None, delete_from_datastore=True):
+    def dumy_delete(self, serverconfig=None, object_id=None, force_consistency=False, force=False, transaction=None, delete_from_datastore=True):
         """
         @type serverconfig: ServerConfig, None
         @type object_id: str, None
