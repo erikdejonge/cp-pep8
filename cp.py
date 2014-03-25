@@ -22,7 +22,7 @@ def replace_variables():
     @return: @rtype:
     """
     #variables = ["print", "warning", "event_emit"]
-    variables = ["utils.print_once", "print", "warning", "emit_event_angular", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
+    variables = ["utils.print_once", "serverevents.subscribe", "print", "warning", "emit_event_angular", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
     undo_variables = []
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
@@ -1278,11 +1278,12 @@ def coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_
                 if prev_line:
                     if not (".then" in prev_line or "->" in prev_line or "=>" in prev_line):
                         add_enter = True
-                        debuginfo = "resolve func"
+                        debuginfo = "resolve func " + str(resolve_func)
 
         if line.strip() is ")":
-            debuginfo = "resolve func stopped"
-            resolve_func -= 1
+            resolve_func = 0
+            debuginfo = "resolve func stopped " + str(resolve_func)
+
     return add_enter, debuginfo, resolve_func
 
 
