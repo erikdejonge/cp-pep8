@@ -22,7 +22,7 @@ def replace_variables():
     @return: @rtype:
     """
     #variables = ["print", "warning", "event_emit"]
-    variables = ["utils.print_once", "serverevents.subscribe", "print", "warning", "emit_event_angular", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
+    variables = ["utils.print_once", "utils.assert_equal", "serverevents.subscribe", "print", "warning", "emit_event_angular", "urls.command", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
     undo_variables = []
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
@@ -644,9 +644,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if "[" in line and not "]" in line and not "\\033[" in line:
             debuginfo += " datastructure"
             datastructure_define = True
-        else:
-            debuginfo = "assignment"
-        if scoped > 1:
+        if scoped > 0:
             debuginfo += " prev scope"
             add_enter = True
 
@@ -749,6 +747,32 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if prev_line:
             if not in_test(["if", "else", "->", "=>"], prev_line):
                 add_enter = True
+    elif "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
+        debuginfo = " if statement"
+
+        if scoped > 0:
+            debuginfo += " scope change"
+            add_enter = True
+
+        if scoped == 0:
+            debuginfo += " on same scope"
+            if "_.defer" in prev_line:
+                debuginfo += " after defer call"
+                add_enter = True
+
+            if assignment(prev_line):
+                debuginfo += " after assignement"
+                add_enter = True
+            if "if" in prev_line:
+                debuginfo += " after if"
+                add_enter = True
+            if method_call(prev_line):
+                debuginfo += " after method call"
+                add_enter = True
+
+        if "else" in line:
+            debuginfo += " else"
+            add_enter = False
     elif func_def(line):
         if '"""' not in next_line:
             add_docstring = True
@@ -830,7 +854,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 debuginfo += " after noinspection"
     elif class_method_call(line) and not fname.endswith(".py"):
         debuginfo = "class method call"
-        if scoped > 1:
+        if scoped > 0:
             add_enter = True
             debuginfo += " scoped"
     elif scoped_method_call(line):
@@ -861,32 +885,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if scoped > 0:
             debuginfo = " with scope chage"
             add_enter = True
-    elif "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
-        debuginfo = " if statement"
 
-        if scoped > 0:
-            debuginfo += " scope change"
-            add_enter = True
-
-        if scoped == 0:
-            debuginfo += " on same scope"
-            if "_.defer" in prev_line:
-                debuginfo += " after defer call"
-                add_enter = True
-
-            if assignment(prev_line):
-                debuginfo += " after assignement"
-                add_enter = True
-            if "if" in prev_line:
-                debuginfo += " after if"
-                add_enter = True
-            if method_call(prev_line):
-                debuginfo += " after method call"
-                add_enter = True
-
-        if "else" in line:
-            debuginfo += " else"
-            add_enter = False
     elif in_test_kw(["when"], line):
         debuginfo = in_test_result(["when"], line) + " statement"
     elif "pass" == prev_line.strip() and not in_test_result(["if", "elif", "else"], line):
@@ -917,7 +916,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 if not is_member_var(prev_line):
                     add_enter = True
                     debuginfo += " new scope"
-    if line.strip().startswith("with") and fname.endswith(".py"):
+    elif line.strip().startswith("with") and fname.endswith(".py"):
         debuginfo = "with statement"
         add_enter = True
     elif method_call(line) and not "raise" in line:
