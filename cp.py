@@ -165,9 +165,6 @@ def method_call(line):
     if line.count("(") == 1:
         if line.count("str(") == 1:
             return False
-    line = str(line)
-    if line.strip().find(":") > 0:
-        return False
     #return (line.count("(") is 1 and line.count(")") is 1) or ("$(this)." in line and line.count("(") is 1 and line.count(")") is 1)
     return (line.count("(") > 0 and line.count(")") > 0) or ("$(this)." in line and line.count("(") > 0 and line.count(")") > 0)
 
