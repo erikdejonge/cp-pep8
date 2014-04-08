@@ -1153,8 +1153,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                         if empty:
                             line_redone += "\n" + line.replace('"""', "") + emptydocstring.strip()
                         else:
-                            docstring += next_line.count(" ") * " " + "@return: @raise\n"
-                            line_redone += "\n" + line.replace('"""', "") + docstring.strip()
+                            docstring += next_line.count(" ") * " " + "@return: \n"
+                            docstring += next_line.count(" ") * " " + "@raise: "
+                            line_redone += "\n" + line.replace('"""', "") + docstring.lstrip()
 
 
     if "]" in line and not "[]" in line:
