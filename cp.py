@@ -15,7 +15,7 @@ ADDCOMMENT_WITH_FOUND_TYPE = False
 
 datastructure_define = False
 
-is_python = True
+g_is_python = True
 
 def replace_variables():
     """
@@ -137,8 +137,8 @@ def func_def(line):
     if in_test(["warning", "print "], line):
         return False
 
-    global is_python
-    if not is_python:
+    global g_is_python
+    if not g_is_python:
         is_func = ("->" in line or "=>" in line) and "= " in line
     else:
         is_func = False
@@ -517,8 +517,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     @param in_python_comment:
     @return: @rtype:
     """
-    global is_python
-    is_python = fname.endswith(".py")
+    global g_is_python
+    g_is_python = fname.endswith(".py")
     add_docstring = False
     line_redone = org_line = line
 
@@ -1552,16 +1552,29 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
     @return: @rtype:
     """
     if comment(line):
+        if line.find(" ") > 0:
+            add_double_enter = True
+
         if debuginfo:
             debuginfo = "comment -> " + debuginfo
         else:
-            debuginfo = "comment"
+            global g_is_python
+            debuginfo = "comment line"
+            if g_is_python:
+                if line.find(" ") > 0:
+                    debuginfo += " module level"
+                    add_enter = False
+                    add_double_enter = False
+
         if not comment(prev_line) and not "else" in prev_line and not func_def(prev_line) and not anon_func(prev_line) and not prev_line.strip().startswith("if "):
-            add_enter = False
-            add_double_enter = False
             debuginfo = " comment after something"
-        if line.find(" ") > 0:
-            add_double_enter = True
+            if line.find(" ") > 0:
+                add_enter = True
+                debuginfo += " module level"
+            else:
+                add_enter = False
+            add_double_enter = False
+
     if add_double_enter:
         add_enter = False
 
