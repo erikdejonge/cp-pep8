@@ -719,9 +719,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         debuginfo = "0n event"
         if scoped == 0:
             debuginfo += " on same scope "
-            add_enter = True
-        if scoped == 0:
-            debuginfo += " on same scope "
+            add_enter = False
+        if scoped > 0:
+            debuginfo += " on different scope "
             add_enter = True
     elif "set_time_out" in line:
         debuginfo = "set_time_out"
