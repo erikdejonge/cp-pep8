@@ -10,11 +10,9 @@ import sys
 reload(sys)
 #noinspection PyUnresolvedReferences
 sys.setdefaultencoding("utf-8")
-
 ADDCOMMENT_WITH_FOUND_TYPE = False
-
 datastructure_define = False
-
+g_last_assignment_on_global_prefix = ""
 g_is_python = True
 
 def replace_variables():
@@ -165,8 +163,14 @@ def method_call(line):
     if line.count("(") == 1:
         if line.count("str(") == 1:
             return False
-    #return (line.count("(") is 1 and line.count(")") is 1) or ("$(this)." in line and line.count("(") is 1 and line.count(")") is 1)
-    return (line.count("(") > 0 and line.count(")") > 0) or ("$(this)." in line and line.count("(") > 0 and line.count(")") > 0)
+
+    if (line.count("(") > 0 and line.count(")") > 0) or ("$(this)." in line and line.count("(") > 0 and line.count(")") > 0):
+        if line.replace(" ", "").find("[(") > 0:
+            return False
+        if line.replace(" ", "").find("=(") > 0:
+            return False
+        return True
+    return False
 
 
 def class_method(line):
@@ -483,6 +487,11 @@ def function_call(line):
     @return: @rtype:
     """
     if parenthesis(line) and not "." in line:
+        if line.replace(" ", "").find("[(") > 0:
+            return False
+        if line.replace(" ", "").find("=(") > 0:
+            return False
+
         return True
     return False
 
@@ -517,6 +526,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     @param in_python_comment:
     @return: @rtype:
     """
+    global g_last_assignment_on_global_prefix
     global g_is_python
     g_is_python = fname.endswith(".py")
     add_docstring = False
@@ -647,6 +657,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
 
         if global_line(line):
             debuginfo += " on global"
+            assignment_on_global_prefix = line.strip()[:3]
+            if g_last_assignment_on_global_prefix != assignment_on_global_prefix:
+                add_enter = True
+            g_last_assignment_on_global_prefix = assignment_on_global_prefix
             if not global_line(prev_line):
                 add_double_enter = True
             if prev_line.strip().startswith(")"):
