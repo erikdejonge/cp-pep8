@@ -10,6 +10,7 @@ import sys
 reload(sys)
 #noinspection PyUnresolvedReferences
 sys.setdefaultencoding("utf-8")
+
 ADDCOMMENT_WITH_FOUND_TYPE = False
 datastructure_define = False
 g_last_assignment_on_global_prefix = ""
@@ -1582,11 +1583,14 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
 
         if not comment(prev_line) and not "else" in prev_line and not func_def(prev_line) and not anon_func(prev_line) and not prev_line.strip().startswith("if "):
             debuginfo = " comment after something"
-            if line.find(" ") > 0:
-                add_enter = True
-                debuginfo += " module level"
+            add_enter = False
+            assignment_on_global_prefix = line.strip()[:3]
+            if g_last_assignment_on_global_prefix != assignment_on_global_prefix:
+                debuginfo += " same prefix "
             else:
-                add_enter = False
+                if line.find(" ") > 0:
+                    add_enter = True
+                    debuginfo += " module level"
             add_double_enter = False
 
     if add_double_enter:
