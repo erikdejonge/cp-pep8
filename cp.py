@@ -313,7 +313,6 @@ def data_assignment(line, prev_line):
 
 def comment(line):
     """
-
     @param line:
     @return: @rtype:
     """
@@ -510,8 +509,6 @@ def double_meth_call(line):
 
 def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname):
     """
-
-
     @param fname:
     @param add_double_enter:
     @param add_enter:
@@ -930,7 +927,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     debuginfo += " new scope"
     elif line.strip().startswith("with") and fname.endswith(".py"):
         debuginfo = "with statement"
-        add_enter = True
+
+        if comment(prev_line) or '"""' in prev_line:
+            debuginfo += " after comment"
+        else:
+            add_enter = True
     elif method_call(line) and not "raise" in line:
         debuginfo = "methodcall"
         if assignment(line):
