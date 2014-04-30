@@ -1572,7 +1572,12 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
             add_double_enter = True
 
         if debuginfo:
-            debuginfo = "comment -> " + debuginfo
+
+            if comment(prev_line):
+                add_double_enter = False
+                debuginfo = " another comment "
+            else:
+                debuginfo = "comment -> " + debuginfo
         else:
             global g_is_python
             debuginfo = "comment line"
@@ -1585,13 +1590,13 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
         if not comment(prev_line) and not "else" in prev_line and not func_def(prev_line) and not anon_func(prev_line) and not prev_line.strip().startswith("if "):
             debuginfo = " comment after something"
             add_enter = False
-            assignment_on_global_prefix = line.strip()[:3]
+            assignment_on_global_prefix = line.strip().strip("#")[:3]
             if g_last_assignment_on_global_prefix != assignment_on_global_prefix:
                 debuginfo += " same prefix "
             else:
                 if line.find(" ") > 0:
                     add_enter = True
-                    debuginfo += " module level"
+                    debuginfo += " module level" + g_last_assignment_on_global_prefix+"|"+line.strip()[:3]
             add_double_enter = False
 
     if add_double_enter:
