@@ -339,6 +339,8 @@ def whitespace(line):
         cnt += 1
     return cnt
 
+def list_comprehension(line):
+    return ("]" in line and "[" in line and "for" in line)
 
 def scope_diff(line, prev_line):
     """
@@ -756,8 +758,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if prev_line:
             if not in_test(["if", "else", "->", "=>"], prev_line):
                 add_enter = True
-    elif "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
-        debuginfo = " if statement"
+    elif ("]" not in line and "[" not in line) and "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
+        debuginfo = " xxif statement"
 
         if scoped > 0:
             debuginfo += " scope change"
@@ -900,8 +902,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif "pass" == prev_line.strip() and not in_test_result(["if", "elif", "else"], line):
         debuginfo = " pass"
         add_enter = True
-    elif in_test_kw(["switch", "for", "while"], line) and not in_test_kw(["switch", "for", "while"], prev_line) and not comment(prev_line):
-        debuginfo = in_test_result(["switch", "try", "when", "while", "if", "for"], line) + " statement"
+    elif list_comprehension(line):
+        debuginfo = "list comprehension"
+    elif in_test_kw(["switch", "for", "while"], line) and not in_test_kw(["switch", "for", "while", "["], prev_line) and not comment(prev_line) and not ("]" in line and "[" in line):
+        debuginfo = in_test_result(["switch", "try", "when", "while", "for"], line) + " statement tested"
         if prev_line:
             if not in_test(["when", "if", "->", "=>", '"""', "def ", "else", "with", "switch", "try", "#noinspection"], prev_line):
                 if in_test(["return"], prev_line) and in_test(["when"], line) and scoped > 1:
