@@ -1611,11 +1611,13 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
         if not comment(prev_line) and not "else" in prev_line and not func_def(prev_line) and not anon_func(prev_line) and not prev_line.strip().startswith("if "):
             debuginfo = " comment after something"
             add_enter = False
+            add_double_enter = False
             assignment_on_global_prefix = line.strip().strip("#")[:2]
             if g_last_assignment_on_global_prefix != assignment_on_global_prefix:
-                debuginfo += " different prefix "
-                add_enter = False
-                add_double_enter = True
+                if line.find(" ") > 0:
+                    debuginfo += " different prefix "
+                    add_enter = False
+                    add_double_enter = True
             else:
                 if line.find(" ") > 0:
                     add_enter = True
