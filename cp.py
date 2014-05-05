@@ -657,9 +657,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
 
         if global_line(line):
             debuginfo += " on global"
-            assignment_on_global_prefix = line.strip()[:3]
+            assignment_on_global_prefix = line.strip()[:2]
             if g_last_assignment_on_global_prefix != assignment_on_global_prefix:
                 add_enter = True
+                debuginfo += " different prefix "
+                if comment(prev_line):
+                    debuginfo += " after comment"
+                    add_enter = False
             g_last_assignment_on_global_prefix = assignment_on_global_prefix
             if not global_line(prev_line):
                 add_double_enter = True
@@ -937,22 +941,35 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         else:
             add_enter = True
     elif method_call(line) and not "raise" in line:
+        assigned = False
         debuginfo = "methodcall"
         if assignment(line):
             debuginfo += " and assigned "
+            assigned = True
             if fname.endswith(".py"):
                 if scoped > 0:
                     debuginfo += "in python scope change "
                     add_enter = True
         if line.find(" ") is not 0:
             debuginfo += "method call global scope"
-            if "# noins" not in prev_line and "import " not in prev_line and "#noins" not in prev_line:
-                add_enter = False
-                add_double_enter = True
-            if ")()" in line.strip():
-                debuginfo += " end mod"
-                add_enter = False
+            if assigned:
                 add_double_enter = False
+                assignment_on_global_prefix = line.strip()[:2]
+
+                if g_last_assignment_on_global_prefix != assignment_on_global_prefix:
+                    add_enter = True
+                    debuginfo += " different prefix"
+                else:
+                    debuginfo += " same prefix"
+                g_last_assignment_on_global_prefix = assignment_on_global_prefix
+            else:
+                if "# noins" not in prev_line and "import " not in prev_line and "#noins" not in prev_line:
+                    add_enter = False
+                    add_double_enter = True
+                if ")()" in line.strip():
+                    debuginfo += " end mod"
+                    add_enter = False
+                    add_double_enter = False
         elif prev_line:
             if method_call(prev_line):
                 if whitespace(line) < whitespace(prev_line):
@@ -1594,14 +1611,16 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
         if not comment(prev_line) and not "else" in prev_line and not func_def(prev_line) and not anon_func(prev_line) and not prev_line.strip().startswith("if "):
             debuginfo = " comment after something"
             add_enter = False
-            assignment_on_global_prefix = line.strip().strip("#")[:3]
+            assignment_on_global_prefix = line.strip().strip("#")[:2]
             if g_last_assignment_on_global_prefix != assignment_on_global_prefix:
-                debuginfo += " same prefix "
+                debuginfo += " different prefix "
+                add_enter = False
+                add_double_enter = True
             else:
                 if line.find(" ") > 0:
                     add_enter = True
-                    debuginfo += " module level" + g_last_assignment_on_global_prefix+"|"+line.strip()[:3]
-            add_double_enter = False
+                    debuginfo += " module level" + g_last_assignment_on_global_prefix+"|"+line.strip()[:2]
+                add_double_enter = False
 
     if add_double_enter:
         add_enter = False
@@ -1621,7 +1640,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                         add_enter = False
                         debuginfo += " some closing tag"
 
-    #debuginfo += " ifcnt:" + str(if_cnt) + " double_enter:" + str(add_double_enter)
+    #debuginfo += " ifcnt:" + str(if_cnt) + " double_enter:" + str(add_double_enter)+ " add_enter:" + str(add_enter)
     return add_double_enter, add_enter, debuginfo, line
 
 
