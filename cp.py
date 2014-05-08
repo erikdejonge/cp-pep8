@@ -155,6 +155,8 @@ def method_call(line):
     @param line:
     @return: @rtype:
     """
+    if line.strip().startswith("return"):
+        return False
 
     if in_test(["+=", "-=", "++", "--", "*="], line):
         return False
@@ -257,7 +259,7 @@ def elif_switch(line):
     return False
 
 
-def keyword(line):
+def keyword(line, returnkw=False):
     """
 
     @param line:
@@ -269,11 +271,13 @@ def keyword(line):
     kws = [x + " " for x in kws]
     kws.extend(["$on", "$(", '"""'])
     if in_test(kws, line):
+        if returnkw:
+            return in_test(kws, line, return_val=True)
         return True
     elif some_func(line):
+        if returnkw:
+            return "some_func"
         return True
-        #elif anon_func(line):
-    #    return True
     return False
 
 
@@ -597,9 +601,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             if '"""' in prev_line:
                 add_enter = False
                 debuginfo = " after doc comment"
+
             elif keyword(prev_line):
                 add_enter = False
-                debuginfo = " after keyword"
+                debuginfo = " after keyword1 "
             elif func_def(prev_line):
                 add_enter = False
                 debuginfo += " after funcdef"
@@ -616,7 +621,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     debuginfo += " after rturn"
                     #add_enter = True
                 elif keyword(prev_line):
-                    debuginfo += "after keyword"
+                    debuginfo += "after keyword2"
                     add_enter = False
                 else:
                     if next_line and not in_test(["setInterval", "setTimeout"], prev_line):
@@ -760,6 +765,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         debuginfo = "resolve method body"
         resolve_func += 1
         if prev_line:
+            if prev_line.strip().startswith("return"):
+                debuginfo = " after return"
+                add_enter = True
             if not in_test(["if", "else", "->", "=>"], prev_line):
                 add_enter = True
     elif ("]" not in line and "[" not in line) and "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
