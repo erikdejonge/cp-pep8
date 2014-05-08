@@ -838,7 +838,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                         debuginfo = "scope change"
                     if "@" in prev_line or keyword(prev_line):
                         add_enter = False
-                        debuginfo += " after property or kw"
+                        debuginfo += " after property or kw " + str(keyword(prev_line, True))
                 elif first_method_factory:
                     debuginfo += "first method factory"
                     add_enter = True
