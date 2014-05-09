@@ -656,6 +656,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if "[" in line and not "]" in line and not "\\033[" in line:
             debuginfo += " datastructure"
             datastructure_define = True
+            if global_line(line):
+                add_enter = True
+                debuginfo += " (global)"
+
         if scoped > 0:
             debuginfo += " prev scope"
             add_enter = True
@@ -665,9 +669,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             assignment_on_global_prefix = line.strip()[:2]
             if g_last_assignment_on_global_prefix != assignment_on_global_prefix:
                 add_enter = True
-                debuginfo += " different prefix "
+                debuginfo += " ass different prefix "
                 if comment(prev_line):
                     debuginfo += " after comment"
+                    add_enter = False
+            else:
+                if datastructure_define:
+                    debuginfo += " same prefix"
                     add_enter = False
             g_last_assignment_on_global_prefix = assignment_on_global_prefix
             if not global_line(prev_line):
@@ -1208,7 +1216,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             debuginfo += " end datastructure_define"
         datastructure_define = False
 
-    if datastructure_define:
+    if datastructure_define and ("=" not in line):
         debuginfo += " in datastructure_define"
         add_double_enter = False
         add_enter = False
