@@ -1020,7 +1020,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                 if scoped > 0:
                                     add_enter = True
                                     debuginfo += " scope change "
-                                if assignment(line):
+                                if assignment(line) and not "_." in line:
                                     if not fname.endswith(".py"):
                                         debuginfo += " and assigned in coffee "
                                         add_enter = False
