@@ -124,9 +124,10 @@ def func_def(line):
 
     if ", ->" in line.strip():
         return True
-    if ", ->" in line.strip():
+    elif ", ->" in line.strip():
         return True
-
+    elif "...) ->" in line.strip():
+        return True
     elif line.strip().startswith("def "):
         return True
     elif functional(line):
@@ -997,6 +998,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 else:
                     debuginfo += "nested method call"
             elif not func_test([func_def, scoped_method_call, method_call, class_method], prev_line.strip()):
+                debuginfo += " mcall not after functest "
                 if data_assignment(line, prev_line):
                     debuginfo += "method call data assignment " + str(if_cnt)
                     add_enter = False
@@ -1007,7 +1009,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                             debuginfo += " after assignment"
                         else:
                             add_enter = True
-                            debuginfo += " scope change"
+                            debuginfo += " mcall scope change"
                     else:
                         test_items = ["@staticmethod", "catch", "print", "with", "when", "_.keys", "finally", "except", '"""', "->", "=>"]
                         if in_test(test_items, prev_line) and scoped == 0:
@@ -1095,8 +1097,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
         if "->" in line:
             debuginfo = "func with print"
             add_enter = True
+            if not line.strip().startswith("print"):
+                debuginfo = " (doesn't start with print)"
+                add_enter = False
+
             if class_method(prev_line):
-                debuginfo = "func with print after classmethod"
+                debuginfo = " func with print after classmethod"
                 add_enter = False
 
     if "{" in line and "}" in line and ":" in line and "," in line and line.strip().endswith("}"):
