@@ -1017,13 +1017,14 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                                 debuginfo += " after comment"
                             else:
                                 debuginfo += " not after comment "
-                                if scoped > 0:
-                                    add_enter = True
-                                    debuginfo += " scope change "
                                 if assignment(line) and not "_." in line:
                                     if not fname.endswith(".py"):
                                         debuginfo += " and assigned in coffee "
                                         add_enter = False
+                                if scoped > 0:
+                                    add_enter = True
+                                    debuginfo += " scope change "
+
                 if in_test(["$watch", "if", "else", "for", "while", "try:", "#noinspection"], prev_line.strip()):
                     debuginfo += "method call after 1f 3lse or wtch"
                     add_enter = False
