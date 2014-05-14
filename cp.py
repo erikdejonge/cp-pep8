@@ -778,8 +778,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                 add_enter = True
             if not in_test(["if", "else", "->", "=>"], prev_line):
                 add_enter = True
-    elif ("]" not in line and "[" not in line) and "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
-        debuginfo = " xxif statement"
+    elif "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
+        debuginfo = " if statement"
 
         if scoped > 0:
             debuginfo += " scope change"
@@ -922,7 +922,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     elif "pass" == prev_line.strip() and not in_test_result(["if", "elif", "else"], line):
         debuginfo = " pass"
         add_enter = True
-    elif list_comprehension(line):
+    elif list_comprehension(line) and fname.endswith(".py"):
         debuginfo = "list comprehension"
     elif in_test_kw(["switch", "for", "while"], line) and not in_test_kw(["switch", "for", "while", "["], prev_line) and not comment(prev_line) and not ("]" in line and "[" in line):
         debuginfo = in_test_result(["switch", "try", "when", "while", "for"], line) + " statement tested"
