@@ -514,12 +514,11 @@ def double_meth_call(line):
     return "self" in line and line.count("()") > 1
 
 
-def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname):
+def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname):
     """
     @param fname:
     @param add_double_enter:
     @param add_enter:
-    @param debuginfo:
     @param first_method_class:
     @param first_method_factory:
     @param line:
@@ -544,13 +543,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
     if line.strip().startswith("if"):
         if_cnt += 1
 
+    debuginfo = ""
     if ".factory" in line:
         add_double_enter = True
-        debuginfo = ".factory"
-
-    if line.startswith("class"):
+        debuginfo += ".factory"
+    elif line.startswith("class"):
         if "noinspection" in prev_line:
-            debuginfo = "class def after inspection"
+            debuginfo += "class def after inspection"
         else:
             add_double_enter = True
             debuginfo = "class def"
@@ -585,7 +584,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
 
     elif prev_line.strip().startswith("raise"):
         debuginfo = "raise"
-        if "except" not in line and "else" not in line:
+        if "except" not in line and "else" not in line and not elif_switch(line):
             debuginfo = " after raise"
             add_enter = True
             if func_def(line) and not "(self" in line:
@@ -988,7 +987,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     add_enter = False
                     add_double_enter = False
         elif prev_line:
-            if method_call(prev_line):
+            if method_call(prev_line) and not elif_switch(line):
                 if whitespace(line) < whitespace(prev_line):
                     if not elif_switch(prev_line):
                         debuginfo += " method call higher scope " + str(whitespace(prev_line) - whitespace(line))
@@ -1004,12 +1003,18 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
                     add_enter = False
                 else:
                     if assignment(prev_line):
-                        if scoped == 0:
+                        debuginfo += " after assignment"
+                        if elif_switch(line):
+                            debuginfo += " if or elif in line"
                             add_enter = False
-                            debuginfo += " after assignment"
                         else:
-                            add_enter = True
-                            debuginfo += " mcall scope change"
+                            if scoped == 0:
+                                add_enter = False
+                                debuginfo += " same scope"
+                            else:
+                                add_enter = True
+                                debuginfo += " mcall scope change"
+
                     else:
                         test_items = ["@staticmethod", "catch", "print", "with", "when", "_.keys", "finally", "except", '"""', "->", "=>"]
                         if in_test(test_items, prev_line) and scoped == 0:
@@ -1104,7 +1109,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_m
             if class_method(prev_line):
                 debuginfo = " func with print after classmethod"
                 add_enter = False
-
     if "{" in line and "}" in line and ":" in line and "," in line and line.strip().endswith("}"):
         nesting = line.find("{")
         if fname.endswith(".py"):
@@ -1570,7 +1574,7 @@ def prepare_line(cnt, line, mylines):
     @return: @rtype:
     """
     prev_line = ""
-    next_line = None
+    next_line = ""
     if cnt > 1:
         prev_line = mylines[cnt - 1]
     if len(mylines) > cnt + 1:
@@ -1616,15 +1620,14 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
             add_double_enter = True
 
         if debuginfo:
-
             if comment(prev_line):
                 add_double_enter = False
-                debuginfo = " another comment "
+                debuginfo += " another comment "
             else:
-                debuginfo = "comment -> " + debuginfo
+                debuginfo += "comment -> " + debuginfo
         else:
             global g_is_python
-            debuginfo = "comment line"
+            debuginfo += "comment line"
             if g_is_python:
                 if line.find(" ") > 0:
                     debuginfo += " module level"
@@ -1632,15 +1635,15 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                     add_double_enter = False
 
         if not comment(prev_line) and not "else" in prev_line and not func_def(prev_line) and not anon_func(prev_line) and not prev_line.strip().startswith("if "):
-            debuginfo = " comment after something"
-            add_enter = False
+            debuginfo += " comment after something"
             add_double_enter = False
+            add_enter = True
             assignment_on_global_prefix = line.strip().strip("#")[:2]
             if g_last_assignment_on_global_prefix != assignment_on_global_prefix:
                 if line.find(" ") > 0:
                     debuginfo += " different prefix "
-                    add_enter = False
-                    add_double_enter = True
+                    add_enter = True
+                    add_double_enter = False
             else:
                 if line.find(" ") > 0:
                     add_enter = True
@@ -1648,6 +1651,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                 add_double_enter = False
 
     if add_double_enter:
+        debuginfo += " double disables add_enter"
         add_enter = False
 
     elif cnt > 1:
@@ -1655,8 +1659,12 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
             if scoped >= 3:
                 if not class_method(line):
                     if not add_double_enter:
-                        debuginfo += "triple scope change"
+                        debuginfo += " triple scope change"
                         add_enter = True
+                    if elif_switch(line):
+                        debuginfo += " in elif switch"
+                        add_enter = False
+
                     if next_line:
                         if "else" not in line:
                             debuginfo += " scope level "
@@ -1666,6 +1674,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                         debuginfo += " some closing tag"
 
     #debuginfo += " ifcnt:" + str(if_cnt) + " double_enter:" + str(add_double_enter)+ " add_enter:" + str(add_enter)
+
     return add_double_enter, add_enter, debuginfo, line
 
 
@@ -1703,7 +1712,7 @@ def main(args):
 
         add_double_enter, add_enter, line, next_line, prev_line, scoped = prepare_line(cnt, line, mylines)
 
-        in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line = coffee_script_pretty_printer(add_double_enter, add_enter, debuginfo, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname)
+        in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line = coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname)
 
         add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, prev_line, scoped, if_cnt)
 
