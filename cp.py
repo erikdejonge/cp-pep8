@@ -345,7 +345,8 @@ def whitespace(line):
     return cnt
 
 def list_comprehension(line):
-    return ("]" in line and "[" in line and "for" in line)
+
+    return (("]" in line or "}" in line or ")" in line) and ("[" in line or "{" in line or "(" in line) and "for" in line)
 
 def scope_diff(line, prev_line):
     """
@@ -645,6 +646,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if not keyword(prev_line):
             if not double_meth_call(prev_line):
                 add_enter = True
+    elif line.strip().startswith("import") and fname.endswith(".py"):
+        debuginfo += "import"
+        if prev_line.strip().startswith("import"):
+            debuginfo += " after import"
+        else:
+            add_enter = True
     elif global_class_declare(line):
         debuginfo = "global_class_declare"
         add_enter = True
