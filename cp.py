@@ -606,6 +606,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             elif keyword(prev_line):
                 add_enter = False
                 debuginfo = " after keyword1 "
+                if scoped > 1:
+                    debuginfo += " after scope change "
+                    add_enter = True
             elif func_def(prev_line):
                 add_enter = False
                 debuginfo += " after funcdef"
@@ -619,7 +622,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                     debuginfo += " after close or underscore func"
                     #add_enter = True
                 elif "return" in prev_line:
-                    debuginfo += " after rturn"
+                    debuginfo += " after rturn" + str(scoped)
+
                     #add_enter = True
                 elif keyword(prev_line):
                     debuginfo += "after keyword2"
