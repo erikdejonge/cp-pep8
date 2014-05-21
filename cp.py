@@ -21,7 +21,7 @@ def replace_variables():
     @return: @rtype:
     """
     #variables = ["print", "warning", "event_emit"]
-    variables = ["utils.print_once", "broadcast_and_emit_event", "utils.digest_scope", "utils.digest_scope_debounce", "utils.assert_equal", "utils.assert_not_equal", "serverevents.subscribe", "print", "warning", "emit_event_angular", "urls.slug_comand_timestamp", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
+    variables = ["utils.print_once", "broadcast_and_emit_event", "utils.digest_scope", "warning_server_error", "utils.digest_scope_debounce", "utils.assert_equal", "utils.assert_not_equal", "serverevents.subscribe", "print", "warning", "emit_event_angular", "urls.slug_comand_timestamp", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
     undo_variables = []
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
