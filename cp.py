@@ -754,6 +754,16 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif "it " in line and ("->" in line or "=>" in line):
         debuginfo = "karma test"
         add_enter = True
+    elif line.strip().startswith("_.each"):
+        if scoped!=0:
+            add_enter = False
+            debuginfo = "start for each"
+        else:
+            add_enter = False
+            debuginfo = "for each, one liner"
+    elif prev_line.strip().startswith("_.each"):
+        add_enter = True
+        debuginfo = "after for each loop"
     elif "@unittest" in line:
         add_enter = True
         debuginfo = "unittest decorator"
@@ -1109,7 +1119,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif "setInterval" in line or "setTimeout" in line:
         debuginfo = "setInterval timeout"
     elif "print" in line:
-        debuginfo = "debug statement"
+        debuginfo = "debug(pr1t) statement"
         if "->" in line:
             debuginfo = "func with print"
             add_enter = True
@@ -1120,6 +1130,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             if class_method(prev_line):
                 debuginfo = " func with print after classmethod"
                 add_enter = False
+        if scoped != 0:
+            add_enter = True
+            debuginfo += " scope change"
     if "{" in line and "}" in line and ":" in line and "," in line and line.strip().endswith("}"):
         nesting = line.find("{")
         if fname.endswith(".py"):
