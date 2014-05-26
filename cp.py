@@ -755,7 +755,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo = "karma test"
         add_enter = True
     elif line.strip().startswith("_.each"):
-        if scoped!=0:
+        if scoped > 0:
             add_enter = False
             debuginfo = "start for each"
         else:
@@ -1130,9 +1130,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             if class_method(prev_line):
                 debuginfo = " func with print after classmethod"
                 add_enter = False
-        if scoped != 0:
+        if scoped > 0:
             add_enter = True
-            debuginfo += " scope change"
+            debuginfo += " scope change " + str(scoped)
     if "{" in line and "}" in line and ":" in line and "," in line and line.strip().endswith("}"):
         nesting = line.find("{")
         if fname.endswith(".py"):
