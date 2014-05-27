@@ -608,27 +608,28 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif "return" in line:
         debuginfo = "retrn"
         if not comment(line) and not comment(prev_line):
-            add_enter = False
 
-            if whitespace(prev_line) - whitespace(line) > 0:
+            add_enter = False
+            if scoped == 1:
+                debuginfo += " scoped is 1"
+                add_enter = False
+            elif whitespace(prev_line) - whitespace(line) > 0:
                 add_enter = True
-                debuginfo = " whitespace"
+                debuginfo += " whitespace"
             if '"""' in prev_line:
                 add_enter = False
-                debuginfo = " after doc comment"
+                debuginfo += " after doc comment"
 
             elif keyword(prev_line):
                 add_enter = False
-                debuginfo = " after keyword1 "
-                if scoped > 1:
-                    debuginfo += " after scope change "
+                debuginfo += " after keyword1 "
+                if scoped == 0:
+                    debuginfo += " same scope  "
                     add_enter = True
             elif func_def(prev_line):
                 add_enter = False
                 debuginfo += " after funcdef"
             elif prev_line:
-                debuginfo += " | "
-
                 if next_line:
                     if (prev_line.strip() == "") or ("else" in prev_line) or ("else" in next_line) and not in_test(["setInterval", "setTimeout"], prev_line):
                         debuginfo += " after empty line time func or 3lse"
