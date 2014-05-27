@@ -669,6 +669,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo += "import"
         if prev_line.strip().startswith("import"):
             debuginfo += " after import"
+        elif scoped != 0:
+            debuginfo += " scope change"
         else:
             add_enter = True
     elif global_class_declare(line):
