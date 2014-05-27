@@ -695,7 +695,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             assignment_on_global_prefix = line.strip()[:2]
             if g_last_assignment_on_global_prefix != assignment_on_global_prefix:
                 add_enter = True
-                debuginfo += " ass different prefix "
+                debuginfo += " has different prefix "
                 if comment(prev_line):
                     debuginfo += " after comment"
                     add_enter = False
@@ -705,8 +705,14 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                     add_enter = False
             g_last_assignment_on_global_prefix = assignment_on_global_prefix
             if not global_line(prev_line):
-                add_double_enter = True
+                debuginfo += " (prev!=global)"
+                if scoped == 0:
+                    add_double_enter = True
+                else:
+                    add_enter = True
+
             if prev_line.strip().startswith(")"):
+                debuginfo += " prev ends data"
                 add_double_enter = True
         if scoped > 1:
             debuginfo += " on prev scope"
@@ -1531,6 +1537,7 @@ def init_file(args):
                 content += i
         if args.test is None:
             open(args.myfile, "w").write(content)
+
         myfile = open(args.myfile)
     else:
         print "no -f (file) given as argument"
@@ -1785,8 +1792,9 @@ def main(args):
 
     if not args.test:
         if str(args.myfile).endswith(".coffee"):
-            finalbuf = "\n" + buffer_string.strip() + "\n"
+            finalbuf = buffer_string.strip() + "\n"
             open(args.myfile, "w").write(finalbuf)
+
         else:
             open(args.myfile, "w").write(buffer_string.strip() + "\n")
     else:
