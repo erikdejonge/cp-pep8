@@ -590,7 +590,21 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             add_enter = True
             if func_def(line) and not "(self" in line:
                 add_double_enter = True
+    elif "print" in line:
+        debuginfo = "debug(pr1t) statement"
+        if "= ->" in line:
+            debuginfo = "func with print"
+            add_enter = True
+            if not line.strip().startswith("print"):
+                debuginfo = " (doesn't start with print)"
+                add_enter = False
 
+            if class_method(prev_line):
+                debuginfo = " func with print after classmethod"
+                add_enter = False
+        if scoped > 0:
+            add_enter = True
+            debuginfo += " scope change " + str(scoped)
     elif "return" in line:
         debuginfo = "retrn"
         if not comment(line) and not comment(prev_line):
@@ -706,14 +720,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo = "global method call"
         if "#noinspection" not in prev_line and "import " not in prev_line:
             add_double_enter = True
-    if ": [" in line and not fname.endswith(".py"):
+    elif ": [" in line and not fname.endswith(".py"):
         debuginfo = "struct coffeescript"
         add_enter = True
     elif class_method(line):
-        debuginfo = "class_method"
+        debuginfo = str('print' in line) + " class_method"
         if first_method_class:
             debuginfo += " " + str(first_method_class)
-
             if "class" in prev_line:
                 add_enter = False
             else:
@@ -723,7 +736,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
 
             add_enter = True
         else:
-            debuginfo = "method"
             if is_member_var(prev_line):
                 debuginfo += " after member var"
                 add_enter = True
@@ -732,7 +744,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                     if scoped < 0:
                         if "unless" not in prev_line:
                             add_enter = True
-                            debuginfo += " in a nested scope" + str(global_class_declare(prev_line))
+                            debuginfo += " in a nested scope " + str(global_class_declare(prev_line))
                         else:
                             debuginfo += " in a nested scope after unless"
 
@@ -1118,21 +1130,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         add_double_enter = True
     elif "setInterval" in line or "setTimeout" in line:
         debuginfo = "setInterval timeout"
-    elif "print" in line:
-        debuginfo = "debug(pr1t) statement"
-        if "->" in line:
-            debuginfo = "func with print"
-            add_enter = True
-            if not line.strip().startswith("print"):
-                debuginfo = " (doesn't start with print)"
-                add_enter = False
-
-            if class_method(prev_line):
-                debuginfo = " func with print after classmethod"
-                add_enter = False
-        if scoped > 0:
-            add_enter = True
-            debuginfo += " scope change " + str(scoped)
     if "{" in line and "}" in line and ":" in line and "," in line and line.strip().endswith("}"):
         nesting = line.find("{")
         if fname.endswith(".py"):
