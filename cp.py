@@ -610,13 +610,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if not comment(line) and not comment(prev_line):
 
             add_enter = False
-            if scoped == 1:
-                debuginfo += " scoped is 1"
+            if scoped <= 1:
+                debuginfo += " scoped is <=1"
                 add_enter = False
             elif whitespace(prev_line) - whitespace(line) > 0:
                 add_enter = True
                 debuginfo += " whitespace"
-            if '"""' in prev_line:
+            elif '"""' in prev_line:
                 add_enter = False
                 debuginfo += " after doc comment"
 
