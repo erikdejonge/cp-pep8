@@ -691,7 +691,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if scoped > 0:
             debuginfo += " prev scope"
             add_enter = True
-
+        if prev_line.strip().startswith("_."):
+            debuginfo += " after some functional js"
+            add_enter = True
         if global_line(line):
             debuginfo += " on global"
             assignment_on_global_prefix = line.strip()[:2]
@@ -856,7 +858,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             else:
                 add_double_enter = True
         else:
-            if not func_def(prev_line) or comment(prev_line):
+            if not func_def(prev_line) and not comment(prev_line):
                 debuginfo = "function def nested"
                 if func_def(prev_line):
                     debuginfo += " after function def"
@@ -1782,8 +1784,8 @@ def main(args):
     #open(args.myfile, "w").write()
 
     num = 0
-    if str(args.myfile).endswith(".coffee"):
-        num += 1
+    #if str(args.myfile).endswith(".coffee"):
+    #    num += 1
 
     buffer_string = ""
     for line in sio_file2:
