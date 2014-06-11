@@ -1700,8 +1700,12 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
 
                     if next_line:
                         if "else" not in line:
-                            debuginfo += " scope level "
+                            debuginfo += " scope level " + str(line.find(" "))
                             add_enter = True
+                            if line.find(" ") != 0:
+                                debuginfo += " root "
+                                add_enter = False
+                                add_double_enter = True
                     if len(line.strip()) <= 2:
                         add_enter = False
                         debuginfo += " some closing tag"
