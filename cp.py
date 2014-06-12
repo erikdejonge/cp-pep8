@@ -590,7 +590,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             add_enter = True
             if func_def(line) and not "(self" in line:
                 add_double_enter = True
-    elif "print" in line:
+    elif line.strip().startswith("print"):
         debuginfo = "debug(pr1t) statement"
         if "= ->" in line:
             debuginfo = "func with print"
@@ -605,7 +605,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if scoped > 0:
             add_enter = True
             debuginfo += " scope change " + str(scoped)
-    elif "return" in line:
+    elif line.strip().startswith("return"):
         debuginfo = "retrn"
         if not comment(line) and not comment(prev_line):
 
