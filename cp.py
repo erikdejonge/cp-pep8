@@ -1540,6 +1540,11 @@ def init_file(args):
             if str(i).strip() != "":
                 content += i
         if args.test is None:
+            if args.myfile.endswith(".conf"):
+                exit(0)
+            if args.myfile.endswith(".sh"):
+                exit(0)
+
             open(args.myfile, "w").write(content)
 
         myfile = open(args.myfile)
@@ -1589,7 +1594,8 @@ def init_cp(args, fname, myfile):
 
     if ".cf" not in fname and ".py" not in fname:
         myfile.close()
-        mylines = open(args.myfile)
+        exit(0)
+        #mylines = open(args.myfile)
         #mylines = cStringIO.StringIO(data)
     resolve_func = 0
     debuginfo = ""
@@ -1610,6 +1616,7 @@ def prepare_line(cnt, line, mylines):
     next_line = ""
     if cnt > 1:
         prev_line = mylines[cnt - 1]
+
     if len(mylines) > cnt + 1:
         next_line = mylines[cnt + 1]
     scoped = scope_diff(line, prev_line)
