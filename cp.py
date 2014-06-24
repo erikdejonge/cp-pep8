@@ -669,6 +669,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo += "import"
         if prev_line.strip().startswith("import"):
             debuginfo += " after import"
+        elif prev_line.strip().startswith("#noinspection"):
+            debuginfo += " after pycharm directive"
+            add_enter = False
         elif scoped != 0:
             debuginfo += " scope change"
         else:
