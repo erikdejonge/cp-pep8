@@ -159,6 +159,9 @@ def method_call(line):
     if line.strip().startswith("return"):
         return False
 
+    if line.strip().startswith("except"):
+        return False
+
     if in_test(["+=", "-=", "++", "--", "*="], line):
         return False
 
@@ -494,6 +497,9 @@ def function_call(line):
     @param line:
     @return: @rtype:
     """
+    if line.strip().startswith("except"):
+        return False
+
     if parenthesis(line) and not "." in line:
         if line.replace(" ", "").find("[(") > 0:
             return False
@@ -1036,7 +1042,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         elif prev_line:
             if method_call(prev_line) and not elif_switch(line):
                 if whitespace(line) < whitespace(prev_line):
-                    if not elif_switch(prev_line):
+                    if not elif_switch(prev_line) and not line.strip().startswith("except"):
                         debuginfo += " method call higher scope " + str(whitespace(prev_line) - whitespace(line))
                         if whitespace(prev_line) - whitespace(line) > 0:
                             add_enter = True
