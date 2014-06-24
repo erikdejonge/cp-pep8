@@ -554,7 +554,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     if ".factory" in line:
         add_double_enter = True
         debuginfo += ".factory"
-    elif line.startswith("class"):
+    elif line.startswith("class") and "=" not in line:
         if "noinspection" in prev_line:
             debuginfo += "class def after inspection"
         else:
@@ -616,8 +616,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if not comment(line) and not comment(prev_line):
 
             add_enter = False
-            if scoped <= 1:
-                debuginfo += " scoped is <=1"
+            if scoped < 1:
+                debuginfo += " scoped is <1"
                 add_enter = False
             elif whitespace(prev_line) - whitespace(line) > 0:
                 add_enter = True
@@ -660,7 +660,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif "__main__" in line:
         add_double_enter = True
         debuginfo = "main"
-    elif line.strip().startswith("class"):
+    elif line.strip().startswith("class") and "=" not in line:
         add_enter = True
         debuginfo = "class def"
     elif "unless" in line:
