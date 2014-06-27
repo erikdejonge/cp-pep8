@@ -560,6 +560,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         else:
             add_double_enter = True
             debuginfo = "class def"
+    elif line.strip().startswith("self.assert"):
+        debuginfo = "testcase"
+        if not prev_line.strip().startswith("self.assert"):
+            debuginfo += " start"
+            add_enter = True
+
     elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not '"""' in prev_line and not "param" in line and fname.endswith(".py"):
         debuginfo = "property "
         if func_def(prev_line):
@@ -1150,6 +1156,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         add_double_enter = True
     elif "setInterval" in line or "setTimeout" in line:
         debuginfo = "setInterval timeout"
+
+    if prev_line.strip().startswith("self.assert") and not line.strip().startswith("self.assert"):
+        if not add_enter and not add_double_enter:
+            debuginfo = "testcase ended on previous line"
+            add_enter = True
+
     if "{" in line and "}" in line and ":" in line and "," in line and line.strip().endswith("}"):
         nesting = line.find("{")
         if fname.endswith(".py"):
