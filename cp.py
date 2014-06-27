@@ -1711,10 +1711,10 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                     debuginfo += " module level" + g_last_assignment_on_global_prefix+"|"+line.strip()[:2]
                 add_double_enter = False
 
+    global g_is_python
     if add_double_enter:
         debuginfo += " double disables add_enter"
         add_enter = False
-
     elif cnt > 1:
         if line.strip() != "":
             if scoped >= 3:
@@ -1737,6 +1737,10 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                     if len(line.strip()) <= 2:
                         add_enter = False
                         debuginfo += " some closing tag"
+                        if line.strip()=="]" and not g_is_python:
+                            debuginfo = "coffeescript data or module block end"
+                            add_enter = False
+                            add_double_enter = False
 
     #debuginfo += " ifcnt:" + str(if_cnt) + " double_enter:" + str(add_double_enter)+ " add_enter:" + str(add_enter)
 
