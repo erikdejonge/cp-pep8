@@ -1676,6 +1676,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
     @param if_cnt:
     @return: @rtype:
     """
+    global g_is_python
     if comment(line):
         if line.find(" ") > 0:
             add_double_enter = True
@@ -1687,7 +1688,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
             else:
                 debuginfo += "comment -> " + debuginfo
         else:
-            global g_is_python
+
             debuginfo += "comment line"
             if g_is_python:
                 if line.find(" ") > 0:
@@ -1711,7 +1712,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                     debuginfo += " module level" + g_last_assignment_on_global_prefix+"|"+line.strip()[:2]
                 add_double_enter = False
 
-    global g_is_python
+    
     if add_double_enter:
         debuginfo += " double disables add_enter"
         add_enter = False
