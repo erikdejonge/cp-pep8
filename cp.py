@@ -1712,7 +1712,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                     debuginfo += " module level" + g_last_assignment_on_global_prefix+"|"+line.strip()[:2]
                 add_double_enter = False
 
-    
+
     if add_double_enter:
         debuginfo += " double disables add_enter"
         add_enter = False
