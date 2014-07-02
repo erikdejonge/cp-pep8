@@ -565,6 +565,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if not prev_line.strip().startswith("self.assert"):
             debuginfo += " start"
             add_enter = True
+        if not next_line.strip().startswith("self.assert"):
+            debuginfo += " single"
+            add_enter = False
+
+
 
     elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not '"""' in prev_line and not "param" in line and fname.endswith(".py"):
         debuginfo = "property "
