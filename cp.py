@@ -349,7 +349,7 @@ def whitespace(line):
 
 def list_comprehension(line):
 
-    return (("]" in line or "}" in line or ")" in line) and ("[" in line or "{" in line or "(" in line) and "for" in line)
+    return (("]" in line or "}" in line or ")" in line) and ("[" in line or "{" in line or "(" in line) and "for" in line) and (line.strip().endswith("]") or line.strip().endswith(")") or line.strip().endswith("}"))
 
 def scope_diff(line, prev_line):
     """
