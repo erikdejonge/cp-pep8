@@ -1276,8 +1276,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                         if empty:
                             line_redone += "\n" + line.replace('"""', "") + emptydocstring.strip()
                         else:
-                            docstring += next_line.count(" ") * " " + "@return: \n"
-                            docstring += next_line.count(" ") * " " + "@raise: "
+
+                            docstring += next_line.count(" ") * " " + "@return: None"
+
                             line_redone += "\n" + line.replace('"""', "") + docstring.lstrip()
 
 
