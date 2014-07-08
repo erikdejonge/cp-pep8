@@ -875,6 +875,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if line.find(" ") is not 0:
             if prev_line.strip().startswith("@"):
                 debuginfo += "after property"
+            if prev_line.strip().startswith("#"):
+                debuginfo += "after comment"
             else:
                 add_double_enter = True
         else:
@@ -938,6 +940,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
 
             else:
                 debuginfo = "functiondef after functiondef"
+                line = line + "\n" + " c" * whitespace(line) + 'print "' + line.replace('"', "'") + "'\n"
         if line.strip().startswith("def "):
             if not "(self" in line and not "(cls" in line and not "@" in prev_line and not prev_line.strip().startswith("def ") and not line.startswith(" ") and not "#noinspection" in prev_line:
                 add_enter = True
@@ -947,6 +950,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 add_enter = False
                 add_double_enter = False
                 debuginfo += " after noinspection"
+
     elif class_method_call(line) and not fname.endswith(".py"):
         debuginfo = "class method call"
         if scoped > 0:
@@ -1372,7 +1376,7 @@ def sanatize_line(line, next_line):
     @param next_line:
     @return: @rtype:
     """
-    if not (line.strip().endswith(",") or ")" in next_line) and not in_test([")", "=>", "!=", "hotkeys", "==", "$(", "?", "ng-", "trim", "strip", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element", "if ", "b64", "padding"], line):
+    if not (line.strip().endswith(",") or ")" in next_line) and not in_test([")", "|=", "=>", "!=", "hotkeys", "==", "$(", "?", "ng-", "trim", "strip", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element", "if ", "b64", "padding"], line):
         line = line.replace("=>", "@>").replace("( ", "(").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("* =", "*=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
         if not "+=" in line and not "++" in line:
             line = line.replace("+", " + ")
@@ -1723,6 +1727,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
     if add_double_enter:
         debuginfo += " double disables add_enter"
         add_enter = False
+
     elif cnt > 1:
         if line.strip() != "":
             if scoped >= 3:
