@@ -674,6 +674,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif line.strip().startswith("class") and "=" not in line:
         add_enter = True
         debuginfo = "class def"
+    elif line.strip().startswith("<div") and prev_line.strip().startswith("</div"):
+        add_enter = True
+        debuginfo = "close div"
     elif "unless" in line:
         add_enter = True
         debuginfo = "unless"
@@ -1376,7 +1379,7 @@ def sanatize_line(line, next_line):
     @param next_line:
     @return: @rtype:
     """
-    if not (line.strip().endswith(",") or ")" in next_line) and not in_test([")", "|=", "=>", "!=", "hotkeys", "==", "$(", "?", "ng-", "trim", "strip", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element", "if ", "b64", "padding"], line):
+    if not line.strip().startswith("<") and not (line.strip().endswith(",") or ")" in next_line) and not in_test([")", "|=", "=>", "!=", "hotkeys", "==", "$(", "?", "ng-", "trim", "strip", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element", "if ", "b64", "padding"], line):
         line = line.replace("=>", "@>").replace("( ", "(").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("* =", "*=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
         if not "+=" in line and not "++" in line:
             line = line.replace("+", " + ")
@@ -1624,7 +1627,7 @@ def init_cp(args, fname, myfile):
     cnt = 0
     location_id = 0
 
-    if ".cf" not in fname and ".py" not in fname:
+    if ".cf" not in fname and ".py" not in fname and ".html" not in fname:
         myfile.close()
         exit(0)
         #mylines = open(args.myfile)
