@@ -975,6 +975,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif anon_func(line) and not in_test([".directive", "$watch", ".bind"], line) and not fname.endswith(".py"):
         debuginfo = "anonymousfunction"
         if not resolve_func:
+            debuginfo += "resolve result 3"
+            add_enter = True
             if line.count("    ") is 1 and not assignment(prev_line) and not func_def(prev_line):
                 debuginfo = "anonymousfunction2"
                 add_enter = True
