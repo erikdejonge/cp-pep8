@@ -560,7 +560,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         else:
             add_double_enter = True
             debuginfo = "class def"
-    elif line.strip().startswith("self.assert"):
+    elif line.strip().startswith("self.assert") and scoped==0:
         debuginfo = "testcase"
         if not prev_line.strip().startswith("self.assert"):
             debuginfo += " start"
@@ -568,8 +568,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if not next_line.strip().startswith("self.assert"):
             debuginfo += " single"
             add_enter = False
-
-
 
     elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not '"""' in prev_line and not "param" in line and fname.endswith(".py"):
         debuginfo = "property "
