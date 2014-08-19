@@ -1010,7 +1010,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                     add_enter = True
             else:
                 debuginfo += " prevented by " + str(in_test_result(["when", "if", "->", "=>", "else", "switch"], prev_line))
-    elif line.strip().startswith(".directive"):
+    elif line.strip().startswith(".directive") or line.strip().startswith("app.directive"):
         add_enter = True
         debuginfo = ".directive "
     elif is_member_var(line) and not fname.endswith(".py"):
