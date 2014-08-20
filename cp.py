@@ -244,7 +244,7 @@ def assignment(line):
     if "memory.set" in line:
         return True
 
-    if "==" not in line and line.count("= ") is 1 and not is_member_var(line):
+    if "<=" not in line and ">=" not in line and "==" not in line and line.count("= ") is 1 and not is_member_var(line):
         if not some_func(line):
             return True
     return False
@@ -258,7 +258,7 @@ def elif_switch(line):
     """
     if line.strip() == "":
         return True
-    if in_test(["elif", "else"], line):
+    if in_test(["else if", "elif", "else"], line):
         return True
     return False
 
