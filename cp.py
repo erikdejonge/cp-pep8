@@ -810,7 +810,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         else:
             add_enter = False
             debuginfo = "for each, one liner"
-    elif prev_line.strip().startswith("_.each"):
+    elif prev_line.strip().startswith("_.each") and not prev_line.strip().endswith(">"):
         add_enter = True
         debuginfo = "after for each loop"
     elif "@unittest" in line:
