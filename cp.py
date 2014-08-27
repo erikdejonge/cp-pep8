@@ -580,7 +580,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             debuginfo += " after func"
         else:
             if line.find(" ") > 0 or line.find(" ") == -1:
-                debuginfo += " global"
+                debuginfo += " global - "
                 add_double_enter = True
             else:
                 add_enter = True
@@ -877,11 +877,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif func_def(line):
         if '"""' not in next_line:
             add_docstring = True
-        debuginfo = "function def"
+        debuginfo = "function def "
         if line.find(" ") is not 0:
             if prev_line.strip().startswith("@"):
-                debuginfo += "after property"
-            if prev_line.strip().startswith("#"):
+                debuginfo += "after property - "
+                add_double_enter = False
+                add_enter = False
+            elif prev_line.strip().startswith("#"):
                 debuginfo += "after comment"
             else:
                 add_double_enter = True
