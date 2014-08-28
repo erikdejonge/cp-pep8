@@ -707,7 +707,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif assignment(line):
         debuginfo = "assignment"
         global datastructure_define
-        if "[" in line and not "]" in line and not "\\033[" in line:
+        if "[" in line and not "]" in line and not "\\033[" in line and not anon_func(line) and not func_def(line):
             debuginfo += " datastructure"
             datastructure_define = True
             if global_line(line):
@@ -760,6 +760,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif ": [" in line and not fname.endswith(".py"):
         debuginfo = "struct coffeescript"
         add_enter = True
+        if line.find(" ") is 0:
+            debuginfo = " nested"
+            add_double_enter = True
     elif class_method(line):
         debuginfo = str('print' in line) + " class_method"
         if first_method_class:
@@ -984,6 +987,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             add_enter = True
             if line.count("    ") is 1 and not assignment(prev_line) and not func_def(prev_line):
                 debuginfo = "anonymousfunction2"
+                datastructure_define = False
                 add_enter = True
             if line.find(" ") is not 0:
                 add_double_enter = True
