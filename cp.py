@@ -859,7 +859,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             add_enter = True
 
         if scoped == 0:
-            debuginfo += " on same scope"
+            debuginfo += " on same scope "
             if "_.defer" in prev_line:
                 debuginfo += " after defer call"
                 add_enter = True
@@ -873,7 +873,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             if method_call(prev_line):
                 debuginfo += " after method call"
                 add_enter = True
-
+            if line.find(" ") != 0:
+                add_enter = True
+                debuginfo += "global scope"
         if "else" in line:
             debuginfo += " else"
             add_enter = False
