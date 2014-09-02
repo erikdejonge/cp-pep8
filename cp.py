@@ -570,6 +570,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if not prev_line.strip().startswith("self.assert"):
             debuginfo += " start"
             add_enter = True
+            if prev_line.strip() == '"""':
+                debuginfo += " after comment"
+                add_enter = False
+
         if not next_line.strip().startswith("self.assert"):
             debuginfo += " single"
             add_enter = False
