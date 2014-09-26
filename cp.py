@@ -5,22 +5,48 @@ cp.py
 """
 import os
 import time
+import Levenshtein
 from argparse import ArgumentParser
 import sys
 reload(sys)
-#noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferences
 sys.setdefaultencoding("utf-8")
 
 ADDCOMMENT_WITH_FOUND_TYPE = False
 datastructure_define = False
 g_last_assignment_on_global_prefix = ""
 g_is_python = True
+g_almost_alike = 0
+
+
+def almost_alike(s1, s2):
+    alikeval = 10
+    maxlength = 10
+    s1 = s1.strip()
+    s2 = s2.strip()
+    global g_almost_alike
+    if (len(s1) < maxlength) or (len(s2) < maxlength):
+        d = 20
+    else:
+        d = Levenshtein.distance(s1, s2)
+
+    if d < alikeval:
+        if g_almost_alike < 0:
+            g_almost_alike = 0
+        g_almost_alike += 1
+    else:
+        if g_almost_alike > 0:
+            g_almost_alike = -1
+        else:
+            g_almost_alike = 0
+    return g_almost_alike
+
 
 def replace_variables():
     """
     @return: @rtype:
     """
-    #variables = ["print", "warning", "event_emit"]
+    # variables = ["print", "warning", "event_emit"]
     variables = ["utils.print_once", "broadcast_and_emit_event", "urls.http_error", "utils.digest_scope", "warning_server_error", "utils.digest_scope_debounce", "utils.assert_equal", "utils.assert_not_equal", "serverevents.subscribe", "print", "warning", "emit_event_angular", "urls.slug_comand_timestamp", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
     undo_variables = []
     watch_variables = []
@@ -347,9 +373,10 @@ def whitespace(line):
         cnt += 1
     return cnt
 
-def list_comprehension(line):
 
-    return (("]" in line or "}" in line or ")" in line) and ("[" in line or "{" in line or "(" in line) and "for" in line) and (line.strip().endswith("]") or line.strip().endswith(")") or line.strip().endswith("}"))
+def list_comprehension(line):
+    return (("]" in line or "}" in line or ")" in line) and ("[" in line or "{" in line or "(" in line) and "for" in line) and (line.strip().endswith("]") or line.strip().endswith("}"))
+
 
 def scope_diff(line, prev_line):
     """
@@ -565,7 +592,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         else:
             add_double_enter = True
             debuginfo = "class def"
-    elif line.strip().startswith("self.assert") and scoped==0:
+    elif line.strip().startswith("self.assert") and scoped == 0:
         debuginfo = "testcase"
         if not prev_line.strip().startswith("self.assert"):
             debuginfo += " start"
@@ -632,7 +659,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif line.strip().startswith("return"):
         debuginfo = "retrn"
         if not comment(line) and not comment(prev_line):
-
             add_enter = False
             if scoped < 1:
                 debuginfo += " scoped is <1"
@@ -659,11 +685,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                         debuginfo += " after empty line time func or 3lse"
                 elif is_test([")"], prev_line.strip()) or in_test(["_.filter", "_.map"], prev_line):
                     debuginfo += " after close or underscore func"
-                    #add_enter = True
+                    # add_enter = True
                 elif "return" in prev_line:
                     debuginfo += " after rturn" + str(scoped)
 
-                    #add_enter = True
+                    # add_enter = True
                 elif keyword(prev_line):
                     debuginfo += "after keyword2"
                     add_enter = False
@@ -673,7 +699,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                             debuginfo += " after js time func"
                     elif scoped > 1:
                         debuginfo += " after scope d!ff " + str(scoped)
-                        #add_enter = True
+                        # add_enter = True
 
     elif "__main__" in line:
         add_double_enter = True
@@ -724,6 +750,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if prev_line.strip().startswith("_."):
             debuginfo += " after some functional js"
             add_enter = True
+        if method_call(prev_line) and scoped == 0:
+            debuginfo += " after method call"
+            add_enter = True
+        if assignment(prev_line) and method_call(prev_line):
+            debuginfo += " again"
+            add_enter = False
+
         if global_line(line):
             debuginfo += " on global"
             assignment_on_global_prefix = line.strip()[:2]
@@ -1082,8 +1115,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                         if whitespace(prev_line) - whitespace(line) > 0:
                             add_enter = True
                             debuginfo += " scope>2 "
-                else:
-                    debuginfo += "nested method call"
             elif not func_test([func_def, scoped_method_call, method_call, class_method], prev_line.strip()):
                 debuginfo += " mcall not after functest "
                 if data_assignment(line, prev_line):
@@ -1153,7 +1184,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         add_double_enter = True
     elif "except" in line:
         debuginfo = "except"
-        #add_enter = True
+        # add_enter = True
     elif line.lstrip().startswith("$scope") and in_test(["->", "=>"], line):
         debuginfo = "scoped method define"
         if prev_line:
@@ -1300,11 +1331,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                         if empty:
                             line_redone += "\n" + line.replace('"""', "") + emptydocstring.strip()
                         else:
-
                             docstring += next_line.count(" ") * " " + "@return: None"
 
                             line_redone += "\n" + line.replace('"""', "") + docstring.lstrip()
-
 
     if "]" in line and not "[]" in line:
         if datastructure_define:
@@ -1331,12 +1360,22 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
 
         line_redone += '"""\n'
 
+    if not in_python_comment:
+        alike = almost_alike(line, prev_line)
+        if alike > 0:
+            add_enter = False
+            debuginfo = "almost alike"
+        elif alike < 0:
+            add_enter = True
+            debuginfo = "almost alike is over"
+        debuginfo += " " + str(alike)
+
     debuginfo = debuginfo.replace("  ", " ")
     return in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line_redone
 
 
 def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, mylines, prev_line):
-    #print debuginfo, add_enter, add_double_enter
+    # print debuginfo, add_enter, add_double_enter
     """
 
     @param add_double_enter:
@@ -1351,8 +1390,8 @@ def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, 
 
     if add_double_enter:
         cont = True
-        #if cnt - 1 > 0:
-        #    if ".module" in prev_line:
+        # if cnt - 1 > 0:
+        # if ".module" in prev_line:
         #        cont = False
 
 
@@ -1436,7 +1475,7 @@ def coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_
     return add_enter, debuginfo, resolve_func
 
 
-#noinspection PyUnusedLocal
+# noinspection PyUnusedLocal
 def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, orgfname, undo_variables, variables):
     """
 
@@ -1450,8 +1489,8 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
     @return: @rtype:
     """
     for replace_variable in variables:
-        #if "print_once" in line:
-        #    line = line.replace("print_once(", "print_once (")
+        # if "print_once" in line:
+        # line = line.replace("print_once(", "print_once (")
         check_split = line.split(" ")
         check_split2 = []
         for i in check_split:
@@ -1611,12 +1650,12 @@ def init_file(args):
         if "__init__" in fname:
             fname = os.path.basename(os.getcwd())
             fname = fname + "/" + (str(orgfname))
-            #fname = fname.replace("__init__.py", "")
-            #fname = fname.replace("/:", ":")
+            # fname = fname.replace("__init__.py", "")
+            # fname = fname.replace("/:", ":")
     return buffer_string, fname, myfile, num, orgfname
 
 
-#noinspection PyPep8Naming
+# noinspection PyPep8Naming
 def init_cp(args, fname, myfile):
     """
 
@@ -1628,7 +1667,7 @@ def init_cp(args, fname, myfile):
     color_vals_to_keep, undo_variables, variables, watch_vars = replace_variables()
     mylines = []
     fname = fname.replace("coffee", "cf")
-    #if fname.endswith(".py"):
+    # if fname.endswith(".py"):
     #    variables.remove("event_emit")
     import cStringIO
     data = myfile.read()
@@ -1681,7 +1720,7 @@ def prepare_line(cnt, line, mylines):
     line = line.replace("\n", "")
     add_enter = add_double_enter = False
 
-    #line = line.replace("console.log ", "console?.log? ")
+    # line = line.replace("console.log ", "console?.log? ")
     #line = line.replace("console?.log", "console?.log")
     #line = line.replace("console?.log?", "print")
     line = line.replace("# noinspection", "#noinspection")
@@ -1719,7 +1758,6 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
             else:
                 debuginfo += "comment -> " + debuginfo
         else:
-
             debuginfo += "comment line"
             if g_is_python:
                 if line.find(" ") > 0:
@@ -1740,9 +1778,8 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
             else:
                 if line.find(" ") > 0:
                     add_enter = True
-                    debuginfo += " module level" + g_last_assignment_on_global_prefix+"|"+line.strip()[:2]
+                    debuginfo += " module level" + g_last_assignment_on_global_prefix + "|" + line.strip()[:2]
                 add_double_enter = False
-
 
     if add_double_enter:
         debuginfo += " double disables add_enter"
@@ -1770,17 +1807,17 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                     if len(line.strip()) <= 2:
                         add_enter = False
                         debuginfo += " some closing tag"
-                        if line.strip()=="]" and not g_is_python:
+                        if line.strip() == "]" and not g_is_python:
                             debuginfo = "coffeescript data or module block end"
                             add_enter = False
                             add_double_enter = False
 
-    #debuginfo += " ifcnt:" + str(if_cnt) + " double_enter:" + str(add_double_enter)+ " add_enter:" + str(add_enter)
+    # debuginfo += " ifcnt:" + str(if_cnt) + " double_enter:" + str(add_double_enter)+ " add_enter:" + str(add_enter)
 
     return add_double_enter, add_enter, debuginfo, line
 
 
-#noinspection PyPep8Naming
+# noinspection PyPep8Naming
 def main(args):
     """
         main function
