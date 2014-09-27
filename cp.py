@@ -19,16 +19,20 @@ g_is_python = True
 g_almost_alike = 0
 
 
-def almost_alike(s1, s2):
+def almost_alike(s1, s2, scoped):
     alikeval = 10
     maxlength = 10
-    s1 = s1.strip()
-    s2 = s2.strip()
+    s1 = s1.strip()[:20]
+    s2 = s2.strip()[:20]
     global g_almost_alike
     if (len(s1) < maxlength) or (len(s2) < maxlength):
-        d = 20
+        d = alikeval * 2
     else:
         d = Levenshtein.distance(s1, s2)
+    if s1.strip().startswith("self.m_") and s1.strip().startswith("self.m_"):
+        d = 1
+    if int(scoped) != 0:
+        d = alikeval * 2
 
     if d < alikeval:
         if g_almost_alike < 0:
@@ -1360,12 +1364,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
 
         line_redone += '"""\n'
 
-    if not in_python_comment:
-        alike = almost_alike(line, prev_line)
+    if not in_python_comment and line.strip() != '"""':
+        alike = almost_alike(line, prev_line, scoped)
         if alike > 0:
             add_enter = False
             debuginfo = "almost alike"
-        elif alike < 0:
+        elif alike < 0 and scoped == 0:
             add_enter = True
             debuginfo = "almost alike is over"
         debuginfo += " " + str(alike)
@@ -1392,7 +1396,7 @@ def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, 
         cont = True
         # if cnt - 1 > 0:
         # if ".module" in prev_line:
-        #        cont = False
+        # cont = False
 
 
         if cont:
@@ -1668,7 +1672,7 @@ def init_cp(args, fname, myfile):
     mylines = []
     fname = fname.replace("coffee", "cf")
     # if fname.endswith(".py"):
-    #    variables.remove("event_emit")
+    # variables.remove("event_emit")
     import cStringIO
     data = myfile.read()
     if "ADDTYPES" in data or "addtypes" in data:
@@ -1686,8 +1690,8 @@ def init_cp(args, fname, myfile):
     if ".cf" not in fname and ".py" not in fname and ".html" not in fname:
         myfile.close()
         exit(0)
-        #mylines = open(args.myfile)
-        #mylines = cStringIO.StringIO(data)
+        # mylines = open(args.myfile)
+        # mylines = cStringIO.StringIO(data)
     resolve_func = 0
     debuginfo = ""
     in_if = False
@@ -1721,12 +1725,12 @@ def prepare_line(cnt, line, mylines):
     add_enter = add_double_enter = False
 
     # line = line.replace("console.log ", "console?.log? ")
-    #line = line.replace("console?.log", "console?.log")
-    #line = line.replace("console?.log?", "print")
+    # line = line.replace("console?.log", "console?.log")
+    # line = line.replace("console?.log?", "print")
     line = line.replace("# noinspection", "#noinspection")
     line = line.replace("console?.error?", "warning")
     line = line.replace("console?.error", "warning")
-    #line = line.replace("console.log", "print")
+    # line = line.replace("console.log", "print")
 
     return add_double_enter, add_enter, line, next_line, prev_line, scoped
 
@@ -1827,7 +1831,7 @@ def main(args):
         print "can't cp myself"
         return
 
-    #print "cp.py -f", os.path.basename(os.path.dirname(args.myfile)) + "/" + os.path.basename(args.myfile)
+    # print "cp.py -f", os.path.basename(os.path.dirname(args.myfile)) + "/" + os.path.basename(args.myfile)
 
     buffer_string, fname, myfile, num, orgfname = init_file(args)
 
@@ -1857,7 +1861,7 @@ def main(args):
 
         add_enter, debuginfo, resolve_func = coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_line, resolve_func)
 
-        #if ".cf" in fname:
+        # if ".cf" in fname:
         line = coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, mylines, prev_line)
 
         if not ADDCOMMENT_WITH_FOUND_TYPE:
@@ -1887,10 +1891,10 @@ def main(args):
     myfile.close()
 
     sio_file2 = cStringIO.StringIO("\n" + buffer_string.lstrip())
-    #open(args.myfile, "w").write()
+    # open(args.myfile, "w").write()
 
     num = 0
-    #if str(args.myfile).endswith(".coffee"):
+    # if str(args.myfile).endswith(".coffee"):
     #    num += 1
 
     buffer_string = ""
