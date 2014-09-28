@@ -29,7 +29,11 @@ def almost_alike(s1, s2, scoped):
         d = alikeval * 2
     else:
         d = Levenshtein.distance(s1, s2)
-    if s1.strip().startswith("self.m_") and s1.strip().startswith("self.m_"):
+    if s1.strip().startswith("self.m_") and s2.strip().startswith("self.m_"):
+        d = 1
+    if s1.strip().startswith("self.g_") and s2.strip().startswith("self.g_"):
+        d = 1
+    if s1.strip().startswith("g_") and s2.strip().startswith("g_"):
         d = 1
     if int(scoped) != 0:
         d = alikeval * 2
@@ -1895,7 +1899,7 @@ def main(args):
 
     num = 0
     # if str(args.myfile).endswith(".coffee"):
-    #    num += 1
+    # num += 1
 
     buffer_string = ""
     for line in sio_file2:
