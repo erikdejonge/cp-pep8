@@ -995,6 +995,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                     debuginfo += " first method"
                     add_double_enter = False
                     add_enter = True
+                    if fname.endswith(".py"):
+                        debuginfo += " python"
+                        add_enter = False
 
             else:
                 debuginfo = "functiondef after functiondef"
