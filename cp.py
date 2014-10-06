@@ -29,7 +29,7 @@ def almost_alike(s1, s2, scoped):
         d = alikeval * 2
     else:
         d = Levenshtein.distance(s1, s2)
-    
+
     if s1.strip().startswith("self.g_") and s2.strip().startswith("self.g_"):
         d = 1
     if s1.strip().startswith("g_") and s2.strip().startswith("g_"):
@@ -762,7 +762,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if method_call(prev_line) and scoped == 0:
             debuginfo += " after method call"
             add_enter = True
-        if assignment(prev_line) and method_call(prev_line):
+        if assignment(prev_line) and method_call(prev_line) and scoped == 0:
             debuginfo += " again"
             add_enter = False
 
