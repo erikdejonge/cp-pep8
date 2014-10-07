@@ -32,6 +32,10 @@ def almost_alike(s1, s2, scoped):
 
     if s1.strip().startswith("self.g_") and s2.strip().startswith("self.g_"):
         d = 1
+    if s1.strip().startswith("self.m_") and s2.strip().startswith("self.m_"):
+        d = 1
+    if s1.strip().startswith("self._") and s2.strip().startswith("self._"):
+        d = 1
     if s1.strip().startswith("g_") and s2.strip().startswith("g_"):
         d = 1
     if s1.strip().startswith("m_") and s2.strip().startswith("m_"):
@@ -992,7 +996,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                     if "noinspection" in prev_line:
                         debuginfo += " after no inspection"
                         add_enter = False
-                if "(self" in line and ("class" in prev_line or '"""' in prev_line) and not prev_line.strip().startswith("@"):
+                if "(self" in line and ("class" in prev_line or '"""' in prev_line) and not prev_line.strip().startswith("@") and not "__class__" in prev_line:
                     debuginfo += " first method"
                     add_double_enter = False
                     add_enter = True
