@@ -747,6 +747,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         add_enter = True
     elif line.strip().startswith("try"):
         debuginfo = "try statement"
+    elif line.strip().startswith("app.controller"):
+        debuginfo = "angular controller"
+        add_enter = True
+    elif line.strip().startswith("app.directive"):
+        debuginfo = "angular directive"
+        add_enter = True
     elif assignment(line):
         debuginfo = "assignment"
         global datastructure_define
@@ -779,6 +785,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 if comment(prev_line):
                     debuginfo += " after comment"
                     add_enter = False
+                if line.strip().startswith("app = angular.module"):
+                    add_enter = True
+                    debuginfo += "angular app object"
+
             else:
                 if datastructure_define:
                     debuginfo += " same prefix"
@@ -819,6 +829,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             debuginfo += " " + str(first_method_class)
             if "class" in prev_line:
                 add_enter = False
+                debuginfo += " class in prevline"
             else:
                 add_enter = True
         elif first_method_factory:
@@ -831,7 +842,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 add_enter = True
             else:
                 if not fname.endswith(".py"):
-                    if scoped < 0:
+                    if line.strip().startswith("link:"):
+                        debuginfo += "directive link"
+                        add_enter = False
+                    elif scoped < 0:
                         if "unless" not in prev_line:
                             add_enter = True
                             debuginfo += " in a nested scope " + str(global_class_declare(prev_line))
@@ -1035,7 +1049,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                         add_enter = True
                 else:
                     debuginfo += " not on globalscope"
-    elif anon_func(line) and not in_test([".directive", "$watch", ".bind"], line) and not fname.endswith(".py"):
+    elif anon_func(line) and not in_test([".directive", "$watch", ".bind"], prev_line) and not in_test([".directive", "$watch", ".bind"], line) and not fname.endswith(".py"):
         debuginfo = "anonymousfunction"
         if not resolve_func:
             debuginfo += "resolve result 3"
@@ -1119,6 +1133,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 if "# noins" not in prev_line and "import " not in prev_line and "#noins" not in prev_line:
                     add_enter = False
                     add_double_enter = True
+                    debuginfo += "noins in prev"
                 if ")()" in line.strip():
                     debuginfo += " end mod"
                     add_enter = False
@@ -1364,6 +1379,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo += " in in_python_comment"
         add_double_enter = False
         add_enter = False
+
         if line.strip().startswith("@param") and "args" not in line:
             if not next_line.strip().startswith("@type"):
                 line_redone += "\n" + org_line.split("@param")[0] + "@type " + line.strip().split("@param")[1].split(":")[0].strip() + ": "
