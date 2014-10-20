@@ -1392,7 +1392,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
 
         line_redone += '"""\n'
 
-    if not in_python_comment and line.strip() != '"""':
+    if not in_python_comment and line.strip() != '"""' and not assignment(line):
         alike = almost_alike(line, prev_line, scoped)
         if alike > 0:
             add_enter = False
