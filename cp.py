@@ -30,6 +30,8 @@ def almost_alike(s1, s2, scoped):
     else:
         d = Levenshtein.distance(s1, s2)
 
+    if s1.strip().startswith("<") and s2.strip().startswith("<"):
+        d = 10000
     if s1.strip().startswith("self.g_") and s2.strip().startswith("self.g_"):
         d = 1
     if s1.strip().startswith("self.m_") and s2.strip().startswith("self.m_"):
