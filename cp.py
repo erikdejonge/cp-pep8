@@ -773,9 +773,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if prev_line.strip().startswith("_."):
             debuginfo += " after some functional js"
             add_enter = True
-        if method_call(prev_line) and scoped == 0:
-            debuginfo += " after method call"
-            add_enter = True
         if assignment(prev_line) and method_call(prev_line) and scoped == 0:
             debuginfo += " again"
             add_enter = False
