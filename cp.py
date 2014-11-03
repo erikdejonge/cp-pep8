@@ -776,7 +776,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if scoped > 0:
             debuginfo += " prev scope"
             add_enter = True
-        if prev_line.strip().startswith("_."):
+        if prev_line.strip().startswith("_.") and not prev_line.strip().endswith(">"):
             debuginfo += " after some functional js"
             add_enter = True
         if assignment(prev_line) and method_call(prev_line) and scoped == 0:
