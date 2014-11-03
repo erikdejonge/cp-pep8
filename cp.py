@@ -30,10 +30,16 @@ def almost_alike(s1, s2, scoped):
     else:
         d = Levenshtein.distance(s1, s2)
 
+
+
     if s1.strip().startswith("<") and s2.strip().startswith("<"):
         d = 10000
     elif (":" in s2 and ":" in s1):
         d = 1000
+    elif s1.strip().startswith("import ") and s2.strip().startswith("import "):
+        d = 10000
+    elif s1.strip().startswith("from ") and s2.strip().startswith("from "):
+        d = 10000
     elif s1.strip().startswith("self.g_") and s2.strip().startswith("self.g_"):
         d = 1
     elif s1.strip().startswith("self.m_") and s2.strip().startswith("self.m_"):
@@ -1399,7 +1405,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             add_enter = False
             debuginfo = "almost alike"
         elif alike < 0 and scoped == 0:
-            add_enter = True
+            #add_enter = True
             debuginfo = "almost alike is over"
         debuginfo += " " + str(alike)
 
