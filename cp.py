@@ -619,7 +619,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo = "testcase"
         if not prev_line.strip().startswith("self.assert"):
             debuginfo += " start"
-            add_enter = True
+            add_enter = False
             if prev_line.strip() == '"""':
                 debuginfo += " after comment"
                 add_enter = False
