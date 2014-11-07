@@ -922,7 +922,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 add_enter = True
             if not in_test(["if", "else", "->", "=>"], prev_line):
                 add_enter = True
-    elif "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0):
+    elif "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0 or line.strip().find("elif") is 0):
         debuginfo = " if statement"
 
         if scoped > 0:
@@ -950,6 +950,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if "else" in line:
             debuginfo += " else"
             add_enter = False
+        if "elif" in line:
+            debuginfo += " elif"
+            add_enter = False
+            if scoped > 1:
+                add_enter = True
+                debuginfo += " scope change more then 1 "
+
     elif func_def(line):
         if '"""' not in next_line:
             add_docstring = True
