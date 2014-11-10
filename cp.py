@@ -1063,7 +1063,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                         add_enter = True
                 else:
                     debuginfo += " not on globalscope"
-    elif anon_func(line) and not in_test([".directive", "$watch", ".bind"], prev_line) and not in_test([".directive", "$watch", ".bind"], line) and not fname.endswith(".py"):
+    elif anon_func(line) and not in_test([".directive", "$watch", ".bind"], prev_line) and not in_test(["_.delay", "_.defer", ".directive", "$watch", ".bind"], line) and not fname.endswith(".py"):
         debuginfo = "anonymousfunction"
         if not resolve_func:
             debuginfo += "resolve result 3"
