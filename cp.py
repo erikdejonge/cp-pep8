@@ -1481,6 +1481,7 @@ def sanatize_line(line, next_line):
     @param next_line:
     @return: @rtype:
     """
+
     if not line.strip().startswith("<") and not (line.strip().endswith(",") or ")" in next_line) and not in_test([")", "|=", "=>", "!=", "hotkeys", "==", "$(", "?", "ng-", "trim", "strip", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element", "if ", "b64", "padding"], line):
         line = line.replace("=>", "@>").replace("( ", "(").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("* =", "*=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
         if not "+=" in line and not "++" in line:
@@ -1911,8 +1912,10 @@ def main(args):
 
         debuginfo, line = add_debuginfo(debuginfo, line)
 
-        line = sanatize_line(line, str(next_line))
-
+        if not in_python_comment:
+            line = sanatize_line(line, str(next_line))
+        else:
+            line += "\n"
         restore_color = None
         if orgfname.strip().endswith(".py"):
             for color in color_vals_to_keep:
