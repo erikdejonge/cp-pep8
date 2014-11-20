@@ -1256,6 +1256,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif "angular.module" in line:
         debuginfo = "angular module"
         add_double_enter = True
+
     elif "$." in line:
         if prev_line:
             if not ("_." in prev_line or "$." in prev_line or "if" in prev_line):
@@ -1389,6 +1390,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if datastructure_define:
             debuginfo += " end datastructure_define"
         datastructure_define = False
+    if prev_line.strip() == "]":
+        debuginfo += " prevline is ]"
+        add_enter = True
 
     if datastructure_define and ("=" not in line):
         debuginfo += " in datastructure_define"
