@@ -1711,6 +1711,8 @@ def init_file(args):
             fname = fname + "/" + (str(orgfname))
             # fname = fname.replace("__init__.py", "")
             # fname = fname.replace("/:", ":")
+
+
     return buffer_string, fname, myfile, num, orgfname
 
 
@@ -1743,6 +1745,14 @@ def init_cp(args, fname, myfile):
     location_id = 0
 
     if ".cf" not in fname and ".py" not in fname and ".html" not in fname:
+        if str(args.myfile).endswith(".less"):
+            myfile.seek(0)
+            buffer_string = myfile.read()
+            print {1:buffer_string}
+            buffer_string = buffer_string.replace("}\n.", "}\n\n.").replace("}\n@media", "}\n\n@media").replace("}\n#", "}\n\n#").replace("  }\n  .", "  }\n\n  .").replace("}\n@", "}\n\n@").replace("}\nbody", "}\n\nbody")
+            myfile.close()
+            open(str(args.myfile), "w").write(buffer_string)
+
         myfile.close()
         exit(0)
         # mylines = open(args.myfile)
@@ -1960,8 +1970,7 @@ def main(args):
         num += 1
         if line.strip() != "#":
             buffer_string += line
-    if str(args.myfile).endswith(".less"):
-        buffer_string = buffer_string.replace("}\n.", "}\n\n.")
+
     if not args.test:
         if str(args.myfile).endswith(".coffee"):
             finalbuf = buffer_string.strip() + "\n"
