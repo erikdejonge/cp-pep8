@@ -1748,7 +1748,6 @@ def init_cp(args, fname, myfile):
         if str(args.myfile).endswith(".less"):
             myfile.seek(0)
             buffer_string = myfile.read()
-            print {1:buffer_string}
             buffer_string = buffer_string.replace("}\n.", "}\n\n.").replace("}\n@media", "}\n\n@media").replace("}\n#", "}\n\n#").replace("  }\n  .", "  }\n\n  .").replace("}\n@", "}\n\n@").replace("}\nbody", "}\n\nbody")
             myfile.close()
             open(str(args.myfile), "w").write(buffer_string)
