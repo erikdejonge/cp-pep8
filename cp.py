@@ -850,8 +850,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             else:
                 if not fname.endswith(".py"):
                     if line.strip().startswith("link:"):
-                        debuginfo += "directive link"
+                        debuginfo += " directive link"
                         add_enter = False
+                        if prev_line.lower().strip().startswith("return"):
+                            debuginfo += " after return"
+                            add_enter = True
                     elif scoped < 0:
                         if "unless" not in prev_line:
                             add_enter = True
@@ -1948,8 +1951,8 @@ def main(args):
     # open(args.myfile, "w").write()
 
     num = 0
-    # if str(args.myfile).endswith(".coffee"):
-    # num += 1
+
+
 
     buffer_string = ""
     for line in sio_file2:
@@ -1957,7 +1960,8 @@ def main(args):
         num += 1
         if line.strip() != "#":
             buffer_string += line
-
+    if str(args.myfile).endswith(".less"):
+        buffer_string = buffer_string.replace("}\n.", "}\n\n.")
     if not args.test:
         if str(args.myfile).endswith(".coffee"):
             finalbuf = buffer_string.strip() + "\n"
