@@ -1853,6 +1853,7 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
         debuginfo += " double disables add_enter"
         add_enter = False
 
+
     elif cnt > 1:
         if line.strip() != "":
             if scoped >= 3:
@@ -1956,7 +1957,7 @@ def main(args):
 
     myfile.close()
 
-    sio_file2 = cStringIO.StringIO("\n" + buffer_string.lstrip())
+    sio_file2 = cStringIO.StringIO("\n" + buffer_string.rstrip())
     # open(args.myfile, "w").write()
 
     num = 0
@@ -1972,11 +1973,11 @@ def main(args):
 
     if not args.test:
         if str(args.myfile).endswith(".coffee"):
-            finalbuf = buffer_string.strip() + "\n"
+            finalbuf = buffer_string.rstrip() + "\n"
             open(args.myfile, "w").write(finalbuf)
 
         else:
-            open(args.myfile, "w").write(buffer_string.strip() + "\n")
+            open(args.myfile, "w").write(buffer_string.rstrip() + "\n")
     else:
         print "file not written (test run)"
 
