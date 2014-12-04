@@ -800,6 +800,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 if datastructure_define:
                     debuginfo += " same prefix"
                     add_enter = False
+                    if "angular.module" in prev_line:
+                        debuginfo += " after angular module"
+                        add_enter = True
+                        datastructure_define = False
             g_last_assignment_on_global_prefix = assignment_on_global_prefix
             if not global_line(prev_line):
                 debuginfo += " (prev!=global)"
@@ -824,6 +828,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo = "global method call"
         if "#noinspection" not in prev_line and "import " not in prev_line:
             add_double_enter = True
+        if "angular.module" in line:
+            debuginfo += " angular.module"
+            add_double_enter = False
+            add_enter = True
     elif ": [" in line and not fname.endswith(".py"):
         debuginfo = "struct coffeescript"
         add_enter = True
