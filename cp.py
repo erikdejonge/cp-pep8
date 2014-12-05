@@ -609,6 +609,13 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         add_double_enter = True
         debuginfo += ".factory"
 
+
+    elif "debugger;" == line.strip():
+        add_double_enter = True
+        debuginfo += "debugger statement"
+    elif "debugger;" == prev_line.strip():
+        add_double_enter = True
+        debuginfo += "debugger statement"
     elif line.startswith("class") and "=" not in line:
         if "noinspection" in prev_line:
             debuginfo += "class def after inspection"
