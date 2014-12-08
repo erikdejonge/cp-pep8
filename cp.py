@@ -71,7 +71,7 @@ def replace_variables():
     """
     # variables = ["print", "warning", "event_emit"]
     variables = ["utils.print_once", "broadcast_and_emit_event", "urls.http_error", "utils.digest_scope", "warning_server_error", "utils.digest_scope_debounce", "utils.assert_equal", "utils.assert_not_equal", "serverevents.subscribe", "print", "warning", "emit_event_angular", "urls.slug_comand_timestamp", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
-    undo_variables = []
+    undo_variables = ["print"]
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
     return color_vals_to_keep, undo_variables, variables, watch_variables
@@ -610,12 +610,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo += ".factory"
 
 
-    elif "debugger;" == line.strip():
-        add_double_enter = True
-        debuginfo += "debugger statement"
-    elif "debugger;" == prev_line.strip():
-        add_double_enter = True
-        debuginfo += "debugger statement"
     elif line.startswith("class") and "=" not in line:
         if "noinspection" in prev_line:
             debuginfo += "class def after inspection"
@@ -1631,6 +1625,7 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         line = line.replace(replace_variable, replace_variable + "(\"" + str(location) + "\",")
                     else:
                         line = line.replace(replace_variable, replace_variable + "(").replace("( \"", "(\"")
+
                 for i in range(0, 20):
                     line = line.rstrip(",")
                     line = line.rstrip()
@@ -1666,7 +1661,8 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                     if "print_once(" in line:
                         line = line.replace("print_once(", "print_once ")
                         line = line[:len(line) - 1]
-
+                    if "print" in line:
+                        line = line.replace("print", "console.log")
                 if found_color:
                     line += ", '\\033[m'"
 
@@ -1983,7 +1979,7 @@ def main(args):
     for line in sio_file2:
         line = line.replace("@@@@", str(num))
         num += 1
-        if line.strip() != "#":
+        if line.strip() != "#" and line.strip() != "debugger;":
             buffer_string += line
 
     if not args.test:
