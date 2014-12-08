@@ -65,15 +65,18 @@ def almost_alike(s1, s2, scoped):
     return g_almost_alike
 
 
-def replace_variables():
+def replace_variables(orgfname):
     """
     @return: @rtype:
     """
+
     # variables = ["print", "warning", "event_emit"]
     variables = ["utils.print_once", "broadcast_and_emit_event", "urls.http_error", "utils.digest_scope", "warning_server_error", "utils.digest_scope_debounce", "utils.assert_equal", "utils.assert_not_equal", "serverevents.subscribe", "print", "warning", "emit_event_angular", "urls.slug_comand_timestamp", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
-    undo_variables = ["print"]
+    undo_variables = ["print", "warning"]
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
+    if orgfname.endswith(".py"):
+        undo_variables.remove("print")
     return color_vals_to_keep, undo_variables, variables, watch_variables
 
 
@@ -1663,6 +1666,9 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         line = line[:len(line) - 1]
                     if "print" in line:
                         line = line.replace("print", "console.log")
+                    if "warning" in line:
+                        line = line.replace("warning", "console.error")
+
                 if found_color:
                     line += ", '\\033[m'"
 
@@ -1736,9 +1742,10 @@ def init_cp(args, fname, myfile):
     @param myfile:
     @return: @rtype:
     """
-    color_vals_to_keep, undo_variables, variables, watch_vars = replace_variables()
-    mylines = []
     fname = fname.replace("coffee", "cf")
+    color_vals_to_keep, undo_variables, variables, watch_vars = replace_variables(fname)
+    mylines = []
+
     # if fname.endswith(".py"):
     # variables.remove("event_emit")
     import cStringIO
