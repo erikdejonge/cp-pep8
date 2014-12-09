@@ -841,7 +841,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         add_enter = True
         if line.find(" ") is 0:
             debuginfo = " nested"
-            add_double_enter = True
+            add_enter = False
     elif class_method(line):
         debuginfo = str('print' in line) + " class_method"
         if first_method_class:
