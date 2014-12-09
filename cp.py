@@ -823,7 +823,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             debuginfo += " on prev scope"
             add_enter = True
         elif on_scope(line):
-            debuginfo += " on scope"
+            debuginfo += " on $scope"
+            if scoped == 1:
+                add_enter = False
+                debuginfo += " func?"
         if scoped >= 2:
             add_enter = True
             debuginfo += " new scope"
@@ -907,10 +910,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo = "unittest decorator"
     elif ".$on" in line:
         debuginfo = "0n event"
-        if scoped == 0:
+        if scoped <= 1:
             debuginfo += " on same scope "
             add_enter = False
-        if scoped > 0:
+        if scoped > 1:
             debuginfo += " on different scope "
             add_enter = True
     elif "set_time_out" in line:
@@ -1023,8 +1026,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                     debuginfo += "first method factory"
                     add_enter = True
                 elif on_scope(line):
-                    debuginfo += " on scope"
-                    add_enter = True
+                    debuginfo += " on $scope "
+                    if scoped != 1:
+                        add_enter = True
+                    else:
+                        debuginfo += " func?"
                 elif scoped > 0:
                     debuginfo += " on previous scope"
                     add_enter = True
