@@ -1992,7 +1992,7 @@ def main(args):
     for line in sio_file2:
         line = line.replace("@@@@", str(num))
         num += 1
-        if line.strip() != "#" and line.strip() != "debugger;":
+        if line.strip() != "#" and line.strip() != "debugger;" and line.strip() != "debugger":
             buffer_string += line
 
     if not args.test:
