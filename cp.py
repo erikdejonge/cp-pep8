@@ -1981,7 +1981,11 @@ def main(args):
 
     myfile.close()
 
-    sio_file2 = cStringIO.StringIO("\n" + buffer_string.rstrip())
+    buffer_string = buffer_string.rstrip()
+
+    if not buffer_string.startswith("#"):
+        buffer_string = "\n" + buffer_string
+    sio_file2 = cStringIO.StringIO(buffer_string)
     # open(args.myfile, "w").write()
 
     num = 0
