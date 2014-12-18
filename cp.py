@@ -642,6 +642,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 add_double_enter = True
             else:
                 add_enter = True
+    elif "it " in line and ("->" in line or "=>" in line):
+        debuginfo = "karma test"
+        add_enter = True
 
     elif "#noinspection" in line:
         debuginfo = "pycharm directive"
@@ -892,9 +895,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                             add_enter = True
     elif line.strip().find("warning") == 0 and ":" not in line and ">" not in line:
         debuginfo = "error state (wrning)"
-    elif "it " in line and ("->" in line or "=>" in line):
-        debuginfo = "karma test"
-        add_enter = True
     elif line.strip().startswith("_.each"):
         if scoped > 0:
             add_enter = False
@@ -1523,6 +1523,7 @@ def sanatize_line(line, next_line):
         line = line.replace("  is  ", " is ")
         line = line.replace("  is not  ", " is ")
     line = line.replace("coding = utf-8", "coding=utf-8")
+    line = line.replace("(by.", "(`by`.")
     line += "\n"
     return line
 
