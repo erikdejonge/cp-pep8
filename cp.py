@@ -434,6 +434,8 @@ def in_test(items, line, return_val=False, words=False):
     @return: @rtype:
     """
     for item in items:
+        if item.strip() == "if":
+            item = "if "
         if item == line:
             if return_val:
                 return item
