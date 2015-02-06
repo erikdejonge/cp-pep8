@@ -3,9 +3,15 @@
 """
 cp.py
 """
+modpylev = False
 import os
 import time
-import Levenshtein
+try:
+    import Levenshtein
+except ImportError:
+    import pylev
+    modpylev = True
+
 from argparse import ArgumentParser
 import sys
 reload(sys)
@@ -18,6 +24,12 @@ g_last_assignment_on_global_prefix = ""
 g_is_python = True
 g_almost_alike = 0
 
+def lev_dist(a, b):
+    if modpylev:
+        return pylev.levenshtein(a, b)
+    else:
+        return Levenshtein.distance(a, b)
+
 
 def almost_alike(s1, s2, scoped):
     alikeval = 10
@@ -28,9 +40,7 @@ def almost_alike(s1, s2, scoped):
     if (len(s1) < maxlength) or (len(s2) < maxlength):
         d = alikeval * 2
     else:
-        d = Levenshtein.distance(s1, s2)
-
-
+        d = lev_dist(s1, s2)
 
     if s1.strip().startswith("<") and s2.strip().startswith("<"):
         d = 10000
@@ -1778,7 +1788,16 @@ def init_cp(args, fname, myfile):
             buffer_string = buffer_string.replace("}\n.", "}\n\n.").replace("}\n@media", "}\n\n@media").replace("}\n#", "}\n\n#").replace("  }\n  .", "  }\n\n  .").replace("}\n@", "}\n\n@").replace("}\nbody", "}\n\nbody")
             myfile.close()
             open(str(args.myfile), "w").write(buffer_string)
+        if ".yml" in fname or ".yaml" in fname:
+            buffer_string = ""
+            myfile.seek(0)
+            for line in myfile:
+                if not line.startswith(" "):
+                    buffer_string += "\n"
 
+                buffer_string += line
+            buffer_string = buffer_string.replace(":\n\n-", ":\n-").strip().replace("\n\n---\n\n", "\n---\n")
+            open(str(args.myfile+".yml"), "w").write(buffer_string)
         myfile.close()
         exit(0)
         # mylines = open(args.myfile)
@@ -1992,9 +2011,6 @@ def main(args):
     # open(args.myfile, "w").write()
 
     num = 0
-
-
-
     buffer_string = ""
     for line in sio_file2:
         line = line.replace("@@@@", str(num))

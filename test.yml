@@ -1,0 +1,82 @@
+---
+write_files:
+- path: /etc/systemd/network/static.network
+  permissions: 644
+  owner: root
+  content: |+
+    [Match]
+    Name=ens34
+    [Network]
+    Address=192.168.14.41/24
+    Gateway=192.168.14.254
+    DNS=8.8.8.8
+    DNS=8.8.4.4
+- path: /etc/resolv.conf
+  permissions: 644
+  owner: root
+  content: |
+    nameserver 8.8.8.8
+- path: /etc/environment
+  permissions: 644
+  content: |-
+    COREOS_PUBLIC_IPV4=192.168.14.41
+    COREOS_PRIVATE_IPV4=127.0.0.1
+- path: /etc/ntp.conf
+  content: |
+    # Common pool
+    server 0.pool.ntp.org
+    server 1.pool.ntp.org
+    # - Allow only time queries, at a limited rate.
+    # - Allow all local queries (IPv4, IPv6)
+    restrict default nomodify nopeer noquery limited kod
+    restrict 127.0.0.1
+    restrict [::1]
+coreos:
+  update:
+    server: https://active8.update.core-os.net/v1/update/
+    group: f294d901-f14b-4370-9a43-ddb2cdb1ad02
+  etcd:
+    discovery: https://discovery.etcd.io/e5673c4169432836b9f1ca3e463eb6cc
+    addr: 192.168.14.41:4001
+    peer-addr: 192.168.14.41:7001
+    verbosity: 0
+  fleet:
+    public-ip: 192.168.14.41
+    etcd_servers: http://192.168.14.41:4001
+    verbosity: 0
+  units:
+  - name: etcd.service
+    command: start
+    enable: true
+  - name: fleet.service
+    command: start
+    enable: true
+  - name: settimezone.service
+    command: start
+    enable: true
+    content: |
+      [Unit]
+      Description=Set the timezone
+      [Service]
+      ExecStart=/usr/bin/timedatectl set-timezone Europe/Amsterdam
+      RemainAfterExit=yes
+      Type=oneshot
+  - name: docker-tcp.socket
+    command: start
+    enable: true
+    content: |+
+      [Unit]
+      Description=Docker Socket for the API
+      [Socket]
+      ListenStream=2375
+      Service=docker.service
+      BindIPv6Only=both
+      [Install]
+      WantedBy=sockets.target
+users:
+- name: rabshakeh
+  groups:
+  - docker
+  - systemd-journal
+  - sudo
+hostname: core1.a8.nl
