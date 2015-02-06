@@ -1797,7 +1797,7 @@ def init_cp(args, fname, myfile):
 
                 buffer_string += line
             buffer_string = buffer_string.replace(":\n\n-", ":\n-").strip().replace("\n\n---\n\n", "\n---\n")
-            open(str(args.myfile+".yml"), "w").write(buffer_string)
+            open(str(args.myfile), "w").write(buffer_string)
         myfile.close()
         exit(0)
         # mylines = open(args.myfile)
