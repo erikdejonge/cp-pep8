@@ -1792,11 +1792,20 @@ def init_cp(args, fname, myfile):
             buffer_string = ""
             myfile.seek(0)
             for line in myfile:
+                if "--" not in line:
+                    line = line.replace("-\n", "-")
+
                 if not line.startswith(" "):
                     buffer_string += "\n"
-
                 buffer_string += line
-            buffer_string = buffer_string.replace(":\n\n-", ":\n-").strip().replace("\n\n---\n\n", "\n---\n")
+            buffer_string = buffer_string.replace(":\n\n-", ":\n-").strip().replace("\n\n---\n\n", "\n---\n").replace("---\n\n", "---\n")
+            cnt = 50
+            for i in range(1, 50):
+
+                cnt = 50 - i
+                spaces = " " * cnt
+                print cnt, "[" + "-" + spaces + "]"
+                buffer_string = buffer_string.replace("- "+spaces, "- ")
             open(str(args.myfile), "w").write(buffer_string)
         myfile.close()
         exit(0)
