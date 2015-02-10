@@ -1791,14 +1791,22 @@ def init_cp(args, fname, myfile):
         if ".yml" in fname or ".yaml" in fname:
             buffer_string = ""
             myfile.seek(0)
+
             for line in myfile:
                 if "--" not in line:
                     line = line.replace("-\n", "-")
 
                 if not line.startswith(" "):
                     buffer_string += "\n"
+                if line.strip().endswith(":"):
+                    buffer_string += "\n"
+                if line.strip().endswith("drop-ins:"):
+                    buffer_string += "\n\n\n\n"
+                if line.strip().endswith("groups:"):
+                    buffer_string += "\n\n\n\n"
+
                 buffer_string += line
-            buffer_string = buffer_string.replace(":\n\n-", ":\n-").strip().replace("\n\n---\n\n", "\n---\n").replace("---\n\n", "---\n")
+            buffer_string = buffer_string.replace(":\n\n-", ":\n-").strip().replace("\n\n---\n\n", "\n---\n").replace("---\n\n", "---\n").replace("\n  - ", "\n\n  - ").replace(":\n\n    - ", ":\n    - ").replace("\n    - ", "\n\n    - ").replace(":\n\n    - ", ":\n    - ").replace(":\n\n", ":\n").replace("\n\n\n\n\n", "").replace("\n\n#", "\n#")
             cnt = 50
             for i in range(1, 50):
 
