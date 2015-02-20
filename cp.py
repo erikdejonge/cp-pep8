@@ -1776,6 +1776,7 @@ def init_cp(args, fname, myfile):
         data = data.replace("\n\n", "\n")
     data = data.replace(")->", ") ->")
     data = data.replace(")=>", ") =>")
+    data = data.replace("\t", "    ")
     for line in data.split("\n"):
         mylines.append(line + "\n")
     cnt = 0
@@ -1819,6 +1820,8 @@ def init_cp(args, fname, myfile):
         exit(0)
         # mylines = open(args.myfile)
         # mylines = cStringIO.StringIO(data)
+
+
     resolve_func = 0
     debuginfo = ""
     in_if = False
