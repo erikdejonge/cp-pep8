@@ -1794,6 +1794,9 @@ def init_cp(args, fname, myfile):
             myfile.seek(0)
 
             for line in myfile:
+                if line.startswith("-"):
+                    line = "\n" + line
+                    
                 if "--" not in line:
                     line = line.replace("-\n", "-")
 
