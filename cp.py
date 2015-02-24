@@ -2037,6 +2037,7 @@ def main(args):
     buffer_string = ""
     for line in sio_file2:
         line = line.replace("@@@@", str(num))
+        line = line.replace("#noinspection", "# noinspection")
         num += 1
         if line.strip() != "#" and line.strip() != "debugger;" and line.strip() != "debugger":
             buffer_string += line
