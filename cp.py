@@ -673,8 +673,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                     add_double_enter = False
         if next_line.rstrip().startswith("def "):
             add_double_enter = True
+            debuginfo += "next line def"
         if next_line.rstrip().startswith("class "):
             add_double_enter = True
+            debuginfo += "next line class"
 
     elif prev_line.strip().startswith("raise"):
         debuginfo = "raise"
@@ -845,13 +847,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if scoped >= 2:
             add_enter = True
             debuginfo += " new scope"
-
     elif global_object_method_call(line):
-        debuginfo = "global method call"
-        if "#noinspection" not in prev_line and "import " not in prev_line:
+        if not ("noinspection" in prev_line and "no1nspect1on" not in prev_line) and "import " not in prev_line:
+            debuginfo = "global method call"
             add_double_enter = True
         if "angular.module" in line:
-            debuginfo += " angular.module"
+            debuginfo = " angular.module"
             add_double_enter = False
             add_enter = True
     elif ": [" in line and not fname.endswith(".py"):
