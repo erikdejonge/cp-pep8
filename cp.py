@@ -2052,7 +2052,9 @@ def main(args):
             open(args.myfile, "w").write(buffer_string.rstrip() + "\n")
     else:
         print "file not written (test run)"
-
+    
+    if args.myfile.endswith(".py"):
+        os.system("autopep8 --in-place --max-line-length=300 --aggressive "+args.myfile)
 
 def lock_acquire(key):
     """
