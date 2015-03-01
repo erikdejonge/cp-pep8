@@ -643,9 +643,17 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if not next_line.strip().startswith("self.assert"):
             debuginfo += " single"
             add_enter = False
-
+    elif line.strip().startswith("Options:") and in_python_comment:
+        add_enter = True
+        debuginfo = "doc opt option"
+    elif line.strip().startswith("Usage:") and in_python_comment:
+        add_enter = True
+        debuginfo = "doc opt option"
+    elif line.strip().startswith("@return") and in_python_comment:
+        add_enter = False
+        debuginfo = "return"
     elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not '"""' in prev_line and not "param" in line and fname.endswith(".py"):
-        debuginfo = "property "
+        debuginfo = "propertyx "
         if func_def(prev_line):
             debuginfo += " after func"
         else:
@@ -1313,6 +1321,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             line_redone = line.replace(",", ",\n" + nesting * " ")
 
     if line.count('"""') % 2 != 0:
+        
         if in_python_comment:
             in_python_comment = False
         else:
@@ -1435,7 +1444,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     if in_python_comment:
         debuginfo += " in in_python_comment"
         add_double_enter = False
-        add_enter = False
+        #add_enter = False
 
         if line.strip().startswith("@param") and "args" not in line:
             if not next_line.strip().startswith("@type"):
@@ -2054,7 +2063,8 @@ def main(args):
         print "file not written (test run)"
     
     if args.myfile.endswith(".py"):
-        os.system("autopep8 --in-place --max-line-length=300 --aggressive "+args.myfile)
+        if "addtypes" not in buffer_string:
+            os.system("autopep8 --in-place --max-line-length=300 --aggressive "+args.myfile)
 
 def lock_acquire(key):
     """
