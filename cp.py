@@ -649,7 +649,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif line.strip().startswith("Usage:") and in_python_comment:
         add_enter = True
         debuginfo = "doc opt option"
-    elif line.strip().startswith("@return") and in_python_comment:
+    elif line.strip().startswith("@") and in_python_comment:
         add_enter = False
         debuginfo = "return"
     elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not '"""' in prev_line and not "param" in line and fname.endswith(".py"):
