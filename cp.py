@@ -1214,7 +1214,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                         if whitespace(prev_line) - whitespace(line) > 0:
                             add_enter = True
                             debuginfo += " scope>2 "
-            elif not func_test([func_def, scoped_method_call, method_call, class_method], prev_line.strip()):
+            elif not func_test([func_def, scoped_method_call, method_call, class_method], prev_line.strip()) :
                 debuginfo += " mcall not after functest "
                 if data_assignment(line, prev_line):
                     debuginfo += "method call data assignment " + str(if_cnt)
@@ -1250,8 +1250,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                                     add_enter = True
                                     debuginfo += " scope change "
 
-                if in_test(["$watch", "if", "else", "for", "while", "try:", "#noinspection"], prev_line.strip()):
-                    debuginfo += "method call after 1f 3lse or wtch"
+                if in_test(["$watch", "if", "else", "for", "while", "try:", "#noinspection", "= {"], prev_line.strip()):
+                    debuginfo += "method call after 1f 3lse or wtch or dct"
                     add_enter = False
                     add_double_enter = False
             else:
