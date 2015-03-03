@@ -637,7 +637,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             debuginfo += " start"
             add_enter = False
             if prev_line.strip() == '"""':
-                debuginfo += " after comment"
+                debuginfo += " after comment2"
                 add_enter = False
 
         if not next_line.strip().startswith("self.assert"):
@@ -681,10 +681,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                     add_double_enter = False
         if next_line.rstrip().startswith("def "):
             add_double_enter = True
-            debuginfo += "next line def"
+            debuginfo += " next line def"
         if next_line.rstrip().startswith("class "):
             add_double_enter = True
-            debuginfo += "next line class"
+            debuginfo += " next line class"
 
     elif prev_line.strip().startswith("raise"):
         debuginfo = "raise"
@@ -819,7 +819,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 add_enter = True
                 debuginfo += " has different prefix "
                 if comment(prev_line):
-                    debuginfo += " after comment"
+                    debuginfo += " after comment(3)"
                     add_enter = False
                 if line.strip().startswith("app = angular.module"):
                     add_enter = True
@@ -1006,7 +1006,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 add_double_enter = False
                 add_enter = False
             elif prev_line.strip().startswith("#"):
-                debuginfo += "after comment"
+                debuginfo += " after comment(4)"
+                if "PyUnresolvedReferences" in prev_line.strip():
+                    debuginfo += " pyinspection line"
+                    add_double_enter = False
+                    add_enter = False
             else:
                 add_double_enter = True
         else:
@@ -1073,7 +1077,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                     if fname.endswith(".py"):
                         debuginfo += " python"
                         if '"""' in prev_line:
-                            debuginfo += " after comment"
+                            debuginfo += " after comment(5)"
                         else:
                             debuginfo += " no enter"
                             add_enter = False
@@ -1165,7 +1169,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo = "with statement"
 
         if comment(prev_line) or '"""' in prev_line:
-            debuginfo += " after comment"
+            debuginfo += " after comment(1)"
         else:
             add_enter = True
     elif method_call(line) and not "raise" in line:
@@ -1232,7 +1236,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                             debuginfo += " after " + str(in_test_result(test_items, prev_line)).replace("print", "pr1nt")
                         else:
                             if comment(prev_line):
-                                debuginfo += " after comment"
+                                debuginfo += " after comment(2)"
                             else:
                                 debuginfo += " not after comment "
                                 if assignment(line) and not "_." in line:
@@ -1871,6 +1875,9 @@ def prepare_line(cnt, line, mylines):
     # line = line.replace("console?.log", "console?.log")
     # line = line.replace("console?.log?", "print")
     line = line.replace("# noinspection", "#noinspection")
+    next_line = next_line.replace("# noinspection", "#noinspection")
+    prev_line = prev_line.replace("# noinspection", "#noinspection")
+    
     line = line.replace("console?.error?", "warning")
     line = line.replace("console?.error", "warning")
     # line = line.replace("console.log", "print")
