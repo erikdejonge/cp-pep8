@@ -1171,7 +1171,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if comment(prev_line) or '"""' in prev_line:
             debuginfo += " after comment(1)"
         else:
-            add_enter = True
+            if not keyword(line):
+                add_enter = True
+            else:
+                debuginfo += "after keyword"
     elif method_call(line) and not "raise" in line:
         assigned = False
         debuginfo = "methodcall"
