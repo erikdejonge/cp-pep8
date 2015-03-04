@@ -2119,6 +2119,7 @@ if __name__ == "__main__":
     lock = os.path.dirname(os.path.join(os.getcwd(), args.myfile)) + "/cp"
     try:
         lock_acquire(lock)
+        
         main(args)
     finally:
         lock_release(lock)
