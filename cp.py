@@ -1013,6 +1013,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                     add_enter = False
             else:
                 add_double_enter = True
+                debuginfo += " commentblock"
         else:
             if not func_def(prev_line) and not comment(prev_line):
                 debuginfo = "function def nested"
@@ -2075,6 +2076,10 @@ def main(args):
     if args.myfile.endswith(".py"):
         if "addtypes" not in buffer_string:
             os.system("autopep8 --in-place --max-line-length=300 --aggressive "+args.myfile)
+            buf = open(args.myfile).read()
+            buf = buf.replace('):\n\n    """', '):\n    """')
+            buf = buf.replace('"""\n\n    def', '"""\n    def')
+            open(args.myfile, "w").write(buf)
 
 def lock_acquire(key):
     """
