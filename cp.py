@@ -2075,7 +2075,7 @@ def main(args):
     
     if args.myfile.endswith(".py"):
         if "addtypes" not in buffer_string:
-            os.system("autopep8 --in-place --max-line-length=300 --aggressive "+args.myfile)
+            os.system("autopep8 --in-place --max-line-length=340 --aggressive "+args.myfile)
             buf = open(args.myfile).read()
             buf = buf.replace('):\n\n    """', '):\n    """')
             buf = buf.replace('"""\n\n    def', '"""\n    def')
