@@ -1746,8 +1746,8 @@ def init_file(args):
         if args.test is None:
             if args.myfile.endswith(".conf"):
                 exit(0)
-            if args.myfile.endswith(".sh"):
-                exit(0)
+            #if args.myfile.endswith(".sh"):
+            #    exit(0)
 
             open(args.myfile, "w").write(content)
 
@@ -1800,7 +1800,8 @@ def init_cp(args, fname, myfile):
     cnt = 0
     location_id = 0
 
-    if ".cf" not in fname and ".py" not in fname and ".html" not in fname:
+    if ".cf" not in fname and ".py" not in fname and ".html" not in fname and ".sh" not in fname:
+
         if str(args.myfile).endswith(".less"):
             myfile.seek(0)
             buffer_string = myfile.read()
@@ -1996,6 +1997,7 @@ def main(args):
     if_cnt = 0
     in_python_comment = False
     for line in mylines:
+
         line_cnt += 1
         for v in watch_vars:
             if v.lower() in line.lower():
@@ -2080,6 +2082,11 @@ def main(args):
             buf = buf.replace('):\n\n    """', '):\n    """')
             buf = buf.replace('"""\n\n    def', '"""\n    def')
             open(args.myfile, "w").write(buf)
+    elif args.myfile.endswith(".sh"):
+        buf = open(args.myfile).read()
+        buf = buf.replace(" = (", "=(")
+        buf = buf.replace("=(", "=(\t")
+        open(args.myfile, "w").write(buf)
 
 def lock_acquire(key):
     """
