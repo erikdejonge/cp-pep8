@@ -1,3 +1,11 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from builtins import open
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
 # coding=utf-8
 import os
 import unittest
@@ -80,7 +88,7 @@ class CPTest(unittest.TestCase):
             oc, nc = self.run_cp(tf)
 
             if not oc == nc:
-                print "tests.py:83", tf
+                print("tests.py:83", tf)
 
             self.assertEqual(oc, nc)
             self.rmfile(tf)

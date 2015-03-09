@@ -1,8 +1,21 @@
-#!/usr/bin/python2.7
+#!/usr/local/bin/python3
 # coding=utf-8
 """
 cp.py
 """
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import absolute_import
+from builtins import open
+from builtins import int
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+import io
+from io import StringIO
+from past.utils import old_div
 modpylev = False
 import os
 import time
@@ -14,9 +27,7 @@ except ImportError:
 
 from argparse import ArgumentParser
 import sys
-reload(sys)
-# noinspection PyUnresolvedReferences
-sys.setdefaultencoding("utf-8")
+
 
 ADDCOMMENT_WITH_FOUND_TYPE = False
 datastructure_define = False
@@ -358,7 +369,7 @@ def indentation(line):
         if c != " ":
             break
         cnt += 1
-    return float(cnt) / 4
+    return old_div(float(cnt), 4)
 
 
 def data_assignment(line, prev_line):
@@ -426,7 +437,7 @@ def scope_diff(line, prev_line):
 
     lws = whitespace(line)
     pws = whitespace(prev_line)
-    dif = (pws - lws) / 4
+    dif = old_div((pws - lws), 4)
 
     return dif
 
@@ -1753,7 +1764,7 @@ def init_file(args):
 
         myfile = open(args.myfile)
     else:
-        print "no -f (file) given as argument"
+        print("no -f (file) given as argument")
         exit(1)
     buffer_string = ""
     num = 1
@@ -1785,7 +1796,7 @@ def init_cp(args, fname, myfile):
 
     # if fname.endswith(".py"):
     # variables.remove("event_emit")
-    import cStringIO
+    import io
     data = myfile.read()
     if "ADDTYPES" in data or "addtypes" in data:
         global ADDCOMMENT_WITH_FOUND_TYPE
@@ -1835,7 +1846,7 @@ def init_cp(args, fname, myfile):
 
                 cnt = 50 - i
                 spaces = " " * cnt
-                print cnt, "[" + "-" + spaces + "]"
+                print(cnt, "[" + "-" + spaces + "]")
                 buffer_string = buffer_string.replace("- "+spaces, "- ")
             open(str(args.myfile), "w").write(buffer_string)
         myfile.close()
@@ -1848,7 +1859,7 @@ def init_cp(args, fname, myfile):
     debuginfo = ""
     in_if = False
     first_method_factory = first_method_class = False
-    return cStringIO, cnt, color_vals_to_keep, debuginfo, first_method_class, first_method_factory, fname, in_if, location_id, mylines, resolve_func, undo_variables, variables, watch_vars
+    return StringIO, cnt, color_vals_to_keep, debuginfo, first_method_class, first_method_factory, fname, in_if, location_id, mylines, resolve_func, undo_variables, variables, watch_vars
 
 
 def prepare_line(cnt, line, mylines):
@@ -1984,14 +1995,14 @@ def main(args):
     @param args:
     """
     if args.myfile.endswith("cp.py"):
-        print "can't cp myself"
+        print("can't cp myself")
         return
 
     # print "cp.py -f", os.path.basename(os.path.dirname(args.myfile)) + "/" + os.path.basename(args.myfile)
 
     buffer_string, fname, myfile, num, orgfname = init_file(args)
 
-    cStringIO, cnt, color_vals_to_keep, debuginfo, first_method_class, first_method_factory, fname, in_if, location_id, mylines, resolve_func, undo_variables, variables, watch_vars = init_cp(args, fname, myfile)
+    StringIO, cnt, color_vals_to_keep, debuginfo, first_method_class, first_method_factory, fname, in_if, location_id, mylines, resolve_func, undo_variables, variables, watch_vars = init_cp(args, fname, myfile)
 
     line_cnt = 0
     if_cnt = 0
@@ -2001,7 +2012,7 @@ def main(args):
         line_cnt += 1
         for v in watch_vars:
             if v.lower() in line.lower():
-                print line
+                print(line)
 
         process_line = True
 
@@ -2053,7 +2064,7 @@ def main(args):
 
     if not buffer_string.startswith("#"):
         buffer_string = "\n" + buffer_string
-    sio_file2 = cStringIO.StringIO(buffer_string)
+    sio_file2 = io.StringIO(buffer_string)
     # open(args.myfile, "w").write()
 
     num = 0
@@ -2073,7 +2084,7 @@ def main(args):
         else:
             open(args.myfile, "w").write(buffer_string.rstrip() + "\n")
     else:
-        print "file not written (test run)"
+        print("file not written (test run)")
     
     if args.myfile.endswith(".py"):
         if "addtypes" not in buffer_string:
@@ -2123,10 +2134,11 @@ def lock_release(key):
 
 if __name__ == "__main__":
     args = arg_parse()
-    lock = os.path.dirname(os.path.join(os.getcwd(), args.myfile)) + "/cp"
-    try:
-        lock_acquire(lock)
-        
-        main(args)
-    finally:
-        lock_release(lock)
+    if args.myfile is not None:
+        lock = os.path.dirname(os.path.join(os.getcwd(), args.myfile)) + "/cp"
+        try:
+            lock_acquire(lock)
+
+            main(args)
+        finally:
+            lock_release(lock)
