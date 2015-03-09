@@ -2037,7 +2037,7 @@ def main(args):
 
         debuginfo, line = add_debuginfo(debuginfo, line)
 
-        if not in_python_comment:
+        if not in_python_comment and not args.myfile.endswith(".sh"):
             line = sanatize_line(line, str(next_line))
         else:
             line += "\n"
