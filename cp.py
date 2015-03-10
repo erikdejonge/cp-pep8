@@ -1565,6 +1565,7 @@ def sanatize_line(line, next_line):
         line = line.replace("  is not  ", " is ")
     line = line.replace("coding = utf-8", "coding=utf-8")
     line = line.replace("(by.", "(`by`.")
+    line = line.replace("print ()", "print()")
     line += "\n"
     return line
 
