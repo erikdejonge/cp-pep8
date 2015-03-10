@@ -2037,7 +2037,17 @@ def main(args):
 
         debuginfo, line = add_debuginfo(debuginfo, line)
 
-        if not in_python_comment and not args.myfile.endswith(".sh"):
+        if args.myfile.endswith(".sh"):
+            bashreplacements1 = [(" + ", "+"), (" - ", "-"), (" = ", "=")]
+            bashreplacements2 = [(x[0].lstrip(" "), x[1]) for x in bashreplacements1]
+            bashreplacements3 = [(x[0].rstrip(" "), x[1]) for x in bashreplacements1]
+            bashreplacements = bashreplacements1
+            bashreplacements.extend(bashreplacements2)
+            bashreplacements.extend(bashreplacements3)
+            for br in bashreplacements:
+                line = line.replace(br[0], br[1])
+            line += "\n"
+        elif not in_python_comment:
             line = sanatize_line(line, str(next_line))
         else:
             line += "\n"
