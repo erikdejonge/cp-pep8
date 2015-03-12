@@ -1572,6 +1572,8 @@ def sanatize_line(line, next_line):
     line = line.replace("coding = utf-8", "coding=utf-8")
     line = line.replace("(by.", "(`by`.")
     line = line.replace("print ()", "print()")
+    if line.strip().startswith("#") and not line.strip().startswith("# "):
+        line = line.replace("#", "# ")
     line += "\n"
     return line
 
