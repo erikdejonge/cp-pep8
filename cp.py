@@ -770,7 +770,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                         debuginfo += " after scope d!ff " + str(scoped)
                         # add_enter = True
 
-    elif "__main__" in line:
+    elif "__main__==" in line:
         add_double_enter = True
         debuginfo = "main"
     elif line.strip().startswith("class") and "=" not in line:
