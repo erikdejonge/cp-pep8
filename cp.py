@@ -2047,10 +2047,10 @@ def main(args):
         if args.myfile.endswith(".sh"):
             bashreplacements1 = [(" + ", "+"), (" - ", "-"), (" = ", "=")]
             bashreplacements2 = [(x[0].lstrip(" "), x[1]) for x in bashreplacements1]
-            bashreplacements3 = [(x[0].rstrip(" "), x[1]) for x in bashreplacements1]
+
             bashreplacements = bashreplacements1
             bashreplacements.extend(bashreplacements2)
-            bashreplacements.extend(bashreplacements3)
+
             for br in bashreplacements:
                 line = line.replace(br[0], br[1])
             line += "\n"
