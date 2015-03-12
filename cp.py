@@ -770,7 +770,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                         debuginfo += " after scope d!ff " + str(scoped)
                         # add_enter = True
 
-    elif "__main__==" in line:
+    elif "__main__" in line and "__name__" in line:
         add_double_enter = True
         debuginfo = "main"
     elif line.strip().startswith("class") and "=" not in line:
@@ -787,7 +787,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if not keyword(prev_line):
             if not double_meth_call(prev_line):
                 add_enter = True
-    elif line.strip().startswith("import") and fname.endswith(".py"):
+    elif line.strip().startswith("import") and fname.endswith(".py") and '"""' not in prev_line:
         debuginfo += "import"
         if prev_line.strip().startswith("import"):
             debuginfo += " after import"
