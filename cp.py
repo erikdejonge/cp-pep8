@@ -1373,7 +1373,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                         for typeitem in pls:
                             if typeitem != "self" and typeitem != "Exception" and typeitem != "object" and "admin." not in typeitem.lower() and "model." not in typeitem.lower():
                                 empty = False
-                                mytype = "str, unicode"
+                                mytype = "str"
                                 typeval = None
                                 if "=" in typeitem:
                                     tis = typeitem.split("=")
