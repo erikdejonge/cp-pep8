@@ -654,9 +654,15 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if not next_line.strip().startswith("self.assert"):
             debuginfo += " single"
             add_enter = False
-    elif line.strip().startswith("Options:") and in_python_comment:
+    elif line.strip().lower().startswith("options:") and in_python_comment:
         add_enter = True
-        debuginfo = "doc opt option"
+        debuginfo = "docopt options"
+    elif line.strip().lower().startswith("usage:") and in_python_comment:
+        add_enter = True
+        debuginfo = "docopt usage"
+    elif line.strip().lower().startswith("commands:") and in_python_comment:
+        add_enter = True
+        debuginfo = "docopt commands"
     elif "for " in line.strip() and in_python_comment:
         add_enter = False
         debuginfo = "for in python comment"
