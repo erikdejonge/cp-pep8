@@ -1296,7 +1296,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if prev_line.strip() == ")":
             debuginfo = " new line"
             add_enter = True
-    elif start_in_test(["class"], line):
+    elif start_in_test(["class"], line) and not start_in_test(["classifier"], line):
         debuginfo = "class"
         add_double_enter = True
     elif "except" in line:
