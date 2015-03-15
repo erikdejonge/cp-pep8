@@ -2009,7 +2009,7 @@ def main(args):
         main function
     @param args:
     """
-    if args.myfile.endswith("cp.py"):
+    if args.myfile.strip().lower() == "cp.py":
         print("can't cp myself")
         return
 
