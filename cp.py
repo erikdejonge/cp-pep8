@@ -1396,6 +1396,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                                     mytype = "list"
                                 elif "ids" in typeitem:
                                     mytype = "list"
+                                elif typeitem.endswith("s"):
+                                    mytype = "list"
+                                elif "commandline" in typeitem:
+                                    mytype = "Arguments"
+                                elif "argument" in typeitem.lower():
+                                    mytype = "Arguments"
                                 elif typeitem.startswith("d_"):
                                     mytype = "dict"
                                 elif typeitem.startswith("l_"):
