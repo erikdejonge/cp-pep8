@@ -1422,7 +1422,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                                     mytype = "ServerConfig"
                                 elif typeitem.startswith("dbase"):
                                     mytype = "CouchDBServer"
-                                elif typeitem.startswith("crypto_user") or typeitem.startswith("user"):
+                                elif typeitem.startswith("crypto_user"):
                                     mytype = "CryptoUser"
                                 elif typeitem == "cryptobox":
                                     mytype = "CryptoboxMetaData"
