@@ -1586,6 +1586,7 @@ def sanatize_line(line, next_line):
     line = line.replace("print ()", "print()")
     if line.strip().startswith("#") and not line.strip().startswith("# "):
         line = line.replace("#", "# ")
+    line = line.replace("# !", "#!")
     line += "\n"
     return line
 
