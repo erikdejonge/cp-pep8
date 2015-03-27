@@ -91,9 +91,9 @@ def replace_variables(orgfname):
     @return: @rtype:
     """
 
-    # variables = ["print", "warning", "event_emit"]
-    variables = ["utils.print_once", "broadcast_and_emit_event", "urls.http_error", "utils.digest_scope", "warning_server_error", "utils.digest_scope_debounce", "utils.assert_equal", "utils.assert_not_equal", "serverevents.subscribe", "warning", "emit_event_angular", "urls.slug_comand_timestamp", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
-    undo_variables = ["print", "warning"]
+    # variables = ["print", "event_emit"]
+    variables = ["utils.print_once", "broadcast_and_emit_event", "urls.http_error", "utils.digest_scope", "warning_server_error", "utils.digest_scope_debounce", "utils.assert_equal", "utils.assert_not_equal", "serverevents.subscribe", "emit_event_angular", "urls.slug_comand_timestamp", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
+    undo_variables = ["print"]
     watch_variables = []
     color_vals_to_keep = ['91m', '92m', '94m', '95m', '41m', '97m']
     if orgfname.endswith(".py"):
@@ -143,7 +143,7 @@ def anon_func(line):
     @return: @rtype:
     """
     line = str(line)
-    if in_test(["warning", "print"], line):
+    if in_test(["print"], line):
         return False
     if "->" in line:
         return True
@@ -207,7 +207,7 @@ def func_def(line):
         return False
     line = str(line)
 
-    if in_test(["warning", "print "], line):
+    if in_test(["print "], line):
         return False
 
     global g_is_python
@@ -291,7 +291,7 @@ def scoped_method_call(line):
     if functional(line):
         return False
 
-    if in_test(["warning", "print"], line):
+    if in_test([ "print"], line):
         return False
 
     line = str(line)
@@ -529,7 +529,7 @@ def is_member_var(line):
     @return: @rtype:
     """
     line = str(line)
-    if not "[" in line and not "]" in line and not "= {" in line and not "@param" in line and (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not in_test(["warning"], line) and not keyword(line):
+    if not "[" in line and not "]" in line and not "= {" in line and not "@param" in line and (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not keyword(line):
         return True
     return False
 
@@ -937,7 +937,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                                 add_enter = True
                         else:
                             add_enter = True
-    elif line.strip().find("warning") == 0 and ":" not in line and ">" not in line:
+    elif ":" not in line and ">" not in line:
         debuginfo = "error state (wrning)"
     elif line.strip().startswith("_.each"):
         if scoped > 0:
@@ -1728,16 +1728,12 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
                         line = line[:len(line) - 1]
                     for i in range(0, 5):
                         line = line.replace("print  ", "print ")
-                    if "warning(" in line:
-                        line = line.replace("warning(", "warning ")
-                        line = line[:len(line) - 1]
+
                     if "print_once(" in line:
                         line = line.replace("print_once(", "print_once ")
                         line = line[:len(line) - 1]
                     if "print" in line:
                         line = line.replace("print", "console.log")
-                    if "warning" in line:
-                        line = line.replace("warning", "console.error")
 
                 if found_color:
                     line += ", '\\033[m'"
@@ -1916,8 +1912,6 @@ def prepare_line(cnt, line, mylines):
     next_line = next_line.replace("# noinspection", "#noinspection")
     prev_line = prev_line.replace("# noinspection", "#noinspection")
     
-    line = line.replace("console?.error?", "warning")
-    line = line.replace("console?.error", "warning")
     # line = line.replace("console.log", "print")
 
     return add_double_enter, add_enter, line, next_line, prev_line, scoped
