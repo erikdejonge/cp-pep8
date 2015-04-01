@@ -938,7 +938,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                         else:
                             add_enter = True
     elif ":" not in line and ">" not in line:
-        debuginfo = "error state (wrning)"
+        if not in_python_comment:
+            debuginfo = "error state (wrning)"
     elif line.strip().startswith("_.each"):
         if scoped > 0:
             add_enter = False
@@ -1351,7 +1352,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if fname.endswith(".py"):
             line_redone = line.replace(",", ",\n" + nesting * " ")
 
-    if line.count('"""') % 2 != 0:
+    if line.count('"""') % 2 != 0 and not "strip" in line:
         
         if in_python_comment:
             in_python_comment = False
