@@ -1777,8 +1777,9 @@ def init_file(args):
             try:
                 import sortpythonmethods
                 sortpythonmethods.sortmethods(filename=os.path.abspath(args.myfile), writefile=True)
-            except:
+            except BaseException as be:
                 print("sortpythonmethods is not installed")
+                print(be)
         myfile = open(args.myfile)
         content = ""
         for i in myfile:
