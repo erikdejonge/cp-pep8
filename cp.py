@@ -636,7 +636,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo += ".factory"
 
 
-    elif line.startswith("class") and "=" not in line:
+    elif line.startswith("class ") and "=" not in line:
         if "noinspection" in prev_line:
             debuginfo += "class def after inspection"
         else:
@@ -779,7 +779,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif "__main__" in line and "__name__" in line:
         add_double_enter = True
         debuginfo = "main"
-    elif line.strip().startswith("class") and "=" not in line:
+    elif line.strip().startswith("class ") and "=" not in line:
         add_enter = True
         debuginfo = "class def"
     elif line.strip().startswith("<div") and prev_line.strip().startswith("</div"):
@@ -1766,6 +1766,11 @@ def init_file(args):
     @param args:
     @return: @rtype:
     """
+    try:
+        import sortpythonmethods
+    except:
+        os.system("pip3 install sortpythonmethods")
+
     myfile = None
     if args.myfile:
         if args.myfile.endswith(".py"):
@@ -1773,7 +1778,7 @@ def init_file(args):
                 import sortpythonmethods
                 sortpythonmethods.sortmethods(filename=os.path.abspath(args.myfile), writefile=True)
             except:
-                raise
+                print("sortpythonmethods is not installed")
         myfile = open(args.myfile)
         content = ""
         for i in myfile:
