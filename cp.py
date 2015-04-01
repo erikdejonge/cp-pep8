@@ -1769,14 +1769,15 @@ def init_file(args):
     try:
         import sortpythonmethods
     except:
-        os.system("pip3 install sortpythonmethods")
+        #os.system("pip3 install sortpythonmethods")
+        pass
 
     myfile = None
     if args.myfile:
         if args.myfile.endswith(".py"):
             try:
                 import sortpythonmethods
-                sortpythonmethods.sortmethods(filename=os.path.abspath(args.myfile), writefile=True)
+                #sortpythonmethods.sortmethods(filename=os.path.abspath(args.myfile), writefile=True)
             except BaseException as be:
                 print("sortpythonmethods is not installed")
                 import traceback
