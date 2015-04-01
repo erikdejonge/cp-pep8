@@ -1768,6 +1768,12 @@ def init_file(args):
     """
     myfile = None
     if args.myfile:
+        if args.myfile.endswith(".py"):
+            try:
+                import sortpythonmethods
+                sortpythonmethods.sortmethods(filename=os.path.abspath(args.myfile), writefile=True)
+            except:
+                raise
         myfile = open(args.myfile)
         content = ""
         for i in myfile:
