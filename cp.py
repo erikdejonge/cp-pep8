@@ -937,9 +937,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                                 add_enter = True
                         else:
                             add_enter = True
-    elif ":" not in line and ">" not in line:
-        if not in_python_comment:
-            debuginfo = "error state (wrning)"
     elif line.strip().startswith("_.each"):
         if scoped > 0:
             add_enter = False
