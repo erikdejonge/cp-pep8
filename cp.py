@@ -881,7 +881,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif global_object_method_call(line):
         if not ("noinspection" in prev_line and "no1nspect1on" not in prev_line) and "import " not in prev_line:
             debuginfo = "global method call"
-            add_double_enter = True
+            add_enter = True
         if "angular.module" in line:
             debuginfo = " angular.module"
             add_double_enter = False
@@ -1221,9 +1221,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 g_last_assignment_on_global_prefix = assignment_on_global_prefix
             else:
                 if "# noins" not in prev_line and "import " not in prev_line and "#noins" not in prev_line:
-                    add_enter = False
-                    add_double_enter = True
-                    debuginfo += "noins in prev"
+                    lastlinemethodcall = (method_call(prev_line) and scoped!=0)
+                    add_enter = not lastlinemethodcall
+                    add_double_enter = lastlinemethodcall
+                    debuginfo += "noins in pre, lastlinemethodcall:" + str(lastlinemethodcall)
                 if ")()" in line.strip():
                     debuginfo += " end mod"
                     add_enter = False
@@ -1465,9 +1466,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                             line_redone += "\n" + line.replace('"""', "") + docstring.lstrip()
 
     if "]" in line and not "[]" in line:
-        if datastructure_define:
-            debuginfo += " end datastructure_define"
-        datastructure_define = False
+        if line.rfind("]") > line.rfind('"'):
+            if datastructure_define:
+                debuginfo += " end datastructure_define"
+            datastructure_define = False
     if prev_line.strip() == "]":
         debuginfo += " prevline is ]"
         add_enter = True
@@ -1496,11 +1498,15 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     if not in_python_comment and line.strip() != '"""' and not assignment(line) and not func_def(line):
         alike = almost_alike(line, prev_line, scoped)
         if alike > 0:
-            add_enter = False
-            debuginfo = "almost alike"
+            if datastructure_define is False:
+                add_enter = False
+                add_double_enter = False
+                debuginfo = "almost alike"
         elif alike < 0 and scoped == 0:
-            #add_enter = True
-            debuginfo = "almost alike is over"
+            if datastructure_define is False:
+                add_enter = True
+                add_double_enter = False
+                debuginfo = "almost alike is over"
         debuginfo += " " + str(alike)
 
     debuginfo = debuginfo.replace("  ", " ")
