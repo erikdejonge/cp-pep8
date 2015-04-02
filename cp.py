@@ -689,8 +689,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo = "karma test"
         add_enter = True
 
-    elif "#noinspection" in line:
-        debuginfo = "pycharm directive"
+    elif "noinspection" in line:
+        debuginfo = ""
         if not keyword(prev_line) or "return" in prev_line or "raise" in prev_line:
             add_enter = True
         else:
@@ -708,7 +708,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if next_line.rstrip().startswith("class "):
             add_double_enter = True
             debuginfo += " next line class"
-
+        debuginfo = ""
     elif prev_line.strip().startswith("raise"):
         debuginfo = "raise"
         if "except" not in line and "else" not in line and not elif_switch(line):
@@ -1351,7 +1351,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             line_redone = line.replace(",", ",\n" + nesting * " ")
 
     if line.count('"""') % 2 != 0 and not "strip" in line:
-        
+
         if in_python_comment:
             in_python_comment = False
         else:
@@ -1533,7 +1533,6 @@ def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, 
         # if ".module" in prev_line:
         # cont = False
 
-
         if cont:
             if cnt - 1 > 0:
                 if not len(prev_line.strip()) is 0:
@@ -1555,6 +1554,8 @@ def add_debuginfo(debuginfo, line):
     @param line:
     @return: @rtype:
     """
+    if line.strip().startswith("#"):
+        return debuginfo, line
     if debuginfo:
         ef = line.find("\n")
         if ef > 0 and ef is not 0:
@@ -1769,22 +1770,9 @@ def init_file(args):
     @param args:
     @return: @rtype:
     """
-    try:
-        import sortpythonmethods
-    except:
-        #os.system("pip3 install sortpythonmethods")
-        pass
 
     myfile = None
     if args.myfile:
-        if args.myfile.endswith(".py"):
-            try:
-                import sortpythonmethods
-                #sortpythonmethods.sortmethods(filename=os.path.abspath(args.myfile), writefile=True)
-            except BaseException as be:
-                print("sortpythonmethods is not installed")
-                import traceback
-                traceback.print_exc()
 
         myfile = open(args.myfile)
         content = ""
@@ -1863,7 +1851,7 @@ def init_cp(args, fname, myfile):
             for line in myfile:
                 if line.startswith("-"):
                     line = "\n" + line
-                    
+
                 if "--" not in line:
                     line = line.replace("-\n", "-")
 
@@ -1911,6 +1899,7 @@ def prepare_line(cnt, line, mylines):
     next_line = ""
     if cnt > 1:
         prev_line = mylines[cnt - 1]
+    line = line.replace("# # ^", "## ^")
 
     if len(mylines) > cnt + 1:
         next_line = mylines[cnt + 1]
@@ -1930,7 +1919,7 @@ def prepare_line(cnt, line, mylines):
     line = line.replace("# noinspection", "#noinspection")
     next_line = next_line.replace("# noinspection", "#noinspection")
     prev_line = prev_line.replace("# noinspection", "#noinspection")
-    
+
     # line = line.replace("console.log", "print")
 
     return add_double_enter, add_enter, line, next_line, prev_line, scoped
@@ -2029,7 +2018,7 @@ def main(args):
         main function
     @param args:
     """
-    if args.myfile.strip().lower() == "cp.py":
+    if "cp.py" in args.myfile.strip().lower():
         print("can't cp myself")
         return
 
@@ -2130,7 +2119,7 @@ def main(args):
             open(args.myfile, "w").write(buffer_string.rstrip() + "\n")
     else:
         print("file not written (test run)")
-    
+
     if args.myfile.endswith(".py"):
         if "addtypes" not in buffer_string:
             os.system("autopep8 --in-place --max-line-length=440 --aggressive "+args.myfile)

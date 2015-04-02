@@ -35,3 +35,4 @@ def f(a):
     @return: None
     """
     return 37 + -+a[42 - x: y**3]
+"""hello world"""
