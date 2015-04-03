@@ -2073,7 +2073,7 @@ def main(args):
             for br in bashreplacements:
                 line = line.replace(br[0], br[1])
             line += "\n"
-        elif not in_python_comment:
+        elif args.myfile.strip().endswith(".py") and not in_python_comment:
             line = sanatize_line(line, str(next_line))
         else:
             line += "\n"
