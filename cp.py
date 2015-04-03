@@ -2064,8 +2064,10 @@ def main(args):
         debuginfo, line = add_debuginfo(debuginfo, line)
 
         if args.myfile.endswith(".sh"):
+
+
             bashreplacements1 = [(" + ", "+"), (" - ", "-"), (" = ", "=")]
-            bashreplacements2 = [(x[0].lstrip(" "), x[1]) for x in bashreplacements1]
+            bashreplacements2 = [(x[0], x[1]) for x in bashreplacements1 if "==" not in x]
 
             bashreplacements = bashreplacements1
             bashreplacements.extend(bashreplacements2)
