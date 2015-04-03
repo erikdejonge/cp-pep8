@@ -1179,7 +1179,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo = "is_member_var "
         ls = line.strip().split(" ")
         first_word = ""
-        if ls > 0:
+        if len(ls) > 0:
             first_word = ls[0]
         if not keyword(first_word):
             debuginfo += " member initialization"
@@ -1495,7 +1495,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
 
         line_redone += '"""\n'
 
-    if not in_python_comment and line.strip() != '"""' and not assignment(line) and not func_def(line):
+    if not in_python_comment and line.strip() != '"""' and not assignment(line) and not func_def(line) and not "alias" in line:
         alike = almost_alike(line, prev_line, scoped)
         if alike > 0:
             if datastructure_define is False:
@@ -1508,7 +1508,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 add_double_enter = False
                 debuginfo = "almost alike is over"
         debuginfo += " " + str(alike)
-
+    if "alias " in line:
+        add_enter = False
+        add_double_enter = False
     debuginfo = debuginfo.replace("  ", " ")
     return in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line_redone
 
