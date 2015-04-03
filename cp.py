@@ -634,8 +634,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     if ".factory" in line:
         add_double_enter = True
         debuginfo += ".factory"
-
-
+    elif not line.startswith("import ") and not line.startswith("from ") and (prev_line.startswith("from ") or prev_line.startswith("import ")):
+        debuginfo = "imports over"
+        add_enter = True
     elif line.startswith("class ") and "=" not in line:
         if "noinspection" in prev_line:
             debuginfo += "class def after inspection"
@@ -793,6 +794,16 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if not keyword(prev_line):
             if not double_meth_call(prev_line):
                 add_enter = True
+    elif line.strip().startswith("from ") and fname.endswith(".py") and '"""' not in prev_line:
+        debuginfo += "from import"
+        if prev_line.strip().startswith("import "):
+            debuginfo += " after import"
+            add_enter = True
+        elif prev_line.strip().startswith("#noinspection"):
+            debuginfo += " after pycharm directive"
+            add_enter = False
+        else:
+            debuginfo += " after from"
     elif line.strip().startswith("import") and fname.endswith(".py") and '"""' not in prev_line:
         debuginfo += "import"
         if prev_line.strip().startswith("import"):
