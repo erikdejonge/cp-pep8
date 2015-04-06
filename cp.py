@@ -1522,6 +1522,17 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     if "alias " in line:
         add_enter = False
         add_double_enter = False
+    if line.startswith("__"):
+        debuginfo += " module declaration"
+        if prev_line.startswith("__"):
+            debuginfo += " after module declaration"
+            add_enter = False
+            add_double_enter = False
+        else:
+            debuginfo += " first"
+            add_enter = True
+            add_double_enter = False
+
     debuginfo = debuginfo.replace("  ", " ")
     return in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line_redone
 
