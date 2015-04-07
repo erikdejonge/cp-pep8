@@ -1599,15 +1599,13 @@ def sanatize_line(line, next_line):
     @param next_line:
     @return: @rtype:
     """
-
     if not line.strip().startswith("<") and not (line.strip().endswith(",") or ")" in next_line) and not in_test([")", "|=", "=>", "!=", "hotkeys", "==", "$(", "?", "ng-", "trim", "ansible", "strip", "match", "split", "input", "type=", "/=", "\=", ":", "replace", "element", "if ", "b64", "padding", "vagrant", "--", "]"], line):
-        line = line.replace("=>", "@>").replace("( ", "(").replace("=", " = ").replace("  =", " =").replace("=  ", "= ").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("* =", "*=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
+        line = line.replace("=>", "@>").replace("( ", "(").replace("@>", "=>").replace("< =", "<=").replace("> =", ">=").replace("+ =", "+=").replace("- =", "-=").replace("* =", "*=").replace("! =", "!=").replace('(" = ")', '("=")').replace('+ " = "', '+ "="')
         if not "+=" in line and not "++" in line:
             line = line.replace("+", " + ")
             line = line.replace("  +  ", " + ")
     for i in range(0, 10):
         line = line.replace("( ", "(")
-        line = line.replace("  =", " =")
         line = line.replace("  is  ", " is ")
         line = line.replace("  is not  ", " is ")
     line = line.replace("coding = utf-8", "coding=utf-8")
