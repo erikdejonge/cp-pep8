@@ -634,9 +634,6 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     if ".factory" in line:
         add_double_enter = True
         debuginfo += ".factory"
-    elif not line.startswith("import ") and not line.startswith("from ") and (prev_line.startswith("from ") or prev_line.startswith("import ")):
-        debuginfo = "imports over"
-        add_enter = True
     elif line.startswith("class ") and "=" not in line:
         if "noinspection" in prev_line:
             debuginfo += "class def after inspection"
@@ -1339,6 +1336,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif "angular.module" in line:
         debuginfo = "angular module"
         add_double_enter = True
+    elif not line.startswith("import ") and not line.startswith("from ") and (prev_line.startswith("from ") or prev_line.startswith("import ")):
+        debuginfo = "imports over"
+        add_enter = True
 
     elif "$." in line:
         if prev_line:
