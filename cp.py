@@ -1361,7 +1361,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if fname.endswith(".py"):
             line_redone = line.replace(",", ",\n" + nesting * " ")
 
-    if line.count('"""') % 2 != 0 and not "strip" in line:
+    if line.count('"""') % 2 != 0 and not "strip" in line and len(line.strip()) > 0 and line.strip()[0] == '"':
 
         if in_python_comment:
             in_python_comment = False
