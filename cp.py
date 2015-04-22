@@ -1291,8 +1291,12 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif line.strip().startswith("raise"):
         debuginfo = " raise"
         if not in_test(["if", "else", "except"], prev_line):
-            debuginfo += " after if"
-            add_enter = False
+
+            if scoped > 1:
+                debuginfo += " after big if"
+                add_enter = False
+            else:
+                add_enter = True
         elif not method_call(prev_line):
             debuginfo += " after methodcall"
             add_enter = False
