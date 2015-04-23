@@ -1801,10 +1801,11 @@ def init_file(args):
     if args.myfile:
 
         myfile = open(args.myfile)
-        print("/usr/local/bin/gofmt ", args.myfile)
+
         if args.myfile.strip().endswith(".go"):
-           os.system("/usr/local/bin/gofmt -s=True -w " + args.myfile)
-           exit(0)
+            print("/usr/local/bin/gofmt -s=True -w " + args.myfile)
+            os.system("/usr/local/bin/gofmt -s=True -w " + args.myfile)
+            exit(0)
 
         content = ""
         for i in myfile:
