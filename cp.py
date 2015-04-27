@@ -597,7 +597,7 @@ def double_meth_call(line):
     return "self" in line and line.count("()") > 1
 
 
-def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname):
+def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname, in_method_param_list):
     """
     @param fname:
     @param add_double_enter:
@@ -1365,6 +1365,21 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if fname.endswith(".py"):
             line_redone = line.replace(",", ",\n" + nesting * " ")
 
+
+    if line.count('(') % 2 != 0  and not (line[0] == '(') and in_method_param_list is False:
+        in_method_param_list = True
+
+
+
+
+
+    if line.count(')') % 2 != 0 and in_method_param_list:
+        in_method_param_list = False
+        debuginfo += " end method_param_list "
+
+    if in_method_param_list is True:
+        debuginfo += " method_param_list "
+
     if line.count('"""') % 2 != 0 and not "strip" in line and not (line[0] == '"' and not line.strip() == '"""'):
 
         if in_python_comment:
@@ -1510,7 +1525,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
 
         line_redone += '"""\n'
 
-    if not in_python_comment and line.strip() != '"""' and not assignment(line) and not func_def(line) and not "alias" in line:
+    if not in_method_param_list and not in_python_comment and line.strip() != '"""' and not assignment(line) and not func_def(line) and not "alias" in line:
         alike = almost_alike(line, prev_line, scoped)
         if alike > 0:
             if datastructure_define is False:
@@ -1538,7 +1553,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             add_double_enter = False
 
     debuginfo = debuginfo.replace("  ", " ")
-    return in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line_redone
+    return in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line_redone, in_method_param_list
 
 
 def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, mylines, prev_line):
@@ -2064,6 +2079,7 @@ def main(args):
     line_cnt = 0
     if_cnt = 0
     in_python_comment = False
+    in_method_param_list = False
     for line in mylines:
 
         line_cnt += 1
@@ -2080,7 +2096,7 @@ def main(args):
 
         add_double_enter, add_enter, line, next_line, prev_line, scoped = prepare_line(cnt, line, mylines)
 
-        in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line = coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname)
+        in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line, in_method_param_list = coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname, in_method_param_list)
 
         add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, prev_line, scoped, if_cnt)
 
