@@ -779,6 +779,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo = "main"
     elif line.strip().startswith("class ") and "=" not in line:
         add_enter = True
+
         debuginfo = "class def"
     elif line.strip().startswith("<div") and prev_line.strip().startswith("</div"):
         add_enter = True
@@ -1386,6 +1387,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             in_python_comment = False
         else:
             in_python_comment = True
+
             if next_line.count('"""') > 0 or "rtype" in next_line:
                 if "rtype" in next_line:
                     next_line = ""
@@ -1509,6 +1511,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         add_double_enter = False
         add_enter = False
     if in_python_comment:
+
         debuginfo += " in in_python_comment"
         add_double_enter = False
         #add_enter = False
@@ -1518,6 +1521,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 line_redone += "\n" + org_line.split("@param")[0] + "@type " + line.strip().split("@param")[1].split(":")[0].strip() + ": "
 
     if add_docstring and fname.endswith(".py") and not in_python_comment:
+
         line_redone += "\n"
         line_redone += " " * (whitespace(line) + 4)
         line_redone += '"""\n'
@@ -1527,6 +1531,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
 
     if not in_method_param_list and not in_python_comment and line.strip() != '"""' and not assignment(line) and not func_def(line) and not "alias" in line:
         alike = almost_alike(line, prev_line, scoped)
+
         if alike > 0:
             if datastructure_define is False:
                 add_enter = False
@@ -1553,6 +1558,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             add_double_enter = False
 
     debuginfo = debuginfo.replace("  ", " ")
+
     return in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line_redone, in_method_param_list
 
 
@@ -1598,6 +1604,7 @@ def add_debuginfo(debuginfo, line):
     @return: @rtype:
     """
     if line.strip().startswith("#"):
+
         return debuginfo, line
     if debuginfo:
         ef = line.find("\n")
@@ -2126,6 +2133,7 @@ def main(args):
             line = sanatize_line(line, str(next_line))
         else:
             line += "\n"
+
         restore_color = None
         if orgfname.strip().endswith(".py"):
             for color in color_vals_to_keep:
@@ -2175,8 +2183,11 @@ def main(args):
         if "addtypes" not in buffer_string:
             os.system("/usr/local/bin/autopep8 --in-place --max-line-length=440 --aggressive "+args.myfile)
             buf = open(args.myfile).read()
+            buf = buf.replace("class Meta(object):\n\n", "class Meta(object):\n")
             buf = buf.replace('):\n\n    """', '):\n    """')
             buf = buf.replace('"""\n\n    def', '"""\n    def')
+            if "# coding=utf-8" not in buf:
+                buf = "# coding=utf-8\n"+buf
             open(args.myfile, "w").write(buf)
     elif args.myfile.endswith(".sh"):
         buf = open(args.myfile).read()
