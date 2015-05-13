@@ -2184,6 +2184,7 @@ def main(args):
             os.system("/usr/local/bin/autopep8 --in-place --max-line-length=440 --aggressive "+args.myfile)
             buf = open(args.myfile).read()
             buf = buf.replace("class Meta(object):\n\n", "class Meta(object):\n")
+            buf = buf.replace("class Meta:\n\n", "class Meta(object):\n")
             buf = buf.replace('):\n\n    """', '):\n    """')
             buf = buf.replace('"""\n\n    def', '"""\n    def')
             if "# coding=utf-8" not in buf:
