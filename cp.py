@@ -1822,9 +1822,17 @@ def init_file(args):
     @param args:
     @return: @rtype:
     """
-
+    if args.myfile == "./":
+        print("Focus is on debug panel pycharm")
+        exit(1)
     myfile = None
     if args.myfile:
+        if not os.path.exists(args.myfile):
+            print("file does not exist:", args.myfile)
+            exit(1)
+        if os.path.isdir(args.myfile):
+            print("is folder:", args.myfile)
+            exit(1)
 
         myfile = open(args.myfile)
 
