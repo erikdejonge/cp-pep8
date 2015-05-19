@@ -655,6 +655,10 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif line.strip().lower().startswith("options:") and in_python_comment:
         add_enter = True
         debuginfo = "docopt options"
+    elif line.strip().lower().startswith("description:") and in_python_comment:
+        add_enter = True
+        debuginfo = "docopt options"
+
     elif line.strip().lower().startswith("usage:") and in_python_comment:
         add_enter = True
         debuginfo = "docopt usage"
