@@ -1701,11 +1701,11 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
         if replace_variable in check_split and len(line.strip()) > 0:
             if replace_variable + " = " not in line:
                 if fname.endswith(".py"):
-                    if "93m" in line:
+                    if "33m" in line:
                         found_color = True
-                        line = line.replace('"\\033[93m" + log_date_time_string(),', "")
-                        line = line.replace('"\\033[93m"', "")
-                        line = line.replace('93m', "")
+                        line = line.replace('"\\033[33m" + log_date_time_string(),', "")
+                        line = line.replace('"\\033[33m"', "")
+                        line = line.replace('33m', "")
                         line = line.replace('log_date_time_string(),', "")
                         line = line.replace(", '\\033[m'", "")
                     else:
@@ -1773,7 +1773,7 @@ def add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, or
 
                 if orgfname.endswith(".py"):
                     if found_color:
-                        line = line.replace("print(", "print \"\\033[93m\" + log_date_time_string(), ")
+                        line = line.replace("print(", "print \"\\033[33m\" + log_date_time_string(), ")
                     else:
                         line = line.replace("print(", "print ")
                     if line.strip().startswith("print"):
@@ -2151,13 +2151,13 @@ def main(args):
             for color in color_vals_to_keep:
                 if color in line:
                     restore_color = color
-                    line = line.replace(color, "93m")
+                    line = line.replace(color, "33m")
 
         if process_line:
             line = add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, orgfname, undo_variables, variables)
 
         if restore_color:
-            line = line.replace('93m', restore_color)
+            line = line.replace('33m', restore_color)
 
         buffer_string += line
         num += 1
