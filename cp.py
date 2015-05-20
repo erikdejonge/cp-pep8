@@ -95,7 +95,7 @@ def replace_variables(orgfname):
     variables = ["utils.print_once", "broadcast_and_emit_event", "urls.http_error", "utils.digest_scope", "warning_server_error", "utils.digest_scope_debounce", "utils.assert_equal", "utils.assert_not_equal", "serverevents.subscribe", "emit_event_angular", "urls.slug_comand_timestamp", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
     undo_variables = ["print"]
     watch_variables = []
-    color_vals_to_keep = ['91m', '92m', '34m', '95m', '41m', '97m']
+    color_vals_to_keep = ['91m', '32m', '34m', '95m', '41m', '97m']
     if orgfname.endswith(".py"):
         undo_variables.remove("print")
     return color_vals_to_keep, undo_variables, variables, watch_variables
