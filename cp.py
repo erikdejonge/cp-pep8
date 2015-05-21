@@ -597,7 +597,7 @@ def double_meth_call(line):
     return "self" in line and line.count("()") > 1
 
 
-def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname, in_method_param_list):
+def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname, in_method_param_list, mylines, line_cnt, in_python_comment_cnt):
     """
     @param fname:
     @param add_double_enter:
@@ -640,6 +640,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         else:
             add_double_enter = True
             debuginfo = "class def"
+        add_double_enter, add_enter, debuginfo = in_python_comment_test(add_double_enter, add_enter, debuginfo, in_python_comment)
     elif line.strip().startswith("self.assert") and scoped == 0:
         debuginfo = "testcase"
         if not prev_line.strip().startswith("self.assert"):
@@ -652,26 +653,26 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if not next_line.strip().startswith("self.assert"):
             debuginfo += " single"
             add_enter = False
-    elif line.strip().lower().startswith("options:") and in_python_comment:
+    elif line.strip().lower().startswith("options:"):
         add_enter = True
         debuginfo = "docopt options"
-    elif line.strip().lower().startswith("description:") and in_python_comment:
+    elif line.strip().lower().startswith("description:"):
         add_enter = True
         debuginfo = "docopt options"
 
-    elif line.strip().lower().startswith("usage:") and in_python_comment:
+    elif line.strip().lower().startswith("usage:") :
         add_enter = True
         debuginfo = "docopt usage"
-    elif line.strip().lower().startswith("commands:") and in_python_comment:
+    elif line.strip().lower().startswith("commands:"):
         add_enter = True
         debuginfo = "docopt commands"
     elif "for " in line.strip() and in_python_comment:
         add_enter = False
         debuginfo = "for in python comment"
-    elif line.strip().startswith("Usage:") and in_python_comment:
+    elif line.strip().startswith("Usage:"):
         add_enter = False
         debuginfo = "doc opt option"
-    elif line.strip().startswith("Commands:") and in_python_comment:
+    elif line.strip().startswith("Commands:"):
         add_enter = True
         debuginfo = "doc opt option"
     elif line.strip().startswith("@") and in_python_comment:
@@ -783,8 +784,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo = "main"
     elif line.strip().startswith("class ") and "=" not in line:
         add_enter = True
-
         debuginfo = "class def"
+        add_double_enter, add_enter, debuginfo = in_python_comment_test(add_double_enter, add_enter, debuginfo, in_python_comment)
     elif line.strip().startswith("<div") and prev_line.strip().startswith("</div"):
         add_enter = True
         debuginfo = "close div"
@@ -1121,6 +1122,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
             else:
                 debuginfo = "functiondef after functiondef"
                 line = line + "\n" + " c" * whitespace(line) + 'print "' + line.replace('"', "'") + "'\n"
+            add_double_enter, add_enter, debuginfo = in_python_comment_test(add_double_enter, add_enter, debuginfo, in_python_comment)
         if line.strip().startswith("def "):
             if not "(self" in line and not "(cls" in line and not "@" in prev_line and not prev_line.strip().startswith("def ") and not line.startswith(" ") and not "#noinspection" in prev_line:
                 add_enter = True
@@ -1167,7 +1169,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if scoped > 0:
             debuginfo = " with scope chage"
             add_enter = True
-
+        add_double_enter, add_enter, debuginfo = in_python_comment_test(add_double_enter, add_enter, debuginfo, in_python_comment)
     elif in_test_kw(["when"], line):
         debuginfo = in_test_result(["when"], line) + " statement"
     elif "pass" == prev_line.strip() and not in_test_result(["if", "elif", "else"], line):
@@ -1388,11 +1390,31 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     if line.count('"""') % 2 != 0 and not "strip" in line and not (line[0] == '"' and not line.strip() == '"""'):
 
         if in_python_comment:
-            in_python_comment = False
-        else:
-            in_python_comment = True
 
-            if next_line.count('"""') > 0 or "rtype" in next_line:
+            in_python_comment = False
+            in_python_comment_cnt -= 1
+        else:
+            if in_python_comment_cnt % 2 == 0:
+                in_python_comment = True
+                in_python_comment_cnt += 1
+            else:
+                in_python_comment_cnt -= 1
+            try:
+                line_cnt2 = line_cnt
+                while True:
+                    line2 = mylines[line_cnt2]
+
+                    if line2.startswith('"""'):
+                        break
+
+                    if "Usage:" in line2:
+                        in_python_comment = False
+
+                    line_cnt2 += 1
+            except IndexError:
+                pass
+
+            if in_python_comment is True and next_line.count('"""') > 0 or "rtype" in next_line:
                 if "rtype" in next_line:
                     next_line = ""
                 if "(" in prev_line:
@@ -1563,7 +1585,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
 
     debuginfo = debuginfo.replace("  ", " ")
 
-    return in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line_redone, in_method_param_list
+    return in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line_redone, in_method_param_list, in_python_comment_cnt
 
 
 def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, mylines, prev_line):
@@ -1992,7 +2014,7 @@ def prepare_line(cnt, line, mylines):
     return add_double_enter, add_enter, line, next_line, prev_line, scoped
 
 
-def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, prev_line, scoped, if_cnt):
+def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, prev_line, scoped, if_cnt, in_python_comment):
     """
 
 
@@ -2052,8 +2074,10 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
             if scoped >= 3:
                 if not class_method(line):
                     if not add_double_enter:
-                        debuginfo += " triple scope change"
+                        debuginfo += " triple scope change in_pythoncomment:" + str(in_python_comment)
                         add_enter = True
+
+
                     if elif_switch(line):
                         debuginfo += " in elif switch"
                         add_enter = False
@@ -2075,8 +2099,22 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                             add_double_enter = False
 
     # debuginfo += " ifcnt:" + str(if_cnt) + " double_enter:" + str(add_double_enter)+ " add_enter:" + str(add_enter)
-
+    add_double_enter, add_enter, debuginfo = in_python_comment_test(add_double_enter, add_enter, debuginfo, in_python_comment, line)
     return add_double_enter, add_enter, debuginfo, line
+
+
+def in_python_comment_test(add_double_enter, add_enter, debuginfo, in_python_comment, line=None):
+    if line is not None:
+        if line.strip().startswith('"""'):
+            in_python_comment = True
+
+    if in_python_comment is True:
+        if line is not None:
+            debuginfo += " com"+str(line.strip().startswith('"""'))
+        debuginfo += " (in python comment)"
+        add_double_enter = False
+        add_enter = False
+    return add_double_enter, add_enter, debuginfo
 
 
 # noinspection PyPep8Naming
@@ -2097,6 +2135,7 @@ def main(args):
 
     line_cnt = 0
     if_cnt = 0
+    in_python_comment_cnt = 0
     in_python_comment = False
     in_method_param_list = False
     for line in mylines:
@@ -2115,9 +2154,9 @@ def main(args):
 
         add_double_enter, add_enter, line, next_line, prev_line, scoped = prepare_line(cnt, line, mylines)
 
-        in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line, in_method_param_list = coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname, in_method_param_list)
+        in_python_comment, add_double_enter, add_enter, debuginfo, resolve_func, if_cnt, line, in_method_param_list, in_python_comment_cnt = coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class, first_method_factory, line, next_line, prev_line, resolve_func, scoped, if_cnt, in_python_comment, fname, in_method_param_list, mylines, line_cnt, in_python_comment_cnt)
 
-        add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, prev_line, scoped, if_cnt)
+        add_double_enter, add_enter, debuginfo, line = exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, debuginfo, line, next_line, prev_line, scoped, if_cnt, in_python_comment)
 
         add_enter, debuginfo, resolve_func = coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_line, resolve_func)
 
