@@ -2099,11 +2099,11 @@ def exceptions_coffeescript_pretty_printer(add_double_enter, add_enter, cnt, deb
                             add_double_enter = False
 
     # debuginfo += " ifcnt:" + str(if_cnt) + " double_enter:" + str(add_double_enter)+ " add_enter:" + str(add_enter)
-    add_double_enter, add_enter, debuginfo = in_python_comment_test(add_double_enter, add_enter, debuginfo, in_python_comment, line)
+    add_double_enter, add_enter, debuginfo = in_python_comment_test(add_double_enter, add_enter, debuginfo, in_python_comment, line, next_line, prev_line)
     return add_double_enter, add_enter, debuginfo, line
 
 
-def in_python_comment_test(add_double_enter, add_enter, debuginfo, in_python_comment, line=None):
+def in_python_comment_test(add_double_enter, add_enter, debuginfo, in_python_comment, line=None, nextline=None, prevline=None):
     if line is not None:
         if line.strip().startswith('"""'):
             in_python_comment = True
@@ -2111,9 +2111,22 @@ def in_python_comment_test(add_double_enter, add_enter, debuginfo, in_python_com
     if in_python_comment is True:
         if line is not None:
             debuginfo += " com"+str(line.strip().startswith('"""'))
-        debuginfo += " (in python comment)"
-        add_double_enter = False
+        debuginfo += " (in p comment) "
+        if '"""' not in line:
+            add_double_enter = False
+            add_enter = False
+        else:
+            debuginfo += " starting python comment"
+        #if nextline.strip().startswith("#"):
         add_enter = False
+        if not prevline.strip().startswith("#") and line.strip().startswith("#"):
+            add_enter = True
+        if prevline.strip().startswith("["):
+            add_enter = False
+        if line.strip().startswith("["):
+            add_double_enter = True
+        if prevline.strip().startswith("["):
+            add_enter = False
     return add_double_enter, add_enter, debuginfo
 
 
