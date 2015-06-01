@@ -95,7 +95,9 @@ def replace_variables(orgfname):
     variables = ["utils.print_once", "broadcast_and_emit_event", "urls.http_error", "utils.digest_scope", "warning_server_error", "utils.digest_scope_debounce", "utils.assert_equal", "utils.assert_not_equal", "serverevents.subscribe", "emit_event_angular", "urls.slug_comand_timestamp", "urls.postcommand", "async_call_retries", "utils.set_time_out", "utils.set_interval"]
     undo_variables = ["print"]
     watch_variables = []
-    color_vals_to_keep = ['91m', '32m', '34m', '95m', '41m', '97m']
+    #color_vals_to_keep = ['91m', '32m', '34m', '95m', '41m', '97m']
+    color_vals_to_keep = ['30m', '31m', '32m', '33m', '34m', '35m', '36m', '37m', '38m', '39m', '90m', '91m', '92m', '93m', '94m', '95m', '96m', '97m', '98m', '99m']
+
     if orgfname.endswith(".py"):
         undo_variables.remove("print")
     return color_vals_to_keep, undo_variables, variables, watch_variables
@@ -678,7 +680,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif line.strip().startswith("@") and in_python_comment:
         add_enter = False
         debuginfo = "return"
-    elif line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not '"""' in prev_line and not "param" in line and fname.endswith(".py"):
+    elif not in_python_comment and not line.strip().startswith("@type") and not line.strip().startswith("@return") and line.strip().startswith("@") and not (line.strip().startswith("@m_") and ".setter" not in line) and not '"""' in prev_line and not "param" in line and fname.endswith(".py"):
         debuginfo = "propertyx "
         if func_def(prev_line):
             debuginfo += " after func"
@@ -2112,20 +2114,20 @@ def in_python_comment_test(add_double_enter, add_enter, debuginfo, in_python_com
         if line is not None:
             debuginfo += " com"+str(line.strip().startswith('"""'))
         debuginfo += " (in p comment) "
-        if '"""' not in line:
+        if line and '"""' not in line:
             add_double_enter = False
             add_enter = False
         else:
-            debuginfo += " starting python comment"
+            debuginfo += " python comment"
         #if nextline.strip().startswith("#"):
         add_enter = False
-        if not prevline.strip().startswith("#") and line.strip().startswith("#"):
+        if prevline and not prevline.strip().startswith("#") and line.strip().startswith("#"):
             add_enter = True
-        if prevline.strip().startswith("["):
+        if prevline and prevline.strip().startswith("["):
             add_enter = False
-        if line.strip().startswith("["):
+        if line and line.strip().startswith("["):
             add_double_enter = True
-        if prevline.strip().startswith("["):
+        if prevline and prevline.strip().startswith("["):
             add_enter = False
     return add_double_enter, add_enter, debuginfo
 
@@ -2198,18 +2200,9 @@ def main(args):
         else:
             line += "\n"
 
-        restore_color = None
-        if orgfname.strip().endswith(".py"):
-            for color in color_vals_to_keep:
-                if color in line:
-                    restore_color = color
-                    line = line.replace(color, "33m")
-
         if process_line:
             line = add_file_and_linenumbers_for_replace_vars(args, fname, line, location_id, orgfname, undo_variables, variables)
 
-        if restore_color:
-            line = line.replace('33m', restore_color)
 
         buffer_string += line
         num += 1
