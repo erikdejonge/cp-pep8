@@ -2294,5 +2294,6 @@ if __name__ == "__main__":
             lock_acquire(lock)
 
             main(args)
+            main(args)
         finally:
             lock_release(lock)
