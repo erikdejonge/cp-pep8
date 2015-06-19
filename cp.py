@@ -1438,8 +1438,9 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                                     tis = typeitem.split("=")
                                     typeitem = tis[0]
                                     typeval = tis[1].strip()
-
-                                if typeitem.startswith("i_"):
+                                if typeitem.startswith("arguments"):
+                                    mytype = "IArguments"
+                                elif typeitem.startswith("i_"):
                                     mytype = "int"
                                 elif "verbose" in typeitem:
                                     mytype = "bool"
