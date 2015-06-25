@@ -3,6 +3,7 @@
 """
 cp.py
 """
+
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
@@ -26,8 +27,6 @@ except ImportError:
     modpylev = True
 
 from argparse import ArgumentParser
-import sys
-
 
 ADDCOMMENT_WITH_FOUND_TYPE = False
 datastructure_define = False
@@ -1859,7 +1858,7 @@ def init_file(args):
             print("is folder:", args.myfile)
             exit(1)
 
-        myfile = open(args.myfile)
+        myfile = open(args.myfile, encoding="utf-8")
 
         if args.myfile.strip().endswith(".go"):
             print("/usr/local/bin/gofmt -s=True -w " + args.myfile)
@@ -1876,9 +1875,9 @@ def init_file(args):
             #if args.myfile.endswith(".sh"):
             #    exit(0)
 
-            open(args.myfile, "w").write(content)
+            open(args.myfile, "wt", encoding="utf-8").write(content)
 
-        myfile = open(args.myfile)
+        myfile = open(args.myfile, encoding="utf-8")
     else:
         print("no -f (file) given as argument")
         exit(1)
@@ -1935,7 +1934,7 @@ def init_cp(args, fname, myfile):
             buffer_string = myfile.read()
             buffer_string = buffer_string.replace("}\n.", "}\n\n.").replace("}\n@media", "}\n\n@media").replace("}\n#", "}\n\n#").replace("  }\n  .", "  }\n\n  .").replace("}\n@", "}\n\n@").replace("}\nbody", "}\n\nbody")
             myfile.close()
-            open(str(args.myfile), "w").write(buffer_string)
+            open(str(args.myfile), "wt", encoding="utf-8").write(buffer_string)
         if ".yml" in fname or ".yaml" in fname:
             buffer_string = ""
             myfile.seek(0)
@@ -1965,7 +1964,7 @@ def init_cp(args, fname, myfile):
                 spaces = " " * cnt
                 print(cnt, "[" + "-" + spaces + "]")
                 buffer_string = buffer_string.replace("- "+spaces, "- ")
-            open(str(args.myfile), "w").write(buffer_string)
+            open(str(args.myfile), "wt", encoding="utf-8").write(buffer_string)
         myfile.close()
         exit(0)
         # mylines = open(args.myfile)
@@ -2230,29 +2229,29 @@ def main(args):
     if not args.test:
         if str(args.myfile).endswith(".coffee"):
             finalbuf = buffer_string.rstrip() + "\n"
-            open(args.myfile, "w").write(finalbuf)
+            open(args.myfile, "wt", encoding="utf-8").write(finalbuf)
 
         else:
-            open(args.myfile, "w").write(buffer_string.rstrip() + "\n")
+            open(args.myfile, "wt", encoding="utf-8").write(buffer_string.rstrip() + "\n")
     else:
         print("file not written (test run)")
 
     if args.myfile.endswith(".py"):
         if "addtypes" not in buffer_string:
             os.system("/usr/local/bin/autopep8 --in-place --max-line-length=440 --aggressive "+args.myfile)
-            buf = open(args.myfile).read()
+            buf = open(args.myfile, encoding="utf-8").read()
             buf = buf.replace("class Meta(object):\n\n", "class Meta(object):\n")
             buf = buf.replace("class Meta:\n\n", "class Meta(object):\n")
             buf = buf.replace('):\n\n    """', '):\n    """')
             buf = buf.replace('"""\n\n    def', '"""\n    def')
             if "# coding=utf-8" not in buf:
                 buf = "# coding=utf-8\n"+buf
-            open(args.myfile, "w").write(buf)
+            open(args.myfile, "wt", encoding="utf-8").write(buf)
     elif args.myfile.endswith(".sh"):
-        buf = open(args.myfile).read()
+        buf = open(args.myfile, encoding="utf-8").read()
         buf = buf.replace(" = (", "=(")
         buf = buf.replace("=(", "=(\t")
-        open(args.myfile, "w").write(buf)
+        open(args.myfile, "wt", encoding="utf-8").write(buf)
 
 def lock_acquire(key):
     """
