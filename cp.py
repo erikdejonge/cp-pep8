@@ -41,6 +41,15 @@ def lev_dist(a, b):
         return Levenshtein.distance(a, b)
 
 
+def help_line(s):
+    if "--" in s:
+        return True
+    elif s.strip().startswith("-"):
+        return True
+    else:
+        return False
+
+
 def almost_alike(s1, s2, scoped):
     alikeval = 10
     maxlength = 10
@@ -53,6 +62,8 @@ def almost_alike(s1, s2, scoped):
         d = lev_dist(s1, s2)
 
     if s1.strip().startswith("<") and s2.strip().startswith("<"):
+        d = 10000
+    elif help_line(s1) or help_line(s2):
         d = 10000
     elif (":" in s2 and ":" in s1):
         d = 1000
