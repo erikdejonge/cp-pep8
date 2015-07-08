@@ -1568,7 +1568,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
 
         line_redone += '"""\n'
 
-    if not in_method_param_list and not in_python_comment and line.strip() != '"""' and not assignment(line) and not func_def(line) and not "alias" in line:
+    if not in_method_param_list and not in_python_comment and line.strip() != '"""' and prev_line.strip() != '"""' and not assignment(line) and not func_def(line) and not "alias" in line:
         alike = almost_alike(line, prev_line, scoped)
 
         if alike > 0:
