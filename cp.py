@@ -541,6 +541,8 @@ def is_member_var(line):
     @return: @rtype:
     """
     line = str(line)
+    if "http" in line.lower():
+        return False
     if not "[" in line and not "]" in line and not "= {" in line and not "@param" in line and (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not keyword(line):
         return True
     return False
@@ -630,6 +632,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     g_is_python = fname.endswith(".py")
     add_docstring = False
     line_redone = org_line = line
+    if "demo.governet.nl" in line:
+        x = 4
 
     if scoped > 0:
         if if_cnt > 0:
@@ -809,6 +813,8 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if not keyword(prev_line):
             if not double_meth_call(prev_line):
                 add_enter = True
+    elif line.strip().startswith("import "):
+        debuginfo = "import"
     elif line.strip().startswith("from ") and fname.endswith(".py") and '"""' not in prev_line:
         debuginfo += "from import"
         if prev_line.strip().startswith("import "):
@@ -842,6 +848,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         debuginfo = "angular directive"
         add_enter = True
     elif assignment(line):
+
         debuginfo = "assignment"
         global datastructure_define
         if "[" in line and not "]" in line and not "\\033[" in line and not anon_func(line) and not func_def(line):
@@ -1649,6 +1656,8 @@ def add_debuginfo(debuginfo, line):
         ef = line.find("\n")
         if ef > 0 and ef is not 0:
             line = line.rstrip("\n")
+        if debuginfo.strip()=="0":
+            raise RuntimeError()
         line = line + " # ##^ " + debuginfo.replace("i", "1").replace("return", "retrn")
         if ef > 0 and ef is not 0:
             line += "\n"
