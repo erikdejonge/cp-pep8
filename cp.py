@@ -1588,7 +1588,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 add_enter = True
                 add_double_enter = False
                 debuginfo = "almost alike is over"
-        debuginfo += " " + str(alike)
+        debuginfo += " alike:" + str(alike)
     if "alias " in line:
         add_enter = False
         add_double_enter = False
@@ -1657,6 +1657,8 @@ def add_debuginfo(debuginfo, line):
         if ef > 0 and ef is not 0:
             line = line.rstrip("\n")
         if debuginfo.strip()=="0":
+            print(debuginfo)
+            print(line)
             raise RuntimeError()
         line = line + " # ##^ " + debuginfo.replace("i", "1").replace("return", "retrn")
         if ef > 0 and ef is not 0:
@@ -1889,6 +1891,9 @@ def init_file(args):
         for i in myfile:
             if str(i).strip() != "":
                 content += i
+        if "# # #" in content:
+            print("\033[31mPatterns of '# # #' occurs in file, cannot handle this with the type commenting\033[0m")
+            raise RuntimeError()
         if args.test is None:
             if args.myfile.endswith(".conf"):
                 exit(0)
