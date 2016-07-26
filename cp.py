@@ -2263,7 +2263,7 @@ def main(args):
 
     if args.myfile.endswith(".py"):
         if "addtypes" not in buffer_string:
-            os.system("/usr/local/bin/autopep8 --in-place --max-line-length=440 --aggressive "+args.myfile)
+            os.system("~/.pyenv/shims/autopep8 --in-place --max-line-length=440 --aggressive "+args.myfile)
             buf = open(args.myfile, encoding="utf-8").read()
             buf = buf.replace("class Meta(object):\n\n", "class Meta(object):\n")
             buf = buf.replace("class Meta:\n\n", "class Meta(object):\n")
