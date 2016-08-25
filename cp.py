@@ -1965,6 +1965,7 @@ def init_cp(args, fname, myfile):
             myfile.seek(0)
 
             for line in myfile:
+
                 if line.startswith("-"):
                     line = "\n" + line
 
@@ -2181,6 +2182,7 @@ def main(args):
     for line in mylines:
 
         line_cnt += 1
+
         for v in watch_vars:
             if v.lower() in line.lower():
                 print(line)
@@ -2245,6 +2247,7 @@ def main(args):
     num = 0
     buffer_string = ""
     for line in sio_file2:
+
         line = line.replace("@@@@", str(num))
         line = line.replace("#noinspection", "# noinspection")
         num += 1
@@ -2313,6 +2316,7 @@ def lock_release(key):
 
 if __name__ == "__main__":
     args = arg_parse()
+
     if args.myfile is not None:
         lock = os.path.dirname(os.path.join(os.getcwd(), args.myfile)) + "/cp"
         try:
