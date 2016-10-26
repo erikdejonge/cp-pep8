@@ -4,17 +4,18 @@
 cp.py
 """
 
+from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from __future__ import absolute_import
-from builtins import open
 from builtins import int
+from builtins import open
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
-from builtins import range
 import io
+
+from builtins import range
+from builtins import str
 from io import StringIO
 from past.utils import old_div
 modpylev = False
@@ -231,7 +232,8 @@ def func_def(line):
     if not is_func:
         if "def " in line and ":" in line:
             is_func = True
-
+        if line.startswith("function") and line.strip().endswith("{"):
+            is_func = True
     return is_func
 
 
@@ -2266,7 +2268,7 @@ def main(args):
 
     if args.myfile.endswith(".py"):
         if "addtypes" not in buffer_string:
-            os.system("~/.pyenv/shims/autopep8 --in-place --max-line-length=440 --aggressive "+args.myfile)
+            os.system("autopep8 --in-place --max-line-length=440 --aggressive "+args.myfile)
             buf = open(args.myfile, encoding="utf-8").read()
             buf = buf.replace("class Meta(object):\n\n", "class Meta(object):\n")
             buf = buf.replace("class Meta:\n\n", "class Meta(object):\n")
@@ -2275,10 +2277,11 @@ def main(args):
             if "# coding=utf-8" not in buf:
                 buf = "# coding=utf-8\n"+buf
             open(args.myfile, "wt", encoding="utf-8").write(buf)
-    elif args.myfile.endswith(".sh"):
+    elif args.myfile.endswith(".sh") or 'bash' in args.myfile:
         buf = open(args.myfile, encoding="utf-8").read()
         buf = buf.replace(" = (", "=(")
         buf = buf.replace("=(", "=(\t")
+        buf = buf.replace("\nfunction", "function")
         open(args.myfile, "wt", encoding="utf-8").write(buf)
 
 def lock_acquire(key):
