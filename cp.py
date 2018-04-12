@@ -1577,7 +1577,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
 
         line_redone += '"""\n'
 
-    if not in_method_param_list and not in_python_comment and line.strip() != '"""' and prev_line.strip() != '"""' and not assignment(line) and not func_def(line) and not "alias" in line:
+    if not line.endswith(',') and not in_method_param_list and not in_python_comment and line.strip() != '"""' and prev_line.strip() != '"""' and not assignment(line) and not func_def(line) and not "alias" in line:
         alike = almost_alike(line, prev_line, scoped)
 
         if alike > 0:
@@ -1682,7 +1682,14 @@ def sanatize_line(line, next_line):
         if not "+=" in line and not "++" in line:
             line = line.replace("+", " + ")
             line = line.replace("  +  ", " + ")
+    #if "==" in line and not in_test(["|=", "=>", "!=", "<=", ">=", "+=", "-="], line):
+    #    line = line.replace("==", " == ")
+    #elif "=" in line and not in_test(["|=", "=>", "!=", "<=", ">=", "-=", "+=", "=="], line):
+    #    line = line.replace("=", " = ")
+    
     for i in range(0, 10):
+        line = line.replace("  =  ", " = ")
+        line = line.replace("  ==  ", " == ")
         line = line.replace("( ", "(")
         line = line.replace("  is  ", " is ")
         line = line.replace("  is not  ", " is ")
@@ -2326,6 +2333,6 @@ if __name__ == "__main__":
             lock_acquire(lock)
 
             main(args)
-            main(args)
+            #main(args)
         finally:
             lock_release(lock)
