@@ -309,7 +309,7 @@ def scoped_method_call(line):
         return False
 
     line = str(line)
-    return ("= " in line and ("->" in line or "=>" in line)) or (scope_declaration(line) and "()" in line and line.find("     ") is not 0)
+    return ("= " in line and ("->" in line or "=>" in line)) or (scope_declaration(line) and "()" in line and line.find("     ") != 0)
 
 
 def some_func(line):
@@ -331,7 +331,7 @@ def assignment(line):
     if "memory.set" in line:
         return True
 
-    if "<=" not in line and ">=" not in line and "==" not in line and line.count("= ") is 1 and not is_member_var(line):
+    if "<=" not in line and ">=" not in line and "==" not in line and line.count("= ") == 1 and not is_member_var(line):
         if not some_func(line):
             return True
     return False
@@ -545,7 +545,7 @@ def is_member_var(line):
     line = str(line)
     if "http" in line.lower():
         return False
-    if not "[" in line and not "]" in line and not "= {" in line and not "@param" in line and (":" in line and not ".cf" in line) and (line.count(":") is 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not keyword(line):
+    if not "[" in line and not "]" in line and not "= {" in line and not "@param" in line and (":" in line and not ".cf" in line) and (line.count(":") == 1 and not '":"' in line and not "':'" in line) and not anon_func(line) and not keyword(line):
         return True
     return False
 
@@ -924,7 +924,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif ": [" in line and not fname.endswith(".py"):
         debuginfo = "struct coffeescript"
         add_enter = True
-        if line.find(" ") is 0:
+        if line.find(" ") == 0:
             debuginfo = " nested"
             add_enter = False
     elif class_method(line):
@@ -1017,7 +1017,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 add_enter = True
             if not in_test(["if", "else", "->", "=>"], prev_line):
                 add_enter = True
-    elif "if" in line and (line.strip().find("if") is 0 or line.strip().find("else") is 0 or line.strip().find("elif") is 0):
+    elif "if" in line and (line.strip().find("if") == 0 or line.strip().find("else") == 0 or line.strip().find("elif") == 0):
         debuginfo = " if statement"
 
         if scoped > 0:
@@ -1056,7 +1056,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if '"""' not in next_line:
             add_docstring = True
         debuginfo = "function def "
-        if line.find(" ") is not 0:
+        if line.find(" ") != 0:
             if prev_line.strip().startswith("@"):
                 debuginfo += "after property - "
                 add_double_enter = False
@@ -1164,7 +1164,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if prev_line:
             if not func_test([method_call, class_method], prev_line.strip()) and not in_test([".then", "if", "->", "=>", "else"], prev_line):
                 debuginfo += " method define or scoped method call"
-                if line.find(" ") is not 0:
+                if line.find(" ") != 0:
                     if len(prev_line) > 0:
                         add_double_enter = True
                     else:
@@ -1177,11 +1177,11 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
         if not resolve_func:
             debuginfo += "resolve result 3"
             add_enter = True
-            if line.count("    ") is 1 and not assignment(prev_line) and not func_def(prev_line):
+            if line.count("    ") == 1 and not assignment(prev_line) and not func_def(prev_line):
                 debuginfo = "anonymousfunction2"
                 datastructure_define = False
                 add_enter = True
-            if line.find(" ") is not 0:
+            if line.find(" ") != 0:
                 add_double_enter = True
         else:
             debuginfo = "resolve result 2"
@@ -1243,7 +1243,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
                 if scoped > 0:
                     debuginfo += "in python scope change "
                     add_enter = True
-        if line.find(" ") is not 0:
+        if line.find(" ") != 0:
             debuginfo += "method call global scope"
             if assigned:
                 add_double_enter = False
@@ -1350,7 +1350,7 @@ def coffee_script_pretty_printer(add_double_enter, add_enter, first_method_class
     elif line.lstrip().startswith("$scope") and in_test(["->", "=>"], line):
         debuginfo = "scoped method define"
         if prev_line:
-            if not ")" is prev_line.strip():
+            if not ")" == prev_line.strip():
                 add_enter = True
     elif "$(e" in line:
         debuginfo = "jquery"
@@ -1632,14 +1632,14 @@ def coffeescript_pretty_printer_emitter(add_double_enter, add_enter, cnt, line, 
 
         if cont:
             if cnt - 1 > 0:
-                if not len(prev_line.strip()) is 0:
+                if not len(prev_line.strip()) == 0:
                     line = "\n" + line
             if cnt - 2 > 0:
-                if not len(mylines[cnt - 2].strip()) is 0:
+                if not len(mylines[cnt - 2].strip()) == 0:
                     line = "\n" + line
     if add_enter:
         if cnt - 1 > 0:
-            if not len(prev_line.strip()) is 0:
+            if not len(prev_line.strip()) == 0:
                 line = "\n" + line
     return line
 
@@ -1656,14 +1656,14 @@ def add_debuginfo(debuginfo, line):
         return debuginfo, line
     if debuginfo:
         ef = line.find("\n")
-        if ef > 0 and ef is not 0:
+        if ef > 0 and ef != 0:
             line = line.rstrip("\n")
         if debuginfo.strip()=="0":
             print(debuginfo)
             print(line)
             raise RuntimeError()
         line = line + " # ##^ " + debuginfo.replace("i", "1").replace("return", "retrn")
-        if ef > 0 and ef is not 0:
+        if ef > 0 and ef != 0:
             line += "\n"
         debuginfo = ""
 
@@ -1686,7 +1686,7 @@ def sanatize_line(line, next_line):
     #    line = line.replace("==", " == ")
     #elif "=" in line and not in_test(["|=", "=>", "!=", "<=", ">=", "-=", "+=", "=="], line):
     #    line = line.replace("=", " = ")
-    
+
     for i in range(0, 10):
         line = line.replace("  =  ", " = ")
         line = line.replace("  ==  ", " == ")
@@ -1721,7 +1721,7 @@ def coffeescript_pretty_print_resolve_function(add_enter, debuginfo, line, prev_
                         add_enter = True
                         debuginfo = "resolve func " + str(resolve_func)
 
-        if line.strip() is ")":
+        if line.strip() == ")":
             resolve_func = 0
             debuginfo = "resolve func stopped " + str(resolve_func)
 
